@@ -7,4 +7,101 @@ datasource db {
   provider = "postgresql"
 }
 
-// Add database models here when implementing features.
+enum Category {
+  NATURE           @map("ธรรมชาติ")
+  CULTURE_HERITAGE @map("วัฒนธรรมและประวัติศาสตร์")
+  ADVENTURE        @map("ผจญภัย")
+  MARINE           @map("ทางทะเล")
+  WELLNESS         @map("สุขภาพ")
+  CULINARY         @map("อาหาร")
+  RELIGIOUS        @map("ศาสนา")
+  AGRITOURISM      @map("เกษตร")
+  COMMUNITY        @map("ชุมชน")
+  SPORTS           @map("กีฬา")
+  ENTERTAINMENT    @map("บันเทิง")
+}
+
+enum Role {
+  OWNER
+  CAN_EDIT
+}
+
+model User {
+  user_id       Int      @id @default(autoincrement())
+  username      String
+  email         String   @unique
+  created_at    DateTime @default(now())
+  password_hash String
+
+  schedules schedule_member[]
+}
+
+model Schedule {
+  schedule_id   Int      @id @default(autoincrement())
+  schedule_name String
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  description   String?
+  visit_date    DateTime @db.Date
+  category      Category
+
+  items   ScheduleItem[]
+  members schedule_member[]
+}
+
+model ScheduleItem {
+  item_id     Int      @id @default(autoincrement())
+  sequence_no Int
+  visit_time  DateTime @db.Time(0)
+  date        DateTime @db.Date
+  schedule_id Int
+  location_id Int
+
+  schedule Schedule @relation(fields: [schedule_id], references: [schedule_id], onDelete: Cascade)
+  location Location @relation(fields: [location_id], references: [location_id])
+
+  @@index([schedule_id])
+  @@index([location_id])
+}
+
+model Location {
+  location_id Int    @id @default(autoincrement())
+  name        String
+  address     String
+  city_id     Int
+
+  city  City           @relation(fields: [city_id], references: [city_id])
+  items ScheduleItem[]
+
+  @@index([city_id])
+}
+
+model City {
+  city_id     Int    @id @default(autoincrement())
+  city_name   String
+  province_id Int
+
+  province  Province   @relation(fields: [province_id], references: [province_id])
+  locations Location[]
+
+  @@index([province_id])
+}
+
+model Province {
+  province_id   Int    @id @default(autoincrement())
+  province_name String
+
+  cities City[]
+}
+
+model schedule_member {
+  user_id     Int
+  schedule_id Int
+  role        Role @default(CAN_EDIT)
+
+  user     User     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  schedule Schedule @relation(fields: [schedule_id], references: [schedule_id], onDelete: Cascade)
+
+  @@id([user_id, schedule_id])
+  @@index([schedule_id])
+}
