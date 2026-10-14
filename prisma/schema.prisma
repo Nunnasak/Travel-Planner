@@ -43,6 +43,7 @@ model Schedule {
   updated_at    DateTime @updatedAt
   description   String?
   visit_date    DateTime @db.Date
+  cover_url     String?
   category      Category
 
   items   ScheduleItem[]
@@ -69,6 +70,7 @@ model Location {
   name        String
   address     String
   city_id     Int
+  image_url   String?
 
   city  City           @relation(fields: [city_id], references: [city_id])
   items ScheduleItem[]
