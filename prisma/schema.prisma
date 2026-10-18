@@ -9,7 +9,7 @@ datasource db {
 
 enum Category {
   NATURE           @map("ธรรมชาติ")
-  CULTURE_HERITAGE @map("วัฒนธรรมและประวัติศาสตร์")
+  CULTURE          @map("วัฒนธรรม")
   ADVENTURE        @map("ผจญภัย")
   MARINE           @map("ทางทะเล")
   WELLNESS         @map("สุขภาพ")
