@@ -22,7 +22,8 @@ enum Category {
 }
 
 enum Role {
-  CAN_EDIT
+  EDITOR
+  VIEWER
 }
 
 model User {
@@ -103,7 +104,7 @@ model Province {
 model schedule_member {
   user_id     Int
   schedule_id Int
-  role        Role @default(CAN_EDIT)
+  role        Role @default(VIEWER)
 
   user     User     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   schedule Schedule @relation(fields: [schedule_id], references: [schedule_id], onDelete: Cascade)
