@@ -22,7 +22,6 @@ enum Category {
 }
 
 enum Role {
-  OWNER
   CAN_EDIT
 }
 
@@ -33,7 +32,8 @@ model User {
   created_at    DateTime @default(now())
   password_hash String
 
-  schedules schedule_member[]
+  memberships    schedule_member[]
+  ownedSchedules Schedule[]        @relation("ScheduleOwner")
 }
 
 model Schedule {
@@ -42,27 +42,31 @@ model Schedule {
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
   description   String?
-  visit_date    DateTime @db.Date
+  total_day     Int
   cover_url     String?
   category      Category
+  owner_id      Int
 
+  owner   User               @relation("ScheduleOwner", fields: [owner_id], references: [user_id], onDelete: Cascade)
   items   ScheduleItem[]
   members schedule_member[]
+
+  @@index([owner_id])
 }
 
 model ScheduleItem {
   item_id     Int      @id @default(autoincrement())
   sequence_no Int
   visit_time  DateTime @db.Time(0)
-  date        DateTime @db.Date
+  day_no      Int
   schedule_id Int
   location_id Int
 
   schedule Schedule @relation(fields: [schedule_id], references: [schedule_id], onDelete: Cascade)
   location Location @relation(fields: [location_id], references: [location_id])
 
-  @@index([schedule_id])
   @@index([location_id])
+  @@unique([schedule_id, day_no, sequence_no])
 }
 
 model Location {
