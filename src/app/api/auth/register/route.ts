@@ -1,39 +1,29 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { registerSchema } from "@/core/schema/auth";
+import { EmailAlreadyExistsError } from "@/core/errors/auth";
+import { container } from "@/infrastructure/container";
 
-export async function POST(req:NextRequest) {
-    let body: { email?: unknown; password?: unknown };
+export async function POST(request: Request) {
+  let json: unknown;
+  try {
+    json = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
 
-    try {
-        body = await req.json();
-    } catch {
-        return NextResponse.json(
-            { error: "รูปแบบข้อมูลไม่ถูกต้อง" },
-            { status: 400 }
-        );
+  const parsed = registerSchema.safeParse(json);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+  }
+
+  try {
+    const user = await container.registerUser.execute(parsed.data);
+    return NextResponse.json({ user }, { status: 201 });
+  } catch (error) {
+    if (error instanceof EmailAlreadyExistsError) {
+      return NextResponse.json({ error: "Email already exists" }, { status: 409 });
     }
-
-    const { email, password } = body;
-
-    if (typeof email !== "string" || typeof password !== "string" || !email || !password) {
-        return NextResponse.json(
-            { error: "กรุณากรอก email และ password" },
-            { status: 400 }
-        );
-    }
-
-    if (!isValidEmail(email)) {
-        return NextResponse.json(
-            { error: "รูปแบบ email ผิด" },
-            { status: 400 }
-        );
-    }
-
-    function isValidEmail(email: string): boolean {
-        const pattern: RegExp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.com$/;
-        return pattern.test(email);
-    }
-
-    return NextResponse.json(
-        { message: "สมัครสมาชิกสำเร็จ" },
-        { status: 201 });
+    console.error(error);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+  }
 }

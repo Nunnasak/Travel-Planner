@@ -32,7 +32,7 @@ enum Role {
 
 model User {
   user_id       Int      @id @default(autoincrement())
-  username      String
+  username      String   @default("user")
   email         String   @unique
   created_at    DateTime @default(now())
   password_hash String
