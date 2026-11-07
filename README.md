@@ -370,7 +370,53 @@ Compose configuration ที่ถูกต้องจะจบด้วย exi
 | `tests/mocks/` | Dependencies จำลอง |
 | `tests/helpers/` | Utilities สำหรับการทดสอบ |
 
-ปัจจุบันโฟลเดอร์เหล่านี้เป็น placeholders ยังไม่มี test framework, test cases หรือ `npm test` script และยังไม่ได้ตั้งค่า ESLint, formatter หรือ CI
+ยังไม่ได้ตั้งค่า ESLint หรือ formatter
+
+### 7.5 รันการทดสอบ
+
+โปรเจกต์ใช้ [Vitest](https://vitest.dev/) สำหรับ unit และ integration tests และใช้ [Playwright](https://playwright.dev/) สำหรับ E2E tests ต้อง generate Prisma Client ก่อนรัน tests ครั้งแรก:
+
+```bash
+npm run db:generate
+```
+
+**Unit tests** ไม่ต้องใช้ฐานข้อมูล:
+
+```bash
+npm run test:unit
+```
+
+**Integration tests** รันกับ PostgreSQL จริง โดยใช้ฐานข้อมูล `travel_planner_test` แยกจากฐานข้อมูลพัฒนา:
+
+```bash
+docker compose up -d database
+npm run test:integration
+```
+
+- ก่อนเริ่ม tests จะรัน `prisma db push --accept-data-loss` เพื่อสร้างฐานข้อมูล test (หากยังไม่มี) และ sync schema
+- ทุก test จะล้างข้อมูลในทุกตาราง หากต้องการใช้ฐานข้อมูลอื่น ให้ตั้งค่า `TEST_DATABASE_URL` (ดูตัวอย่างใน `.env.example`)
+- เพื่อป้องกันการลบข้อมูลผิดฐาน ชื่อฐานข้อมูลใน `TEST_DATABASE_URL` ต้องลงท้ายด้วย `_test` มิฉะนั้น tests จะไม่ทำงาน
+
+**E2E tests** ติดตั้ง browser ครั้งแรกก่อน แล้วรัน tests ซึ่งจะเริ่ม `npm run dev` ให้อัตโนมัติ (หรือใช้ dev server ที่รันอยู่แล้วบน port 3000):
+
+```bash
+npx playwright install chromium
+npm run test:e2e
+```
+
+รายงานผลอยู่ที่ `playwright-report/` เปิดดูได้ด้วย `npx playwright show-report`
+
+`npm test` รัน unit และ integration tests พร้อมกัน
+
+### 7.6 CI (GitHub Actions)
+
+`.github/workflows/ci.yml` ทำงานเมื่อ push ไปที่ `main` และทุก pull request โดยแบ่งเป็น 3 jobs ที่รันขนานกัน:
+
+| Job | สิ่งที่ตรวจสอบ |
+|---|---|
+| `check` | `db:validate`, `typecheck`, unit tests และ `build` |
+| `integration` | Integration tests กับ PostgreSQL 17 ใน service container |
+| `e2e` | Playwright E2E tests บน Chromium และ upload `playwright-report` เมื่อ job ล้มเหลว |
 
 ---
 
@@ -405,6 +451,9 @@ Compose configuration ที่ถูกต้องจะจบด้วย exi
 | ตรวจสอบ TypeScript | `npm run typecheck` |
 | สร้าง production build | `npm run build` |
 | รัน standalone server หลังเตรียม assets ตามหัวข้อ 5.4 | `node .next/standalone/server.js` |
+| รัน unit tests | `npm run test:unit` |
+| รัน integration tests (ต้องเริ่มฐานข้อมูลก่อน) | `npm run test:integration` |
+| รัน E2E tests | `npm run test:e2e` |
 | ตรวจสอบ Prisma schema | `npm run db:validate` |
 | Generate client หลังมี models | `npm run db:generate` |
 | สร้าง migration หลังมี models | `npm run db:migrate -- --name describe_change` |
