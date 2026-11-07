@@ -36,16 +36,49 @@ describe("createScheduleItemSchema", () => {
     expect(result.error?.issues[0]?.path).toEqual([field]);
   });
 
-  it("rejects an invalid visit_time", () => {
-    expect(createScheduleItemSchema.safeParse({ ...valid, visit_time: "not a date" }).success).toBe(
-      false,
-    );
+  it.each([
+    ["09:30", "1970-01-01T09:30:00.000Z"],
+    ["00:00", "1970-01-01T00:00:00.000Z"],
+    ["23:59:59", "1970-01-01T23:59:59.000Z"],
+  ])("accepts the time of day %j as visit_time", (input, expected) => {
+    const parsed = createScheduleItemSchema.parse({ ...valid, visit_time: input });
+
+    expect(parsed.visit_time.toISOString()).toBe(expected);
+  });
+
+  it("accepts a Date object as visit_time", () => {
+    const date = new Date("1970-01-01T08:15:00.000Z");
+
+    expect(createScheduleItemSchema.parse({ ...valid, visit_time: date }).visit_time).toEqual(date);
+  });
+
+  it.each([
+    null,
+    0,
+    true,
+    false,
+    "",
+    "9:30",
+    "24:00",
+    "09:60",
+    "not a date",
+    "2026-11-08T09:30",
+    new Date("invalid"),
+  ])("rejects %j as visit_time", (value) => {
+    const result = createScheduleItemSchema.safeParse({ ...valid, visit_time: value });
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.path).toEqual(["visit_time"]);
+    expect(result.error?.issues[0]?.message).toBe("Enter a time like 09:30 or 09:30:00.");
   });
 
   it("rejects missing required fields", () => {
     const { location_id: _omit, ...rest } = valid;
 
-    expect(createScheduleItemSchema.safeParse(rest).success).toBe(false);
+    const result = createScheduleItemSchema.safeParse(rest);
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues.map((issue) => issue.path)).toEqual([["location_id"]]);
   });
 });
 

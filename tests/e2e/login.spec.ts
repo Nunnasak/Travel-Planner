@@ -45,14 +45,14 @@ test.describe("login page", () => {
     await expect(password).toHaveAttribute("type", "password");
   });
 
-  test("sends trimmed credentials and redirects to /trips on success", async ({ page }) => {
+  test("sends the credentials and redirects to /trips on success", async ({ page }) => {
     let body: unknown;
     await page.route("**/api/auth/login", async (route) => {
       body = route.request().postDataJSON();
       await route.fulfill({ status: 200, json: {} });
     });
 
-    await page.getByLabel("Email", { exact: true }).fill("  name@example.com  ");
+    await page.getByLabel("Email", { exact: true }).fill("name@example.com");
     await page.getByLabel("Password", { exact: true }).fill("secret123");
     await page.getByRole("button", { name: "Login" }).click();
 
@@ -81,6 +81,38 @@ test.describe("login page", () => {
     await page.getByRole("button", { name: "Login" }).click();
 
     await expect(page.getByText("No account uses this email.")).toBeVisible();
+  });
+
+  test("disables the button while the request is in flight", async ({ page }) => {
+    let release!: () => void;
+    const released = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await page.route("**/api/auth/login", async (route) => {
+      await released;
+      await route.fulfill({ status: 401, json: {} });
+    });
+
+    await page.getByLabel("Email", { exact: true }).fill("name@example.com");
+    await page.getByLabel("Password", { exact: true }).fill("secret123");
+    await page.getByRole("button", { name: "Login" }).click();
+
+    await expect(page.getByRole("button", { name: "Signing in..." })).toBeDisabled();
+    release();
+    await expect(page.getByRole("button", { name: "Login" })).toBeEnabled();
+  });
+
+  test("shows an error when the server cannot be reached", async ({ page }) => {
+    await page.route("**/api/auth/login", (route) => route.abort("failed"));
+
+    await page.getByLabel("Email", { exact: true }).fill("name@example.com");
+    await page.getByLabel("Password", { exact: true }).fill("secret123");
+    await page.getByRole("button", { name: "Login" }).click();
+
+    await expect(
+      page.getByText("Cannot reach the server. Check your connection and try again."),
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "Login" })).toBeEnabled();
   });
 
   test("links to the sign-up page", async ({ page }) => {

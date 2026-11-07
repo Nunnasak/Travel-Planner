@@ -5,7 +5,7 @@ const DEFAULT_TEST_DATABASE_URL =
   "postgresql://travel_user:travel_password@localhost:5432/travel_planner_test?schema=public";
 
 export function getTestDatabaseUrl(): string {
-  const url = process.env.TEST_DATABASE_URL ?? DEFAULT_TEST_DATABASE_URL;
+  const url = process.env.TEST_DATABASE_URL || DEFAULT_TEST_DATABASE_URL;
   const dbName = new URL(url).pathname.replace(/^\//, "");
 
   if (!dbName.endsWith("_test")) {
@@ -18,22 +18,26 @@ export function getTestDatabaseUrl(): string {
   return url;
 }
 
+function getTestSchema(): string {
+  return new URL(getTestDatabaseUrl()).searchParams.get("schema") || "public";
+}
+
 export function createTestPrisma(): PrismaClient {
-  const adapter = new PrismaPg({ connectionString: getTestDatabaseUrl() });
+  const adapter = new PrismaPg(
+    { connectionString: getTestDatabaseUrl() },
+    { schema: getTestSchema() },
+  );
   return new PrismaClient({ adapter });
 }
 
-const TABLES = [
-  "ScheduleItem",
-  "ScheduleMember",
-  "Schedule",
-  "Location",
-  "City",
-  "Province",
-  "User",
-];
-
 export async function resetDb(prisma: PrismaClient): Promise<void> {
-  const tableList = TABLES.map((table) => `"${table}"`).join(", ");
-  await prisma.$executeRawUnsafe(`TRUNCATE TABLE ${tableList} RESTART IDENTITY CASCADE`);
+  const schema = getTestSchema();
+  const rows = await prisma.$queryRaw<{ tablename: string }[]>`
+    SELECT tablename FROM pg_tables
+    WHERE schemaname = ${schema} AND tablename <> '_prisma_migrations'
+  `;
+  if (rows.length === 0) return;
+
+  const tables = rows.map(({ tablename }) => `"${schema}"."${tablename}"`).join(", ");
+  await prisma.$executeRawUnsafe(`TRUNCATE TABLE ${tables} RESTART IDENTITY CASCADE`);
 }

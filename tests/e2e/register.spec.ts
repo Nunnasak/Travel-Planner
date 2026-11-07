@@ -83,6 +83,32 @@ test.describe("register page", () => {
     await expect(page).toHaveURL(/\/register$/);
   });
 
+  test("shows field errors returned by the server instead of the generic message", async ({
+    page,
+  }) => {
+    await page.route("**/api/auth/register", (route) =>
+      route.fulfill({ status: 409, json: { errors: { username: "That username is taken." } } }),
+    );
+
+    await fillForm(page, valid);
+    await page.getByRole("button", { name: "Sign up" }).click();
+
+    await expect(page.getByText("That username is taken.")).toBeVisible();
+    await expect(page.getByLabel("Username")).toHaveAttribute("aria-invalid", "true");
+    await expect(page.getByText("That email or username is already taken.")).toBeHidden();
+  });
+
+  test("shows an error when the server cannot be reached", async ({ page }) => {
+    await page.route("**/api/auth/register", (route) => route.abort("failed"));
+
+    await fillForm(page, valid);
+    await page.getByRole("button", { name: "Sign up" }).click();
+
+    await expect(
+      page.getByText("Cannot reach the server. Check your connection and try again."),
+    ).toBeVisible();
+  });
+
   test("links to the login page", async ({ page }) => {
     await page.getByRole("link", { name: "Log in" }).click();
 

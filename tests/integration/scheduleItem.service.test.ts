@@ -40,6 +40,21 @@ describe("ScheduleItemService.create", () => {
     await expect(prisma.scheduleItem.count()).resolves.toBe(1);
   });
 
+  it("stores a time-of-day visit_time and reads it back unchanged", async () => {
+    const item = await service.create(validItemInput(ctx, { visit_time: "14:45:30" }));
+
+    const stored = await prisma.scheduleItem.findUniqueOrThrow({ where: { item_id: item.item_id } });
+
+    expect(stored.visit_time.toISOString()).toBe("1970-01-01T14:45:30.000Z");
+  });
+
+  it("rejects a null visit_time instead of storing midnight", async () => {
+    await expect(
+      service.create(validItemInput(ctx, { visit_time: null })),
+    ).rejects.toBeInstanceOf(ZodError);
+    await expect(prisma.scheduleItem.count()).resolves.toBe(0);
+  });
+
   it("throws a ZodError for invalid input and writes nothing", async () => {
     await expect(service.create(validItemInput(ctx, { day_no: 0 }))).rejects.toBeInstanceOf(
       ZodError,
@@ -96,6 +111,18 @@ describe("ScheduleItemService.update", () => {
     await expect(
       prisma.scheduleItem.findUniqueOrThrow({ where: { item_id: created.item_id } }),
     ).resolves.toMatchObject({ sequence_no: 1 });
+  });
+
+  it("rejects moving an item into a slot that is already taken", async () => {
+    await service.create(validItemInput(ctx));
+    const second = await service.create(validItemInput(ctx, { sequence_no: 2 }));
+
+    const error = await service.update(second.item_id, { sequence_no: 1 }).catch((e: unknown) => e);
+
+    expect(prismaCode(error)).toBe("P2002");
+    await expect(
+      prisma.scheduleItem.findUniqueOrThrow({ where: { item_id: second.item_id } }),
+    ).resolves.toMatchObject({ sequence_no: 2 });
   });
 
   it("rejects an item that does not exist", async () => {
