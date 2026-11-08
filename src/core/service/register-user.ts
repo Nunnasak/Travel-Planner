@@ -17,7 +17,7 @@ export class RegisterUser {
     const passwordHash = await this.hasher.hash(input.password);
     const user = await this.users.create({
       email: input.email,
-      name: input.name,
+      name: input.username,
       passwordHash,
     });
 
