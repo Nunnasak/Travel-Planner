@@ -11,3 +11,17 @@ export class InvalidCredentialsError extends Error {
     this.name = "InvalidCredentialsError";
   }
 }
+
+export class UsernameAlreadyExistsError extends Error {
+  constructor() {
+    super("Username already exists");
+    this.name = "UsernameAlreadyExistsError";
+  }
+}
+
+export class DuplicateFieldsError extends Error {
+  constructor(public fields: { email?: boolean; username?: boolean }) {
+    super("Duplicate fields");
+    this.name = "DuplicateFieldsError";
+  }
+}

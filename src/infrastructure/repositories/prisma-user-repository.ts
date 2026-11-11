@@ -28,6 +28,11 @@ export class PrismaUserRepository implements UserRepository {
     return row ? toDomain(row) : null;
   }
 
+  async findByUsername(username: string): Promise<User | null> {
+    const row = await this.prisma.user.findUnique({ where: { username } });
+    return row ? toDomain(row) : null;
+  }
+
   async create(data: {
     email: string;
     name: string;
@@ -43,3 +48,4 @@ export class PrismaUserRepository implements UserRepository {
     return toDomain(row);
   }
 }
+
