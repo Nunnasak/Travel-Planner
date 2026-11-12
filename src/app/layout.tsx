@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Mitr, Noto_Sans_Thai } from "next/font/google";
 import "./globals.css";
+import Sidebar from "@/components/ui/sidebar";
+import Topbar from "@/components/ui/topbar";
 
 const mitr = Mitr({
   subsets: ["thai", "latin"],
@@ -24,8 +26,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${mitr.variable} ${notoSansThai.variable}`}>
-      <body>{children}</body>
+    <html lang="th" className={`${mitr.variable} ${notoSansThai.variable}`}>
+      <body>
+        <Topbar/>
+        <Sidebar/>
+        <div className="app-content">{children}</div>
+      </body>
     </html>
   );
 }
