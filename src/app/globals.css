@@ -417,7 +417,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 22px;
   overflow: hidden;
   border: 2px solid var(--border);
   border-radius: 12px;
@@ -436,6 +436,7 @@ body {
   border-radius: 50%;
   background: var(--avatar-bg);
   font-size: 10px;
+  margin-bottom: 10px;
 }
 .sb-user svg {
   flex: none;
@@ -444,8 +445,31 @@ body {
 }
 .sb-username {
   white-space: nowrap;
-  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  font-size: 16px;
   font-weight: 600;
+  transition: background 0.15s;
+  text-decoration: none;
+  color: var(--teal-btn);
+}
+.sb.is-open .sb-username {
+  opacity: 1;
+  transition-delay: 0.1s;
+}
+.sb-userid {
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.15s;
+  font-size: 14px;
+  font-weight: 100;
+  transition: background 0.15s;
+  text-decoration: none;
+  color: gray;
+}
+.sb.is-open .sb-userid {
+  opacity: 1;
+  transition-delay: 0.1s;
 }
 
 /* เมนูเด้งขึ้น */
@@ -504,6 +528,29 @@ body {
 .sb-item.is-active {
   color: var(--teal-btn);        /* ไอคอนตอนถูกเลือกบนพื้นเหลือง */
 }
+.sb-menu-link, .sb-menu button {
+  display: block;
+  width: 100%;
+  padding: 8px 16px;
+  border: 0;
+  background: none;
+  text-align: left;
+  color: black;
+  text-decoration: none;
+  font: inherit;
+}
+.sb-menu-link:hover,
+.sb-menu button:hover {
+  background: #f8f8f8;
+}
+.sb-menu-info {
+  padding: 8px 16px;
+  font-size: 12px;
+  color: #777;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 /*top-bar*/
 .topbar {
@@ -518,7 +565,6 @@ body {
   background: #fff;
   border-bottom: 2px solid var(--border);
 }
-
 .topbar-search {
   display: flex;
   width: 100%;

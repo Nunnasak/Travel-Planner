@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { SESSION_COOKIE } from "@/core/constants/session";
 
 // หน้าที่ต้อง login ก่อนถึงเข้าได้
-const PROTECTED = ["/discover", "/schedule"];
+const PROTECTED = ["/schdules", "/account"];
 // หน้าที่คน login แล้วไม่ควรเข้า
 const AUTH_PAGES = ["/login", "/register"];
 

@@ -7,14 +7,20 @@ import { pickFieldErrors, postJson } from "@/lib/api-client";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 
+type SidebarUser = {
+    name: string;
+    email: string;
+    id: number;
+} | null;
+
 const items = [
-  { key: "D", label: "Discover", icon: GlobeIcon, href: "/discover"  },
-  { key: "S", label: "My Schedule", icon: CalendarIcon, href: "/schdules"  },
+    { key: "D", label: "Discover", icon: GlobeIcon, href: "/discover" },
+    { key: "S", label: "My Schedule", icon: CalendarIcon, href: "/schdules" },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ user }: { user: SidebarUser | null }) {
     const router = useRouter();
-    const pathname = usePathname(); 
+    const pathname = usePathname();
     const [open, setOpen] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const [loggingOut, setLoggingOut] = useState(false);
@@ -25,21 +31,21 @@ export default function Sidebar() {
     };
 
     async function clickLogout() {
-    if (loggingOut) return;
-    setLoggingOut(true);
-    try {
-        const result = await postJson("/api/auth/logout", {});
-        if (result.ok) {
-            setMenuOpen(false);
-            router.push("/login");
-            router.refresh();
+        if (loggingOut) return;
+        setLoggingOut(true);
+        try {
+            const result = await postJson("/api/auth/logout", {});
+            if (result.ok) {
+                setMenuOpen(false);
+                router.push("/login");
+                router.refresh();
+            }
+        } catch {
+            // เชื่อมต่อไม่ได้
+        } finally {
+            setLoggingOut(false);
         }
-    } catch {
-        // เชื่อมต่อไม่ได้
-    } finally {
-        setLoggingOut(false);
     }
-}   
 
     return (
         <>
@@ -85,26 +91,43 @@ export default function Sidebar() {
 
                 {/* ผู้ใช้ */}
                 <div className="sb-user-wrap">
-                    {open && menuOpen && (
-                        <div className="sb-menu">
-                            <button>mail</button>
-                            <button>Account</button>
-                            <div className="sb-menu-line" />
-                            <button 
-                                onClick={clickLogout}
-                                disabled={loggingOut}
-                                className="strong">
-                                {loggingOut ? "Logging out..." : "Logout"}
+                    {user ? (
+                        <>
+                            {open && menuOpen && (
+                                <div className="sb-menu">
+                                    <div className="sb-menu-info">{user.email}</div>
+                                    <Link href="/account" className="sb-menu-link">Account</Link>
+                                    <div className="sb-menu-line" />
+                                    <button
+                                        onClick={clickLogout}
+                                        disabled={loggingOut}
+                                        className="strong">
+                                        {loggingOut ? "Logging out..." : "Logout"}
+                                    </button>
+                                </div>
+                            )}
+
+                            <button className="sb-user" onClick={() => open && setMenuOpen(!menuOpen)}>
+                                <span className="sb-avatar"><UserIcon /></span>
+                                <span className="sb-username">{user.name}  <span className="sb-userid">#{String(user.id).padStart(6, '0')}</span></span>
                             </button>
-                        </div>
+                        </>
+                    ) : (
+                        <>
+                            {open && menuOpen && (
+                                <div className="sb-menu">
+                                    <Link href="/login" className="sb-menu-link">Log in</Link>
+                                    <div className="sb-menu-line" />
+                                    <Link href="/register" className="sb-menu-link">Sign up</Link>
+                                </div>
+                            )}
+
+                            <button className="sb-user" onClick={() => open && setMenuOpen(!menuOpen)}>
+                                <span className="sb-avatar"><UserIcon /></span>
+                                <span className="sb-username">Guest</span>
+                            </button>
+                        </>
                     )}
-                    <button
-                        className="sb-user"
-                        onClick={() => open && setMenuOpen(!menuOpen)}
-                    >
-                        <UserIcon className="sb-avatar"/>
-                        {open && <span className="sb-username">user name</span>}
-                    </button>
                 </div>
             </aside>
         </>

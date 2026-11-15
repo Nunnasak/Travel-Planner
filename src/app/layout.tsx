@@ -4,6 +4,8 @@ import { Mitr, Noto_Sans_Thai } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/components/ui/sidebar";
 import Topbar from "@/components/ui/topbar";
+import { getSessionUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 const mitr = Mitr({
   subsets: ["thai", "latin"],
@@ -24,12 +26,14 @@ export const metadata: Metadata = {
   description: "Plan your trip around Thailand",
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const user = await getSessionUser();
+
   return (
     <html lang="th" className={`${mitr.variable} ${notoSansThai.variable}`}>
       <body>
         <Topbar/>
-        <Sidebar/>
+        <Sidebar user={user ? { name: user.name, email: user.email, id: user.id } : null} />
         <div className="app-content">{children}</div>
       </body>
     </html>
