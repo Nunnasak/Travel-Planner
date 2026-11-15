@@ -41,6 +41,21 @@ model User {
   ownedSchedules Schedule[]        @relation("ScheduleOwner")
 
   @@map("users")
+  sessions Session[]
+}
+
+model Session {
+  session_id Int      @id @default(autoincrement())
+  token_hash String   @unique
+  user_id    Int
+  expires_at DateTime
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([expires_at])
+  @@map("sessions")
 }
 
 model Schedule {

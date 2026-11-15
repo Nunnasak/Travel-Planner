@@ -158,8 +158,8 @@ body {
 
 /* ---------- auth pages ---------- */
 .auth-page {
-  position: relative;
-  min-height: 100vh;
+  position: static;
+  min-height: calc(100vh - var(--topbar-h));
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -169,6 +169,7 @@ body {
   border-radius: 50%;
   z-index: 0;
   pointer-events: none;
+  overflow: hidden;
 }
 .blob-teal {
   width: 380px;
@@ -194,6 +195,7 @@ body {
   bottom: -130px;
   right: 12%;
 }
+
 .auth-inner {
   position: relative;
   z-index: 1;
@@ -269,7 +271,7 @@ body {
 /*side-bar*/
 .app-content {
   margin-left: var(--sidebar-w);
-  min-height: 100vh;
+  min-height: calc(100vh - var(--topbar-h));;
 }
 
 /* ---------- Overlay ---------- */
@@ -307,42 +309,51 @@ body {
 /* หัว */
 .sb-head {
   flex: none;
+  width: var(--sidebar-w-open);  /* กว้างคงที่ ไม่ถูกบีบตอน sidebar หด */
   height: 70px;
   display: flex;
   align-items: center;
-  padding: 0 16px;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 0 15px;               /* โลโก้ 28px อยู่กลางตอนหุบพอดี */
+  text-decoration: none;
 }
-.sb-logo-mini {
+
+.sb-logo {
+  flex: none;
   display: block;
   width: 50px;
   height: 50px;
-  margin: 0 auto;          /* จัดกลาง */
+  margin: 0;
 }
-.sb-brand {
-  flex: 1;
-  min-width: 0;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;     /* โลโก้เป็นรูป ใช้ center ดูสมดุลกว่า baseline */
-  gap: 8px;
-}
-.sb-brand-title {
-  flex: none;              /* กันโดนบีบ/ยืด */
-  width: 50px;
-  height: 50px;
-}
+
 .sb-brand-sub {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  flex: 1;
+  white-space: nowrap;
   font-family: var(--font-mitr), sans-serif;
-  font-size: 26px;
+  font-size: 36px;
   font-weight: 600;
-  color: var(--teal-btn);      /* เดิมเป็นเทา #777 ซึ่งเล็กไปสำหรับชื่อแบรนด์ */
+  color: var(--teal-btn);
+  text-decoration: none;
 }
+
+.sb-brand-sub,
+.sb-collapse {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  text-decoration: none;
+}
+.sb.is-open .sb-brand-sub,
+.sb.is-open .sb-collapse {
+  opacity: 1;
+  pointer-events: auto;
+  transition-delay: 0.1s;
+  text-decoration: none;
+}
+
 .sb-collapse {
   flex: none;
-  margin-left: 8px;
   padding: 0;
   border: 0;
   background: none;
@@ -379,9 +390,12 @@ body {
   font-size: 14px;
   font-weight: 600;
   transition: background 0.15s;
+  text-decoration: none;
+  color: inherit;
 }
 .sb.is-open .sb-item {
   justify-content: flex-start;
+  padding: 0 0 0 16px;
 }
 .sb-item:hover {
   background: #f8f8f8;
@@ -408,20 +422,25 @@ body {
   border: 2px solid var(--border);
   border-radius: 12px;
   background: #fff;
+  padding: 0 12px 0 12px  ;
 }
-.sb.is-open .sb-user {
+.sb-user {
   justify-content: flex-start;
-  padding: 0 8px;
 }
 .sb-avatar {
   flex: none;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   display: grid;
   place-items: center;
   border-radius: 50%;
   background: var(--avatar-bg);
   font-size: 10px;
+}
+.sb-user svg {
+  flex: none;
+  width: 36px;           /* ขนาดไอคอนข้างในวงกลม */
+  height: 36px;
 }
 .sb-username {
   white-space: nowrap;
@@ -463,20 +482,22 @@ body {
 }
 
 .sb-item {
-  gap: 10px;                 /* ระยะระหว่างไอคอนกับข้อความ */
+  justify-content: flex-start;
+  padding: 0 0 0 16px; 
+  gap: 12px;                 /* ระยะระหว่างไอคอนกับข้อความ */
   color: #19b5a5;            /* สีไอคอน (currentColor จะตามค่านี้) */
-}
+} 
 
 .sb-icon {
   flex: none;                /* ไม่ให้ไอคอนถูกบีบ */
-  width: 20px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
   min-width: 20px;
 }
 
 .sb-label {
   color: var(--teal-btn);        /* ให้ข้อความยังเป็นสีเดิม */
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 600;
 }
 

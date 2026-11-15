@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { loginSchema } from "@/core/schema/auth";
 import { InvalidCredentialsError } from "@/core/errors/auth";
 import { container } from "@/infrastructure/container";
+import { SESSION_COOKIE } from "@/core/constants/session";
 
 export async function POST(request: Request) {
   let json: unknown;
@@ -17,15 +18,15 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { user, token } = await container.loginUser.execute(parsed.data);
+    const { user, token, expiresAt } = await container.loginUser.execute(parsed.data);
 
     const res = NextResponse.json({ user });
-    res.cookies.set("session", token, {
+    res.cookies.set(SESSION_COOKIE, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 วัน
+      expires: expiresAt,   // ตรงกับอายุใน DB
     });
     return res;
   } catch (error) {

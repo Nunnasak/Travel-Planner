@@ -1,30 +1,45 @@
 "use client";
 
 import { useState } from "react";
-import { GlobeIcon, CalendarIcon } from "./icon";
+import { GlobeIcon, CalendarIcon, UserIcon } from "./icon";
 import { Logo } from "@/components/ui/logo";
+import { pickFieldErrors, postJson } from "@/lib/api-client";
+import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 
 const items = [
-  { key: "D", label: "Discover", icon: GlobeIcon },
-  { key: "S", label: "My Schedule", icon: CalendarIcon },
+  { key: "D", label: "Discover", icon: GlobeIcon, href: "/discover"  },
+  { key: "S", label: "My Schedule", icon: CalendarIcon, href: "/schdules"  },
 ];
 
 export default function Sidebar() {
+    const router = useRouter();
+    const pathname = usePathname(); 
     const [open, setOpen] = useState(false);
-    const [locked, setLocked] = useState(false); // กันเปิดกลับทันทีหลังกดหุบ
-    const [active, setActive] = useState("D");
     const [menuOpen, setMenuOpen] = useState(false);
-
-    const collapse = () => {
-        setOpen(false);
-        setLocked(true);
-        setMenuOpen(false);
-    };
+    const [loggingOut, setLoggingOut] = useState(false);
 
     const collapseByOverlay = () => {
         setOpen(false);
         setMenuOpen(false);
     };
+
+    async function clickLogout() {
+    if (loggingOut) return;
+    setLoggingOut(true);
+    try {
+        const result = await postJson("/api/auth/logout", {});
+        if (result.ok) {
+            setMenuOpen(false);
+            router.push("/login");
+            router.refresh();
+        }
+    } catch {
+        // เชื่อมต่อไม่ได้
+    } finally {
+        setLoggingOut(false);
+    }
+}   
 
     return (
         <>
@@ -36,33 +51,15 @@ export default function Sidebar() {
             <aside
                 className={`sb ${open ? "is-open" : ""}`}
                 onMouseEnter={() => {
-                    if (!locked) setOpen(true);   // ใช้ locked ตรงนี้
+                    setOpen(true);   // ใช้ locked ตรงนี้
                 }}
-                onMouseLeave={() => setLocked(false)} // เมาส์ออก ปลดล็อก
+                onMouseLeave={() => setOpen(false)} // เมาส์ออก ปลดล็อก
             >
                 {/* ส่วนหัว */}
-                <div className="sb-head">
-                    {open ? (
-                        <>
-                            <div className="sb-brand">
-                                <Logo className="sb-brand-title"/>
-                                <div className="sb-brand-sub">ไปเรื่อย</div>
-                            </div>
-                            <button
-                                className="sb-collapse"
-                                aria-label="Collapse sidebar"
-                                onClick={collapse}
-                            >
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                                    <path d="M9 3v18" />
-                                </svg>
-                            </button>
-                        </>
-                    ) : (
-                        <Logo className="sb-logo-mini"/>
-                    )}
-                </div>
+                <Link href="/discover" className="sb-head" aria-label="Go to home">
+                    <Logo className="sb-logo" />
+                    <div className="sb-brand-sub">ไปเรื่อย</div>
+                </Link>
 
                 <div className="sb-divider" />
 
@@ -70,15 +67,18 @@ export default function Sidebar() {
                 <nav className="sb-nav">
                     {items.map((item) => {
                         const Icon = item.icon;
+                        const isActive =
+                            pathname === item.href || pathname.startsWith(item.href + "/");
+
                         return (
-                            <button
+                            <Link
                                 key={item.key}
-                                className={`sb-item ${active === item.key ? "is-active" : ""}`}
-                                onClick={() => setActive(item.key)}
+                                href={item.href}
+                                className={`sb-item ${isActive ? "is-active" : ""}`}
                             >
                                 <Icon className="sb-icon" />
                                 {open && <span className="sb-label">{item.label}</span>}
-                            </button>
+                            </Link>
                         );
                     })}
                 </nav>
@@ -90,15 +90,19 @@ export default function Sidebar() {
                             <button>mail</button>
                             <button>Account</button>
                             <div className="sb-menu-line" />
-                            <button className="strong">Logout</button>
+                            <button 
+                                onClick={clickLogout}
+                                disabled={loggingOut}
+                                className="strong">
+                                {loggingOut ? "Logging out..." : "Logout"}
+                            </button>
                         </div>
                     )}
-
                     <button
                         className="sb-user"
                         onClick={() => open && setMenuOpen(!menuOpen)}
                     >
-                        <span className="sb-avatar">U</span>
+                        <UserIcon className="sb-avatar"/>
                         {open && <span className="sb-username">user name</span>}
                     </button>
                 </div>

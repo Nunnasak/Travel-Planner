@@ -58,9 +58,9 @@ export function LoginForm() {
       } else {
         setFormError(
           result.data.message ??
-            (result.status === 401
-              ? "Email or password is incorrect."
-              : "Could not log in. Please try again.")
+          (result.status === 401
+            ? "Email or password is incorrect."
+            : "Could not log in. Please try again.")
         );
       }
     } catch {
@@ -72,7 +72,7 @@ export function LoginForm() {
   return (
     <section className="auth-card">
       <h1>Login</h1>
-      <p className="auth-subtitle">Sign in to manage your schedule</p>
+      <p className="auth-subtitle">Login to manage your schedule</p>
 
       <form onSubmit={handleSubmit} noValidate>
         <Input
