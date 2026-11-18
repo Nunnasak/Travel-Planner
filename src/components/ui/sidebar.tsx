@@ -15,7 +15,7 @@ type SidebarUser = {
 
 const items = [
     { key: "D", label: "Discover", icon: GlobeIcon, href: "/discover" },
-    { key: "S", label: "My Schedule", icon: CalendarIcon, href: "/schdules" },
+    { key: "S", label: "My Schedule", icon: CalendarIcon, href: "/schedules" },
 ];
 
 export default function Sidebar({ user }: { user: SidebarUser | null }) {

@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { user, token, expiresAt } = await container.loginUser.execute(parsed.data);
+    const { user, token, expiresAt, persistent } = await container.loginUser.execute(parsed.data);
 
     const res = NextResponse.json({ user });
     res.cookies.set(SESSION_COOKIE, token, {
@@ -26,7 +26,8 @@ export async function POST(request: Request) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      expires: expiresAt,   // ตรงกับอายุใน DB
+      // ติ๊ก remember → มีวันหมดอายุ, ไม่ติ๊ก → ไม่ใส่ = session cookie
+      ...(persistent ? { expires: expiresAt } : {}),
     });
     return res;
   } catch (error) {
