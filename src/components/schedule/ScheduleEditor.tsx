@@ -121,7 +121,12 @@ export default function ScheduleEditor({ plan }: { plan: ScheduleDetail }) {
               <h2>Plan</h2>
               <button type="button" className="btn-outline small" onClick={share}>Share</button>
             </div>
-            <DayList scheduleId={plan.schedule_id} days={plan.days} canEdit={plan.can_edit} />
+            <DayList
+              scheduleId={plan.schedule_id}
+              totalDays={plan.total_day}
+              days={plan.days}
+              canEdit={plan.can_edit}
+            />
           </section>
         </div>
       )}

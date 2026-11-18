@@ -3,19 +3,22 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { sendJson } from "@/lib/api-client";
 import { formatVisitTime, type ScheduleDay } from "@/lib/schedule";
+import AddPlaceModal from "./AddPlaceModal";
 
 const TINTS = ["#FFF0C2", "#FFDDD6", "#D6F1F7", "#E6E0FF", "#D3F3EE"];
 
 type Props = {
   scheduleId: number;
+  totalDays: number;
   days: ScheduleDay[];
   canEdit: boolean;
 };
 
-export default function DayList({ scheduleId, days, canEdit }: Props) {
+export default function DayList({ scheduleId, totalDays, days, canEdit }: Props) {
   const router = useRouter();
   const [busyId, setBusyId] = useState<number | null>(null);
   const [error, setError] = useState("");
+  const [addDay, setAddDay] = useState<number | null>(null);
 
   async function remove(itemId: number, name: string) {
     if (!confirm(`Remove "${name}" from this plan?`)) return;
@@ -64,8 +67,21 @@ export default function DayList({ scheduleId, days, canEdit }: Props) {
               )}
             </div>
           ))}
+          {canEdit && day.day_no <= totalDays && (
+            <button type="button" className="add-place-btn" onClick={() => setAddDay(day.day_no)}>
+              + Add plan
+            </button>
+          )}
         </div>
       ))}
+      {addDay !== null && (
+        <AddPlaceModal
+          scheduleId={scheduleId}
+          totalDays={totalDays}
+          initialDay={addDay}
+          onClose={() => setAddDay(null)}
+        />
+      )}
     </div>
   );
 }
