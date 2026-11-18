@@ -8,33 +8,54 @@ datasource db {
 }
 
 enum Category {
-  NATURE           @map("ธรรมชาติ")
-  CULTURE          @map("วัฒนธรรม")
-  ADVENTURE        @map("ผจญภัย")
-  MARINE           @map("ทางทะเล")
-  WELLNESS         @map("สุขภาพ")
-  CULINARY         @map("อาหาร")
-  RELIGIOUS        @map("ศาสนา")
-  AGRITOURISM      @map("เกษตร")
-  COMMUNITY        @map("ชุมชน")
-  SPORTS           @map("กีฬา")
-  ENTERTAINMENT    @map("บันเทิง")
+  NATURE        @map("nature")
+  CULTURE       @map("culture")
+  ADVENTURE     @map("adventure")
+  MARINE        @map("marine")
+  WELLNESS      @map("wellness")
+  CULINARY      @map("culinary")
+  RELIGIOUS     @map("religious")
+  AGRITOURISM   @map("agritourism")
+  COMMUNITY     @map("community")
+  SPORTS        @map("sports")
+  ENTERTAINMENT @map("entertainment")
+
+  @@map("category")
 }
 
 enum Role {
-  EDITOR
-  VIEWER
+  EDITOR @map("editor")
+  VIEWER @map("viewer")
+
+  @@map("role")
 }
 
 model User {
   user_id       Int      @id @default(autoincrement())
-  username      String
+  username      String   @unique
   email         String   @unique
   created_at    DateTime @default(now())
   password_hash String
 
   memberships    ScheduleMember[]
   ownedSchedules Schedule[]        @relation("ScheduleOwner")
+
+  @@map("users")
+  sessions Session[]
+}
+
+model Session {
+  session_id Int      @id @default(autoincrement())
+  token_hash String   @unique
+  user_id    Int
+  expires_at DateTime
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([expires_at])
+  @@map("sessions")
 }
 
 model Schedule {
@@ -49,12 +70,13 @@ model Schedule {
   is_public     Boolean  @default(false)
   owner_id      Int
 
-  owner   User               @relation("ScheduleOwner", fields: [owner_id], references: [user_id], onDelete: Cascade)
+  owner   User           @relation("ScheduleOwner", fields: [owner_id], references: [user_id], onDelete: Cascade)
   items   ScheduleItem[]
   members ScheduleMember[]
 
   @@index([owner_id])
-  @@index([is_public]) 
+  @@index([is_public])
+  @@map("schedules")
 }
 
 model ScheduleItem {
@@ -70,6 +92,7 @@ model ScheduleItem {
 
   @@index([location_id])
   @@unique([schedule_id, day_no, sequence_no])
+  @@map("schedule_items")
 }
 
 model Location {
@@ -79,10 +102,11 @@ model Location {
   city_id     Int
   image_url   String?
 
-  city  City           @relation(fields: [city_id], references: [city_id])
+  city  City          @relation(fields: [city_id], references: [city_id])
   items ScheduleItem[]
 
   @@index([city_id])
+  @@map("locations")
 }
 
 model City {
@@ -94,6 +118,7 @@ model City {
   locations Location[]
 
   @@index([province_id])
+  @@map("cities")
 }
 
 model Province {
@@ -101,6 +126,7 @@ model Province {
   province_name String
 
   cities City[]
+  @@map("provinces")
 }
 
 model ScheduleMember {
@@ -113,4 +139,5 @@ model ScheduleMember {
 
   @@id([user_id, schedule_id])
   @@index([schedule_id])
+  @@map("schedule_members")
 }

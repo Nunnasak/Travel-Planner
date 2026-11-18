@@ -45,7 +45,7 @@ test.describe("login page", () => {
     await expect(password).toHaveAttribute("type", "password");
   });
 
-  test("sends the credentials and redirects to /trips on success", async ({ page }) => {
+  test("sends the credentials and redirects to /discover on success", async ({ page }) => {
     let body: unknown;
     await page.route("**/api/auth/login", async (route) => {
       body = route.request().postDataJSON();
@@ -56,8 +56,8 @@ test.describe("login page", () => {
     await page.getByLabel("Password", { exact: true }).fill("secret123");
     await page.getByRole("button", { name: "Login" }).click();
 
-    await expect(page).toHaveURL(/\/trips$/);
-    expect(body).toEqual({ email: "name@example.com", password: "secret123" });
+    await expect(page).toHaveURL(/\/discover$/);
+    expect(body).toEqual({ email: "name@example.com", password: "secret123", remember: false });
   });
 
   test("shows an error when the credentials are wrong", async ({ page }) => {

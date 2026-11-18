@@ -18,6 +18,7 @@ export function LoginForm() {
   const [errors, setErrors] = useState<Errors>({});
   const [formError, setFormError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [agree, setAgree] = useState(false);
 
   function clearError(field: Field) {
     setErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -44,10 +45,11 @@ export function LoginForm() {
       const result = await postJson("/api/auth/login", {
         email: trimmedEmail,
         password,
+        remember: agree,
       });
 
       if (result.ok) {
-        router.push("/trips");
+        router.push("/discover");
         router.refresh();
         return;
       }
@@ -58,9 +60,9 @@ export function LoginForm() {
       } else {
         setFormError(
           result.data.message ??
-            (result.status === 401
-              ? "Email or password is incorrect."
-              : "Could not log in. Please try again.")
+          (result.status === 401
+            ? "Email or password is incorrect."
+            : "Could not log in. Please try again.")
         );
       }
     } catch {
@@ -72,7 +74,7 @@ export function LoginForm() {
   return (
     <section className="auth-card">
       <h1>Login</h1>
-      <p className="auth-subtitle">Sign in to manage your schedule</p>
+      <p className="auth-subtitle">เข้าสู่ระบบเพื่อจัดแผนท่องเที่ยว</p>
 
       <form onSubmit={handleSubmit} noValidate>
         <Input
@@ -103,11 +105,14 @@ export function LoginForm() {
           error={errors.password}
         />
 
-        <div className="auth-row">
-          <Link href="#" className="link">
-            Forgot password?
-          </Link>
-        </div>
+        <label className="check">
+          <input
+            type="checkbox"
+            checked={agree}
+            onChange={(e) => setAgree(e.target.checked)}
+          />
+          <span>จำรหัสผ่าน 30 วัน</span>
+        </label>
 
         {formError && (
           <p className="form-error" role="alert">
@@ -121,7 +126,7 @@ export function LoginForm() {
       </form>
 
       <p className="auth-switch">
-        Don&apos;t have account?{" "}
+        ยังไม่มีบัญชี?{" "}
         <Link href="/register" className="link">
           Sign up
         </Link>
