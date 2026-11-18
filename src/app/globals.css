@@ -85,6 +85,9 @@ body {
 .field {
   margin-bottom: 16px;
 }
+.field {
+  margin-bottom: 16px;
+}
 .field label {
   display: block;
   margin-bottom: 6px;
@@ -271,7 +274,7 @@ body {
 /*side-bar*/
 .app-content {
   margin-left: var(--sidebar-w);
-  min-height: calc(100vh - var(--topbar-h));;
+  min-height: calc(100vh - var(--topbar-h));
 }
 
 /* ---------- Overlay ---------- */
@@ -550,6 +553,43 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.check {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-bottom: 4px ;
+  bottom: 12px;
+}
+.check input {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--input-border);
+  border-radius: 5px;
+  background: #fff;
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+}
+.check input:checked {
+  background: #19b5a5;
+  border-color: #19b5a5;
+}
+.check input::after {
+  content: "";
+  width: 4px;
+  height: 8px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) scale(0);
+  transition: transform 0.12s;
+}
+.check input:checked::after {
+  transform: rotate(45deg) scale(1);
 }
 
 /*top-bar*/

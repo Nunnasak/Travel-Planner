@@ -96,7 +96,7 @@ export function RegisterForm() {
   return (
     <section className="auth-card">
       <h1>Sign up</h1>
-      <p className="auth-subtitle">Create an account to get started</p>
+      <p className="auth-subtitle">สมัครบัญชีเพื่อเริ่มต้นสร้างแผนการท่องเที่ยว</p>
 
       <form onSubmit={handleSubmit} noValidate>
         <Input
@@ -155,7 +155,7 @@ export function RegisterForm() {
       </form>
 
       <p className="auth-switch">
-        Already have account?{" "}
+        มีบัญชีอยู่แล้ว?{" "}
         <Link href="/login" className="link">
           Log in
         </Link>

@@ -5,7 +5,6 @@ import "./globals.css";
 import Sidebar from "@/components/ui/sidebar";
 import Topbar from "@/components/ui/topbar";
 import { getSessionUser } from "@/lib/auth";
-import { redirect } from "next/navigation";
 
 const mitr = Mitr({
   subsets: ["thai", "latin"],
@@ -22,6 +21,7 @@ const notoSansThai = Noto_Sans_Thai({
 });
 
 export const metadata: Metadata = {
+  icons:{icon: '/icon.svg',},
   title: "ไปเรื่อย",
   description: "Plan your trip around Thailand",
 };
