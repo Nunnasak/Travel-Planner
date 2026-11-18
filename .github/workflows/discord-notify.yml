@@ -1,10 +1,8 @@
 name: Discord notifications
 
 on:
-  push:
-    branches: ["**"]
   pull_request:
-    types: [opened, reopened, ready_for_review, closed]
+    types: [opened, reopened, closed]
 
 permissions: {}
 
@@ -16,59 +14,31 @@ jobs:
     env:
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
     steps:
-      - name: Build push message
-        if: github.event_name == 'push'
-        run: |
-          # Skip branch deletions and pushes with no new commits (e.g. force-push to an older commit)
-          if [ "$(jq '.deleted or (.commits | length == 0)' "$GITHUB_EVENT_PATH")" = "true" ]; then
-            echo "Nothing to announce"; exit 0
-          fi
-          jq '{
-            username: "GitHub",
-            embeds: [{
-              title: "[\(.repository.name):\(.ref | sub("^refs/heads/"; ""))] \(.commits | length) new commit\(if (.commits | length) > 1 then "s" else "" end)",
-              url: .compare,
-              color: 3447003,
-              author: { name: .sender.login, icon_url: .sender.avatar_url, url: .sender.html_url },
-              description: (
-                [ .commits[-5:][]
-                  | "[`\(.id[0:7])`](\(.url)) \(.message | split("\n")[0] | .[0:100]) - \(.author.name)" ]
-                | join("\n")
-              ) + (if (.commits | length) > 5 then "\n…and \((.commits | length) - 5) more" else "" end),
-              timestamp: .head_commit.timestamp
-            }]
-          }' "$GITHUB_EVENT_PATH" > payload.json
-
       - name: Build pull request message
-        if: github.event_name == 'pull_request'
         run: |
-          # On "closed", only announce merges
-          if [ "$(jq '.action == "closed" and (.pull_request.merged | not)' "$GITHUB_EVENT_PATH")" = "true" ]; then
-            echo "PR closed without merge, skipping"; exit 0
-          fi
           jq '.pull_request as $pr
-            | (if .action == "closed" then "merged"
-               elif .action == "ready_for_review" then "ready for review"
+            | (if .action == "closed" then (if $pr.merged then "merged" else "closed" end)
                else .action end) as $act
             | {
                 username: "GitHub",
                 embeds: [{
                   title: "PR #\($pr.number) \($act): \($pr.title)\(if $pr.draft then " (draft)" else "" end)",
                   url: $pr.html_url,
-                  color: (if $act == "merged" then 10181046 else 5763719 end),
+                  color: (if $act == "merged" then 10181046
+                          elif $act == "closed" then 15548997
+                          else 5763719 end),
                   author: { name: .sender.login, icon_url: .sender.avatar_url, url: .sender.html_url },
                   description: (($pr.body // "") | if length > 300 then .[0:300] + "…" else . end),
                   fields: [
                     { name: "Branch", value: "`\($pr.head.ref)` → `\($pr.base.ref)`", inline: true },
                     { name: "Changes", value: "\($pr.commits) commits, +\($pr.additions) / -\($pr.deletions)", inline: true }
                   ],
-                  timestamp: (if $act == "merged" then $pr.merged_at else $pr.updated_at end)
+                  timestamp: (if .action == "closed" then $pr.closed_at else $pr.updated_at end)
                 }]
               }' "$GITHUB_EVENT_PATH" > payload.json
 
       - name: Send to Discord
         run: |
-          if [ ! -f payload.json ]; then exit 0; fi
           if [ -z "$DISCORD_WEBHOOK_URL" ]; then
             echo "::warning::DISCORD_WEBHOOK_URL secret is not set (or not available to this PR), skipping"
             exit 0
