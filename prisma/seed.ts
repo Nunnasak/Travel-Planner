@@ -136,8 +136,29 @@ const plans: {
     stops: [[1, "10:00", "grandpalace"]] },
 ];
 
+// --reset wipes every schedule, so only allow it on a local database:
+// localhost on the host machine, or the "database" service inside docker compose.
+const LOCAL_DB_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]", "database"]);
+
+function assertLocalDatabase() {
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error("DATABASE_URL is not set. Check your .env file.");
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("Refusing to run --reset with NODE_ENV=production.");
+  }
+  const host = new URL(url).hostname;
+  if (!LOCAL_DB_HOSTS.has(host)) {
+    throw new Error(
+      `Refusing to run --reset against database host "${host}". ` +
+        "--reset deletes ALL schedules and places, so it only runs on a local database."
+    );
+  }
+}
+
 async function main() {
   const reset = process.argv.includes("--reset");
+  if (reset) assertLocalDatabase();
 
   if ((await prisma.province.count()) > 0) {
     if (!reset) {
