@@ -2,7 +2,30 @@ import { notFound } from "next/navigation";
 import CopyButton from "@/components/discover/CopyButton";
 import { DetailTopBar } from "@/components/discover/TopBar";
 import { categoryInfo } from "@/lib/categories";
-import { api, type PlanDetail as Plan } from "@/lib/discovery";
+import { NotFoundError } from "@/core/errors/not-found.error";
+import { discoveryService } from "@/infrastructure/container";
+import type { PlanDetail as Plan } from "@/lib/discovery";
+
+// Largest value a Postgres INT column can hold.
+const MAX_INT4 = 2_147_483_647;
+
+// Plain digits that fit an INT column; anything else is not a real plan id.
+function parseId(value: string): number | null {
+  if (!/^\d+$/.test(value)) return null;
+  const id = Number(value);
+  return id >= 1 && id <= MAX_INT4 ? id : null;
+}
+
+async function loadPlan(scheduleId: string): Promise<Plan | null> {
+  const id = parseId(scheduleId);
+  if (id === null) return null;
+  try {
+    return await discoveryService.getPublic(id);
+  } catch (error) {
+    if (error instanceof NotFoundError) return null;
+    throw error;
+  }
+}
 
 const TINTS = ["#FFF0C2", "#FFDDD6", "#D6F1F7", "#E6E0FF", "#D3F3EE"];
 
@@ -15,7 +38,7 @@ function fmtTime(t: string | null) {
 
 export default async function PlanDetail({ params }: { params: Promise<{ scheduleId: string }> }) {
   const { scheduleId } = await params;
-  const plan = await api<Plan>(`/api/discovery/${scheduleId}`);
+  const plan = await loadPlan(scheduleId);
   if (!plan) notFound();
   const cat = categoryInfo(plan.category);
 

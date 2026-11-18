@@ -2,7 +2,19 @@ import PlanCard from "@/components/discover/PlanCard";
 import FilterPanel from "@/components/discover/FilterPanel";
 import Pagination from "@/components/discover/Pagination";
 import { SearchTopBar } from "@/components/discover/TopBar";
-import { api, type DiscoveryPage, type Province } from "@/lib/discovery";
+import { ZodError } from "zod";
+import { discoveryService } from "@/infrastructure/container";
+
+// A bad query value (e.g. ?page=abc) or a database error shows the
+// "Couldn't load plans" message instead of the Next.js error page.
+async function orNull<T>(load: Promise<T>): Promise<T | null> {
+  try {
+    return await load;
+  } catch (error) {
+    if (!(error instanceof ZodError)) console.error(error);
+    return null;
+  }
+}
 
 type SP = Promise<Record<string, string | string[] | undefined>>;
 const KEYS = ["q", "province_id", "category", "days"] as const;
@@ -19,8 +31,8 @@ export default async function DiscoverPage({ searchParams }: { searchParams: SP 
   query.set("page_size", "12");
 
   const [data, provinces] = await Promise.all([
-    api<DiscoveryPage>(`/api/discovery?${query}`),
-    api<Province[]>("/api/provinces"),
+    orNull(discoveryService.list(Object.fromEntries(query))),
+    orNull(discoveryService.listProvinces()),
   ]);
 
   const hidden = Object.fromEntries(
