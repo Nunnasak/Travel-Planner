@@ -3,15 +3,23 @@
 export type ApiResult = {
   ok: boolean;
   status: number;
-  data: { message?: string; errors?: Record<string, string> };
+  data: { message?: string; errors?: Record<string, string>; [key: string]: unknown };
 };
 
 export async function postJson(url: string, body: unknown): Promise<ApiResult> {
+  return sendJson("POST", url, body);
+}
+
+export async function sendJson(
+  method: "POST" | "PATCH" | "PUT" | "DELETE",
+  url: string,
+  body?: unknown,
+): Promise<ApiResult> {
   const response = await fetch(url, {
-    method: "POST",
+    method,
     headers: { "Content-Type": "application/json" },
     credentials: "same-origin",
-    body: JSON.stringify(body),
+    body: body === undefined ? undefined : JSON.stringify(body),
   });
 
   let data: ApiResult["data"] = {};
