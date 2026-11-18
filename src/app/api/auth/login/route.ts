@@ -9,12 +9,17 @@ export async function POST(request: Request) {
   try {
     json = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    return NextResponse.json({ message: "Invalid JSON" }, { status: 400 });
   }
 
   const parsed = loginSchema.safeParse(json);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+    const errors: Record<string, string> = {};
+    for (const issue of parsed.error.issues) {
+      const key = String(issue.path[0] ?? "form");
+      if (!errors[key]) errors[key] = issue.message;
+    }
+    return NextResponse.json({ message: "Invalid input", errors }, { status: 400 });
   }
 
   try {
@@ -32,9 +37,12 @@ export async function POST(request: Request) {
     return res;
   } catch (error) {
     if (error instanceof InvalidCredentialsError) {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+      return NextResponse.json(
+        { message: "Email or password is incorrect." },
+        { status: 401 }
+      );
     }
     console.error(error);
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    return NextResponse.json({ message: "Internal error" }, { status: 500 });
   }
 }

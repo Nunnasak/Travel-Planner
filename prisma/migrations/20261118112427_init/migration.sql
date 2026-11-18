@@ -2,7 +2,7 @@
 CREATE TYPE "category" AS ENUM ('nature', 'culture', 'adventure', 'marine', 'wellness', 'culinary', 'religious', 'agritourism', 'community', 'sports', 'entertainment');
 
 -- CreateEnum
-CREATE TYPE "role" AS ENUM ('EDITOR', 'VIEWER');
+CREATE TYPE "role" AS ENUM ('editor', 'viewer');
 
 -- CreateTable
 CREATE TABLE "users" (
@@ -85,7 +85,7 @@ CREATE TABLE "provinces" (
 CREATE TABLE "schedule_members" (
     "user_id" INTEGER NOT NULL,
     "schedule_id" INTEGER NOT NULL,
-    "role" "role" NOT NULL DEFAULT 'VIEWER',
+    "role" "role" NOT NULL DEFAULT 'viewer',
 
     CONSTRAINT "schedule_members_pkey" PRIMARY KEY ("user_id","schedule_id")
 );

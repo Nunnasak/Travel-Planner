@@ -507,6 +507,11 @@ body {
   margin: 0 12px;
   border-top: 2px solid var(--border);
 }
+.sb-menu-error { 
+  color: #b3261e; 
+  font-size: 12px; 
+  margin: 4px 8px; 
+}
 
 .sb-item {
   justify-content: flex-start;

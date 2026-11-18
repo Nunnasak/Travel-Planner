@@ -8,6 +8,7 @@ import { RegisterUser } from "@/core/service/register-user";
 import { LoginUser } from "@/core/service/login-user";
 import { LogoutUser } from "@/core/service/logout-user";
 import { GetCurrentUser } from "@/core/service/get-current-user";
+import { CleanupSessions } from "@/core/service/cleanup-sessions";
 
 // --- Prisma (กันสร้างซ้ำตอน hot reload) ---
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
@@ -32,4 +33,5 @@ export const container = {
   loginUser: new LoginUser(users, hasher, sessions, tokens),
   logoutUser: new LogoutUser(sessions, tokens),
   getCurrentUser: new GetCurrentUser(sessions, tokens, users),
+  cleanupSessions: new CleanupSessions(sessions),
 };

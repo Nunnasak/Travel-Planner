@@ -24,6 +24,7 @@ export default function Sidebar({ user }: { user: SidebarUser | null }) {
     const [open, setOpen] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const [loggingOut, setLoggingOut] = useState(false);
+    const [logoutError, setLogoutError] = useState("");
 
     const collapseByOverlay = () => {
         setOpen(false);
@@ -33,15 +34,18 @@ export default function Sidebar({ user }: { user: SidebarUser | null }) {
     async function clickLogout() {
         if (loggingOut) return;
         setLoggingOut(true);
+        setLogoutError("");
         try {
             const result = await postJson("/api/auth/logout", {});
             if (result.ok) {
                 setMenuOpen(false);
                 router.push("/login");
                 router.refresh();
+                return;
             }
+            setLogoutError(result.data.message ?? "Could not log out. Please try again.");
         } catch {
-            // เชื่อมต่อไม่ได้
+            setLogoutError("Cannot reach the server. Check your connection and try again.");
         } finally {
             setLoggingOut(false);
         }
@@ -103,6 +107,7 @@ export default function Sidebar({ user }: { user: SidebarUser | null }) {
                                         disabled={loggingOut}
                                         className="strong">
                                         {loggingOut ? "Logging out..." : "Logout"}
+                                        {logoutError && <p className="sb-menu-error" role="alert">{logoutError}</p>}
                                     </button>
                                 </div>
                             )}

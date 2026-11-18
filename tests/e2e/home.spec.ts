@@ -11,7 +11,7 @@ test.describe("home page", () => {
     const response = await page.goto("/");
 
     expect(response?.status()).toBe(200);
-    await expect(page.locator("html")).toHaveAttribute("lang", "en");
+    await expect(page.locator("html")).toHaveAttribute("lang", "th");
     await expect(page.locator("main")).toBeAttached();
     expect(consoleErrors).toEqual([]);
   });

@@ -1,6 +1,4 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
-import Sidebar from "@/components/ui/sidebar";
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
 

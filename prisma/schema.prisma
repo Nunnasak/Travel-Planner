@@ -24,8 +24,8 @@ enum Category {
 }
 
 enum Role {
-  EDITOR
-  VIEWER
+  EDITOR @map("editor")
+  VIEWER @map("viewer")
 
   @@map("role")
 }
