@@ -13,7 +13,7 @@ export default function CopyButton({ scheduleId }: { scheduleId: number }) {
     setBusy(false);
     if (res.status === 401) return router.push(`/login?next=/discover/${scheduleId}`);
     if (!res.ok) return setError("Couldn't duplicate this plan.");
-    router.push("/schedule");
+    router.push("/schedules");
   }
 
   return (
