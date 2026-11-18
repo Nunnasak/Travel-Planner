@@ -823,3 +823,9 @@ body {
 .stepper button:disabled{opacity:.4;cursor:default}
 .stepper span{color:#0B5D5B;font-weight:600;font-size:13px}
 .picked{margin:0;color:#0B5D5B;font-size:13px}
+
+.stop-row[draggable="true"]{cursor:grab}
+.stop-row.is-dragging{opacity:.4;border-style:dashed}
+.day-empty.drop-zone{border-color:#19B5A5;background:#D3F3EE;color:#0B5D5B}
+.day-list.is-saving{opacity:.7}
+.drag-hint{margin:4px 0 0;color:#6B7C7C;font-size:12px}
