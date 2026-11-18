@@ -2,17 +2,7 @@ import { notFound } from "next/navigation";
 import CopyButton from "@/components/discover/CopyButton";
 import { DetailTopBar } from "@/components/discover/TopBar";
 import { categoryInfo } from "@/lib/categories";
-import { api } from "@/lib/discovery";
-
-type Stop = {
-  visit_time: string | null;
-  location: { location_name: string; description?: string | null };
-};
-type Plan = {
-  schedule_id: number; schedule_name: string; description: string | null;
-  total_day: number; category: string; owner: string;
-  days: { day_no: number; stops: Stop[] }[];
-};
+import { api, type PlanDetail as Plan } from "@/lib/discovery";
 
 const TINTS = ["#FFF0C2", "#FFDDD6", "#D6F1F7", "#E6E0FF", "#D3F3EE"];
 
@@ -53,13 +43,13 @@ export default async function PlanDetail({ params }: { params: Promise<{ schedul
               <div key={d.day_no}>
                 <div className="day-divider">DAY {d.day_no}</div>
                 {d.stops.map((s, i) => (
-                  <div className="stop-row" key={i}>
+                  <div className="stop-row" key={s.item_id}>
                     <div className="stop-thumb cover-x" style={{ backgroundColor: TINTS[(d.day_no + i) % TINTS.length] }}>
                       <span className="cover-badge">IMG</span>
                     </div>
                     <div className="stop-info">
-                      <strong>{s.location.location_name}</strong>
-                      {s.location.description && <span>{s.location.description}</span>}
+                      <strong>{s.location.name}</strong>
+                      <span>{s.location.address}</span>
                     </div>
                     <span className="stop-time">{fmtTime(s.visit_time)}</span>
                   </div>
