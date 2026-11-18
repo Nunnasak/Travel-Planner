@@ -13,7 +13,7 @@ export function SearchTopBar({ q, hidden }: { q: string; hidden: Record<string, 
           </svg>
         </button>
       </form>
-      <Link href="/schedule/new" className="btn-coral topbar-end">Create Schedule</Link>
+      <Link href="/schedules/new" className="btn-coral topbar-end">Create Schedule</Link>
     </header>
   );
 }
@@ -22,7 +22,7 @@ export function DetailTopBar() {
   return (
     <header className="topbar-detail">
       <Link href="/discover" className="back-btn">← BACK</Link>
-      <Link href="/schedule/new" className="btn-coral">Create Schedule</Link>
+      <Link href="/schedules/new" className="btn-coral">Create Schedule</Link>
     </header>
   );
 }

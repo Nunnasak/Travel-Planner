@@ -5,7 +5,7 @@ import { Logo } from "@/components/ui/logo"; // keep your existing import line
 
 const links = [
   { href: "/discover", label: "Discover", letter: "D" },
-  { href: "/schedule", label: "My Schedule", letter: "S" },
+  { href: "/schedules", label: "My Schedule", letter: "S" },
 ];
 
 export default function Sidebar({ userName = "Guest" }: { userName?: string }) {

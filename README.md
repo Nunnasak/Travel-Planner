@@ -175,6 +175,14 @@ DATABASE_URL="postgresql://travel_user:travel_password@localhost:5432/travel_pla
 
 ไฟล์ `.env` ถูก exclude จาก Git ส่วน `.env.example` ใช้เป็นตัวอย่างสำหรับทีม
 
+#### แผนที่ Google Maps (ไม่ต้องใช้ API key)
+
+หน้าแผนเที่ยว (`/schedules/[id]`) แสดงหมุดและเส้นทางของแต่ละวันด้วย Google Maps แบบฝัง (`maps.google.com/maps?...&output=embed`) และมีปุ่มเปิดเส้นทางใน Google Maps ผ่าน [Maps URLs](https://developers.google.com/maps/documentation/urls/get-started) ทั้งสองแบบใช้ได้ฟรี ไม่ต้องสร้าง API key และไม่ต้องผูกบัญชี billing
+
+- ตำแหน่งค้นหาจากชื่อสถานที่ + อำเภอ/เขต + จังหวัด เพราะตาราง `locations` ยังไม่มีพิกัด lat/lng
+- แผนที่ในหน้าแสดงได้สูงสุด 10 จุดต่อวัน
+- แบบฝังนี้ไม่ใช่ API ทางการของ Google หากวันหนึ่งแสดงไม่ได้ ปุ่ม "Open route in Google Maps" ยังใช้งานได้
+
 ### ขั้นตอนที่ 4: เริ่ม PostgreSQL
 
 ตรวจสอบว่า Docker Desktop หรือ Docker Engine ทำงานอยู่ แล้วรัน:
