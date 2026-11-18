@@ -1,0 +1,46 @@
+name: Discord notifications
+
+on:
+  pull_request:
+    types: [opened, reopened, closed]
+
+permissions: {}
+
+jobs:
+  notify:
+    name: Send Discord message
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    env:
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+    steps:
+      - name: Build pull request message
+        run: |
+          jq '.pull_request as $pr
+            | (if .action == "closed" then (if $pr.merged then "merged" else "closed" end)
+               else .action end) as $act
+            | {
+                username: "GitHub",
+                embeds: [{
+                  title: "PR #\($pr.number) \($act): \($pr.title)\(if $pr.draft then " (draft)" else "" end)",
+                  url: $pr.html_url,
+                  color: (if $act == "merged" then 10181046
+                          elif $act == "closed" then 15548997
+                          else 5763719 end),
+                  author: { name: .sender.login, icon_url: .sender.avatar_url, url: .sender.html_url },
+                  description: (($pr.body // "") | if length > 300 then .[0:300] + "…" else . end),
+                  fields: [
+                    { name: "Branch", value: "`\($pr.head.ref)` → `\($pr.base.ref)`", inline: true },
+                    { name: "Changes", value: "\($pr.commits) commits, +\($pr.additions) / -\($pr.deletions)", inline: true }
+                  ],
+                  timestamp: (if .action == "closed" then $pr.closed_at else $pr.updated_at end)
+                }]
+              }' "$GITHUB_EVENT_PATH" > payload.json
+
+      - name: Send to Discord
+        run: |
+          if [ -z "$DISCORD_WEBHOOK_URL" ]; then
+            echo "::warning::DISCORD_WEBHOOK_URL secret is not set (or not available to this PR), skipping"
+            exit 0
+          fi
+          curl -sS --fail-with-body -H "Content-Type: application/json" -d @payload.json "$DISCORD_WEBHOOK_URL"

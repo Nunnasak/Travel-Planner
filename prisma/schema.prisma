@@ -67,6 +67,7 @@ model Schedule {
   total_day     Int
   cover_url     String?
   category      Category
+  is_public     Boolean  @default(false)
   owner_id      Int
 
   owner   User           @relation("ScheduleOwner", fields: [owner_id], references: [user_id], onDelete: Cascade)
@@ -74,6 +75,7 @@ model Schedule {
   members ScheduleMember[]
 
   @@index([owner_id])
+  @@index([is_public])
   @@map("schedules")
 }
 
