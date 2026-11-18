@@ -760,3 +760,16 @@ body {
 .stop-info strong{color:#1F2D2D;font-size:14px;font-weight:600}
 .stop-info span{overflow:hidden;color:#6B7C7C;font-size:13px;white-space:nowrap;text-overflow:ellipsis}
 .stop-time{flex:none;width:80px;padding:4px 8px;border:1px solid #EADFCB;border-radius:10px;color:#1F2D2D;font-size:12px;text-align:center}
+.schedule-card{position:relative}
+.schedule-card.is-busy{opacity:.5;pointer-events:none}
+.schedule-card-link{display:flex;flex-direction:column;color:inherit;text-decoration:none}
+.tag-public{left:auto;right:56px;background:#19B5A5;color:#fff}
+.plan-meta{margin:4px 0 0;color:#0B5D5B;font-size:12px;font-weight:600}
+.card-menu{position:absolute;top:10px;right:10px}
+.card-menu-btn{height:28px;padding:0 10px;border:1px solid #EADFCB;border-radius:10px;background:#fff;color:#1F2D2D;font-size:12px;letter-spacing:1px;cursor:pointer}
+.card-menu-list{position:absolute;top:32px;right:0;z-index:5;display:grid;min-width:120px;overflow:hidden;border:1px solid #EADFCB;border-radius:12px;background:#fff;box-shadow:0 8px 20px rgba(11,93,91,.15)}
+.card-menu-list a,.card-menu-list button{padding:10px 14px;border:0;background:none;color:#1F2D2D;font-size:13px;text-align:left;text-decoration:none;cursor:pointer}
+.card-menu-list a:hover,.card-menu-list button:hover{background:#FFF8EC}
+.card-menu-list .danger{color:#DD4B33}
+.card-error{margin:0;padding:0 12px 12px}
+.empty .btn-coral{margin-top:12px}
