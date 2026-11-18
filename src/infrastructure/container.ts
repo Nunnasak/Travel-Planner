@@ -9,6 +9,7 @@ import { LogoutUser } from "@/core/service/logout-user";
 import { GetCurrentUser } from "@/core/service/get-current-user";
 import { CleanupSessions } from "@/core/service/cleanup-sessions";
 import { DiscoveryService } from "@/core/service/discovery.service";
+import { ScheduleService } from "@/core/service/schedule.service";
 
 // --- infrastructure ---
 const users = new PrismaUserRepository(prisma);
@@ -26,3 +27,4 @@ export const container = {
 };
 
 export const discoveryService = new DiscoveryService(prisma);
+export const scheduleService = new ScheduleService(prisma);
