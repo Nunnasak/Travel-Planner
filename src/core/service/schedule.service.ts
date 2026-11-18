@@ -19,14 +19,12 @@ const LOCATION_SELECT = {
   },
 } as const;
 
-// "HH:MM" from a Postgres TIME value (stored as 1970-01-01T..Z).
 function formatTime(value: Date): string {
   return value.toISOString().slice(11, 16);
 }
 
 export type Access = "owner" | "editor" | "viewer";
 
-// Plans the user owns or was added to as a member.
 function visibleTo(userId: number): Prisma.ScheduleWhereInput {
   return { OR: [{ owner_id: userId }, { members: { some: { user_id: userId } } }] };
 }
@@ -34,7 +32,6 @@ function visibleTo(userId: number): Prisma.ScheduleWhereInput {
 export class ScheduleService {
   constructor(private readonly prisma: PrismaClient) {}
 
-  // How the user may use this plan. Throws NotFoundError if they can't see it.
   async access(scheduleId: number, userId: number): Promise<Access> {
     const schedule = await this.prisma.schedule.findUnique({
       where: { schedule_id: scheduleId },
@@ -51,14 +48,12 @@ export class ScheduleService {
     throw new NotFoundError("Plan not found.");
   }
 
-  // Throws unless the user is the owner or an editor.
   async assertCanEdit(scheduleId: number, userId: number) {
     const access = await this.access(scheduleId, userId);
     if (access === "viewer") throw new ForbiddenError("You can only view this plan.");
     return access;
   }
 
-  // GET /api/schedules - the My Schedule page
   async listMine(userId: number) {
     const rows = await this.prisma.schedule.findMany({
       where: visibleTo(userId),
@@ -88,8 +83,6 @@ export class ScheduleService {
     }));
   }
 
-  // GET /api/schedules/[id] - one plan with its stops grouped by day.
-  // Every day 1..total_day is returned, also the empty ones.
   async getForUser(scheduleId: number, userId: number) {
     const access = await this.access(scheduleId, userId);
     const schedule = await this.prisma.schedule.findUniqueOrThrow({
@@ -135,13 +128,11 @@ export class ScheduleService {
     return { ...rest, access, can_edit: access !== "viewer", days };
   }
 
-  // POST /api/schedules
   async create(userId: number, input: unknown) {
     const data = createScheduleSchema.parse(input);
     return this.prisma.schedule.create({ data: { ...data, owner_id: userId } });
   }
 
-  // PATCH /api/schedules/[id]
   async update(scheduleId: number, userId: number, input: unknown) {
     const data = updateScheduleSchema.parse(input);
     await this.assertCanEdit(scheduleId, userId);
@@ -163,7 +154,6 @@ export class ScheduleService {
     return this.prisma.schedule.update({ where: { schedule_id: scheduleId }, data });
   }
 
-  // DELETE /api/schedules/[id] - owner only. Items and members are deleted with it.
   async delete(scheduleId: number, userId: number) {
     const access = await this.access(scheduleId, userId);
     if (access !== "owner") throw new ForbiddenError("Only the owner can delete this plan.");

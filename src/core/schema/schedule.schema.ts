@@ -1,10 +1,8 @@
 import { z } from "zod";
 import { CATEGORIES, idSchema } from "./discovery.schema";
 
-// Longest trip a plan can have.
 export const MAX_DAYS = 30;
 
-// "" from an empty optional input means "not set".
 const optionalText = (max: number) =>
   z.preprocess(
     (value) => (value === "" ? null : value),
@@ -35,8 +33,6 @@ export const updateScheduleSchema = createScheduleSchema
   .partial()
   .extend({ is_public: z.boolean().optional() });
 
-// PUT /api/schedules/[id]/items/order
-// The full new order: each day lists its item ids from first to last.
 export const reorderScheduleSchema = z.object({
   days: z
     .array(
