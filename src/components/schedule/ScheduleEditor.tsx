@@ -5,6 +5,7 @@ import { sendJson } from "@/lib/api-client";
 import { categoryInfo } from "@/lib/categories";
 import type { ScheduleDetail } from "@/lib/schedule";
 import DayList from "./DayList";
+import RouteMap from "./RouteMap";
 import ScheduleForm from "./ScheduleForm";
 
 export default function ScheduleEditor({ plan }: { plan: ScheduleDetail }) {
@@ -114,6 +115,8 @@ export default function ScheduleEditor({ plan }: { plan: ScheduleDetail }) {
               {plan.total_day} {plan.total_day === 1 ? "day" : "days"} · {plan.is_public ? "Public" : "Private"}
               {plan.access !== "owner" && ` · by ${plan.owner.username}`}
             </p>
+            <h2>Map</h2>
+            <RouteMap days={plan.days} />
           </aside>
 
           <section className="detail-plan">
