@@ -23,3 +23,13 @@ export const createScheduleItemSchema = z.object({
 });
 
 export const updateScheduleItemSchema = createScheduleItemSchema.partial();
+
+export const addScheduleItemSchema = z.object({
+  location_id: z.number({ error: "Pick a place." }).int().positive(),
+  day_no: z.number().int().min(1),
+  visit_time: visitTimeSchema,
+});
+
+export const editScheduleItemSchema = addScheduleItemSchema
+  .pick({ day_no: true, visit_time: true })
+  .partial();
