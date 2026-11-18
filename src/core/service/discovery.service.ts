@@ -1,6 +1,6 @@
 import type { Prisma, PrismaClient } from "../../generated/prisma/client";
 import { NotFoundError } from "../errors/not-found.error";
-import { discoveryQuerySchema } from "../schema/discovery.schema";
+import { DAYS_OR_MORE, discoveryQuerySchema } from "../schema/discovery.schema";
 
 const ORDERED_ITEMS = [{ day_no: "asc" }, { sequence_no: "asc" }] as const;
 
@@ -32,7 +32,8 @@ export class DiscoveryService {
     const where: Prisma.ScheduleWhereInput = { is_public: true };
     if (query.category) where.category = query.category;
     if (query.days !== undefined) {
-      where.total_day = query.days >= 4 ? { gte: 4 } : query.days;
+      where.total_day =
+        query.days === DAYS_OR_MORE ? { gte: DAYS_OR_MORE } : query.days;
     }
     if (query.province_id !== undefined) {
       where.items = {

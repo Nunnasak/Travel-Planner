@@ -22,7 +22,9 @@ export const CATEGORIES = [
 //   q           search in plan name, description and place names
 //   province_id plans that have at least one stop in this province
 //   category    plan category
-//   days        number of days; 4 means "4 days or more"
+//   days        1, 2 or 3 match exactly; 4 means "4 days or more"
+export const DAYS_OR_MORE = 4;
+
 export const discoveryQuerySchema = z.object({
   q: z.preprocess(emptyToUndefined, z.string().trim().max(100).optional()),
   province_id: z.preprocess(
@@ -32,7 +34,7 @@ export const discoveryQuerySchema = z.object({
   category: z.preprocess(emptyToUndefined, z.enum(CATEGORIES).optional()),
   days: z.preprocess(
     emptyToUndefined,
-    z.coerce.number().int().min(1).max(30).optional()
+    z.coerce.number().int().min(1).max(DAYS_OR_MORE).optional()
   ),
   page: z.preprocess(emptyToUndefined, z.coerce.number().int().min(1).default(1)),
   page_size: z.preprocess(
