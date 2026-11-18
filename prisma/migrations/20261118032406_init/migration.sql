@@ -7,12 +7,23 @@ CREATE TYPE "role" AS ENUM ('EDITOR', 'VIEWER');
 -- CreateTable
 CREATE TABLE "users" (
     "user_id" SERIAL NOT NULL,
-    "username" TEXT NOT NULL DEFAULT 'user',
+    "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "password_hash" TEXT NOT NULL,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("user_id")
+);
+
+-- CreateTable
+CREATE TABLE "sessions" (
+    "session_id" SERIAL NOT NULL,
+    "token_hash" TEXT NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "expires_at" TIMESTAMP(3) NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "sessions_pkey" PRIMARY KEY ("session_id")
 );
 
 -- CreateTable
@@ -80,7 +91,19 @@ CREATE TABLE "schedule_members" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "sessions_token_hash_key" ON "sessions"("token_hash");
+
+-- CreateIndex
+CREATE INDEX "sessions_user_id_idx" ON "sessions"("user_id");
+
+-- CreateIndex
+CREATE INDEX "sessions_expires_at_idx" ON "sessions"("expires_at");
 
 -- CreateIndex
 CREATE INDEX "schedules_owner_id_idx" ON "schedules"("owner_id");
@@ -99,6 +122,9 @@ CREATE INDEX "cities_province_id_idx" ON "cities"("province_id");
 
 -- CreateIndex
 CREATE INDEX "schedule_members_schedule_id_idx" ON "schedule_members"("schedule_id");
+
+-- AddForeignKey
+ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "schedules" ADD CONSTRAINT "schedules_owner_id_fkey" FOREIGN KEY ("owner_id") REFERENCES "users"("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
