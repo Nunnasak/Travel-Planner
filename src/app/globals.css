@@ -783,3 +783,9 @@ body {
 .form-actions{display:flex;justify-content:flex-end;gap:8px}
 .btn-outline{display:inline-flex;align-items:center;height:32px;padding:0 16px;border:1px solid #19B5A5;border-radius:16px;background:#fff;color:#0B5D5B;font-size:13px;font-weight:600;cursor:pointer}
 .btn-outline:disabled{opacity:.6;cursor:default}
+
+.day-empty{margin:8px 0;padding:16px;border:1px dashed #D5C7AA;border-radius:14px;color:#6B7C7C;font-size:13px;text-align:center}
+.stop-row.is-busy{opacity:.5;pointer-events:none}
+.drag-handle{flex:none;color:#6B7C7C;font-size:14px;letter-spacing:-3px;cursor:grab;user-select:none}
+.stop-remove{flex:none;width:28px;height:28px;border:0;border-radius:50%;background:none;color:#6B7C7C;font-size:18px;cursor:pointer}
+.stop-remove:hover{background:#FFDDD6;color:#DD4B33}
