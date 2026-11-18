@@ -1,10 +1,12 @@
-import Sidebar from "@/components/discover/Sidebar";
+import Sidebar from "@/components/ui/sidebar";
+import { getSessionUser } from "@/lib/auth";
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  const user = await getSessionUser();
   return (
-    <div className="app-shell">
-      <Sidebar />
-      <main className="main">{children}</main>
-    </div>
+    <>
+      <Sidebar user={user ? { name: user.name, email: user.email, id: user.id } : null} />
+      <main className="app-content">{children}</main>
+    </>
   );
 }
