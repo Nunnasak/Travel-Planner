@@ -33,49 +33,108 @@ export default function FilterPanel({ provinces }: { provinces: Province[] }) {
         Filter{active ? ` (${active})` : ""}
       </button>
 
-      {open && (
-        <aside className="filter-panel" aria-label="Filters">
-          <div className="filter-head">
-            <span>Filter</span>
-            <button type="button" aria-label="Close filter" onClick={() => setOpen(false)}>✕</button>
-          </div>
+      <aside
+        className={`filter-panel ${open ? "is-open" : ""}`}
+        aria-label="Filters"
+        aria-hidden={!open}
+      >
+        <div className="filter-head">
+          <span>filter</span>
+          <button
+            type="button"
+            className="filter-close"
+            aria-label="Close filter"
+            onClick={() => setOpen(false)}
+          >
+            [X]
+          </button>
+        </div>
 
-          <select className="select" value={province} onChange={(e) => update({ province_id: e.target.value })}>
+        <div className="select-wrap">
+          <select
+            className="select"
+            value={province}
+            onChange={(e) => update({ province_id: e.target.value })}
+          >
             <option value="">Province</option>
             {provinces.map((p) => (
-              <option key={p.province_id} value={p.province_id}>{p.province_name}</option>
+              <option key={p.province_id} value={p.province_id}>
+                {p.province_name}
+              </option>
             ))}
           </select>
+          <svg className="select-chevron" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+            <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
 
+        <div className="select-wrap">
           <select className="select" disabled title="Not supported by the API yet">
             <option>District</option>
           </select>
+          <svg className="select-chevron" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+            <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
 
-          <div className="accordion">
-            <button type="button" className="accordion-title" onClick={() => setCatOpen(!catOpen)}>
-              <span>Category</span><span>{catOpen ? "˄" : "˅"}</span>
-            </button>
-            {catOpen && (
-              <>
-                <input type="search" placeholder="search" value={catQuery} onChange={(e) => setCatQuery(e.target.value)} />
-                {cats.map((k) => (
-                  <label key={k} className="check-row">
-                    <input type="checkbox" className="check" checked={category === k}
-                      onChange={() => update({ category: category === k ? "" : k })} />
-                    {categoryInfo(k).label}
-                  </label>
-                ))}
-              </>
-            )}
+        <div className="accordion">
+          <button
+            type="button"
+            className="accordion-title"
+            aria-expanded={catOpen}
+            onClick={() => setCatOpen(!catOpen)}
+          >
+            <span>Category</span>
+            <svg
+              className={`accordion-chevron ${catOpen ? "is-open" : ""}`}
+              viewBox="0 0 12 8"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+
+          <div className={`accordion-body ${catOpen ? "is-open" : ""}`}>
+            <div className="accordion-inner">
+              <input
+                type="search"
+                className="cat-search"
+                placeholder="search"
+                value={catQuery}
+                onChange={(e) => setCatQuery(e.target.value)}
+              />
+              <div className="check-list">
+                {cats.map((k) => {
+                  const isChecked = category === k;
+                  return (
+                    <label key={k} className={`check-row ${isChecked ? "is-checked" : ""}`}>
+                      <input
+                        type="checkbox"
+                        className="check"
+                        checked={isChecked}
+                        onChange={() => update({ category: isChecked ? "" : k })}
+                      />
+                      <span className="check-box" aria-hidden="true" />
+                      <span className="check-label">{categoryInfo(k).label}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
           </div>
+        </div>
 
-          {active > 0 && (
-            <button type="button" className="filter-clear" onClick={() => update({ province_id: "", category: "" })}>
-              Clear filters
-            </button>
-          )}
-        </aside>
-      )}
+        <div className={`filter-clear-wrap ${active > 0 ? "is-visible" : ""}`}>
+          <button
+            type="button"
+            className="filter-clear"
+            onClick={() => update({ province_id: "", category: "" })}
+          >
+            Clear filters
+          </button>
+        </div>
+      </aside>
     </>
   );
 }
