@@ -19,7 +19,7 @@ function toDomain(row: SessionRow): Session {
 }
 
 export class PrismaSessionRepository implements SessionRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private prisma: PrismaClient) { }
 
   async create(data: { userId: number; tokenHash: string; expiresAt: Date }) {
     const row = await this.prisma.session.create({
@@ -46,6 +46,12 @@ export class PrismaSessionRepository implements SessionRepository {
 
   async deleteAllByUserId(userId: number) {
     await this.prisma.session.deleteMany({ where: { user_id: userId } });
+  }
+
+  async deleteAllByUserIdExcept(userId: number, keepTokenHash: string) {
+    await this.prisma.session.deleteMany({
+      where: { user_id: userId, token_hash: { not: keepTokenHash } },
+    });
   }
 
   async deleteExpired() {

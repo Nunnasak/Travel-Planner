@@ -6,9 +6,13 @@ export type ApiResult = {
   data: { message?: string; errors?: Record<string, string> };
 };
 
-export async function postJson(url: string, body: unknown): Promise<ApiResult> {
+export async function sendJson(
+  method: "POST" | "PATCH" | "PUT" | "DELETE",
+  url: string,
+  body: unknown
+): Promise<ApiResult> {
   const response = await fetch(url, {
-    method: "POST",
+    method,
     headers: { "Content-Type": "application/json" },
     credentials: "same-origin",
     body: JSON.stringify(body),
@@ -21,6 +25,10 @@ export async function postJson(url: string, body: unknown): Promise<ApiResult> {
     // response had no JSON body
   }
   return { ok: response.ok, status: response.status, data };
+}
+
+export function postJson(url: string, body: unknown): Promise<ApiResult> {
+  return sendJson("POST", url, body);
 }
 
 // Keep only the field errors the form actually has.

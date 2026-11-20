@@ -9,6 +9,9 @@ import { LogoutUser } from "@/core/service/logout-user";
 import { GetCurrentUser } from "@/core/service/get-current-user";
 import { CleanupSessions } from "@/core/service/cleanup-sessions";
 import { DiscoveryService } from "@/core/service/discovery.service";
+import { UpdateUsername } from "@/core/service/update-username";
+import { ChangePassword } from "@/core/service/change-password";
+import { DeleteAccount } from "@/core/service/delete-account";
 
 // --- infrastructure ---
 const users = new PrismaUserRepository(prisma);
@@ -23,6 +26,9 @@ export const container = {
   logoutUser: new LogoutUser(sessions, tokens),
   getCurrentUser: new GetCurrentUser(sessions, tokens, users),
   cleanupSessions: new CleanupSessions(sessions),
+  updateUsername: new UpdateUsername(users),
+  changePassword: new ChangePassword(users, hasher, sessions, tokens),
+  deleteAccount: new DeleteAccount(users, hasher, sessions),
 };
 
 export const discoveryService = new DiscoveryService(prisma);
