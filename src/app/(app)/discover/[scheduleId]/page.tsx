@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import CopyButton from "@/components/discover/CopyButton";
+import RouteMap from "@/components/schedule/RouteMap";
 import CategoryTags from "@/components/ui/category-tags";
 import CoverImage from "@/components/ui/cover-image";
 import { NotFoundError } from "@/core/errors/not-found.error";
@@ -50,6 +51,8 @@ export default async function PlanDetail({ params }: { params: Promise<{ schedul
           <p className="detail-desc">{plan.description || "No description yet."}</p>
           <h2>Category</h2>
           <CategoryTags categories={plan.categories} className="tag-list" />
+          <h2>Map</h2>
+          <RouteMap days={plan.days} />
         </aside>
 
         <section className="detail-plan">
