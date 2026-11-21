@@ -154,6 +154,35 @@ export class ScheduleService {
     return this.prisma.schedule.update({ where: { schedule_id: scheduleId }, data });
   }
 
+  async copy(scheduleId: number, userId: number) {
+    const source = await this.prisma.schedule.findFirst({
+      where: { schedule_id: scheduleId, OR: [{ is_public: true }, visibleTo(userId)] },
+      select: {
+        schedule_name: true,
+        description: true,
+        total_day: true,
+        cover_url: true,
+        categories: true,
+        items: {
+          orderBy: [...ORDERED_ITEMS],
+          select: { day_no: true, sequence_no: true, visit_time: true, location_id: true },
+        },
+      },
+    });
+    if (!source) throw new NotFoundError("Plan not found.");
+
+    const { items, schedule_name, ...rest } = source;
+    return this.prisma.schedule.create({
+      data: {
+        ...rest,
+        schedule_name: `${schedule_name.slice(0, 93)} (copy)`,
+        is_public: false,
+        owner_id: userId,
+        items: { create: items },
+      },
+    });
+  }
+
   async delete(scheduleId: number, userId: number) {
     const access = await this.access(scheduleId, userId);
     if (access !== "owner") throw new ForbiddenError("Only the owner can delete this plan.");
