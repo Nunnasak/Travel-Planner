@@ -1,0 +1,133 @@
+.detail-grid {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 800px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.detail-side {
+  display: grid;
+  gap: 8px;
+}
+
+.detail-cover {
+  position: relative;
+  height: 160px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 8px;
+  overflow: hidden;
+  border: 3px solid var(--border);
+  border-radius: 16px;
+  background-size: cover;
+  background-position: center;
+}
+
+.detail-cover img,
+.stop-thumb img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+:where(.detail-side, .detail-plan) h2 {
+  margin: 0;
+  color: #1f2d2d;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.detail-desc {
+  margin: 0;
+  color: #6b7c7c;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.day-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 12px 0 4px;
+  color: #0b5d5b;
+  font-family: var(--font-mitr), sans-serif;
+  font-size: 24px;
+}
+
+.day-divider::before,
+.day-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #19b5a5;
+}
+
+.stop-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+  padding: 12px;
+  border: 1px solid #eadfcb;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 6px 9px rgba(11, 93, 91, 0.1);
+}
+
+.stop-thumb {
+  flex: none;
+  width: 60px;
+  height: 60px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.stop-thumb .cover-badge {
+  font-size: 12px;
+  padding: 3px 8px;
+}
+
+.stop-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stop-info strong {
+  color: #1f2d2d;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.stop-info span {
+  overflow: hidden;
+  color: #6b7c7c;
+  font-size: 13px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.stop-time {
+  flex: none;
+  width: 80px;
+  padding: 4px 8px;
+  border: 1px solid #eadfcb;
+  border-radius: 10px;
+  color: #1f2d2d;
+  font-size: 12px;
+  text-align: center;
+}

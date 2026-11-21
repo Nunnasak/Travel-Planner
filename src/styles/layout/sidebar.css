@@ -1,0 +1,271 @@
+.sb-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgb(0 0 0 / 0.3);
+  opacity: 0;
+  /* ไม่รับเมาส์ กันกระพริบ */
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.sb-overlay.is-open {
+  opacity: 1;
+  /* รับคลิกได้ตอนเปิดอยู่ */
+  pointer-events: auto;
+}
+
+.sb {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 30;
+  width: var(--sidebar-w);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-right: 2px solid var(--border);
+  overflow: hidden;
+  transition: width 0.2s ease-out;
+}
+
+.sb.is-open {
+  width: var(--sidebar-w-open);
+}
+
+.sb-head {
+  flex: none;
+  /* กว้างคงที่ ไม่ถูกบีบตอน sidebar หด */
+  width: var(--sidebar-w-open);
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  /* โลโก้ 28px อยู่กลางตอนหุบพอดี */
+  padding: 0 15px;
+  text-decoration: none;
+}
+
+.sb-logo {
+  flex: none;
+  display: block;
+  width: 50px;
+  height: 50px;
+  margin: 0;
+}
+
+.sb-brand-sub {
+  flex: 1;
+  white-space: nowrap;
+  font-family: var(--font-mitr), sans-serif;
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--teal-btn);
+}
+
+.sb-brand-sub,
+.sb-collapse {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  text-decoration: none;
+}
+
+.sb.is-open .sb-brand-sub,
+.sb.is-open .sb-collapse {
+  opacity: 1;
+  pointer-events: auto;
+  transition-delay: 0.1s;
+}
+
+.sb-collapse {
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  display: grid;
+  place-items: center;
+}
+
+.sb-divider {
+  margin: 0 12px;
+  border-top: 2px solid var(--border);
+}
+
+.sb-nav {
+  margin-top: 24px;
+  padding: 0 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sb-item {
+  width: 100%;
+  height: 60px;
+  flex: none;
+  padding: 0 0 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  /* ระยะระหว่างไอคอนกับข้อความ */
+  gap: 12px;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.15s;
+  text-decoration: none;
+  /* สีไอคอน (currentColor จะตามค่านี้) */
+  color: #19b5a5;
+}
+
+.sb-item:hover {
+  background: #f8f8f8;
+}
+
+.sb-item.is-active {
+  background: var(--yellow);
+  border-color: var(--yellow);
+  /* ไอคอนตอนถูกเลือกบนพื้นเหลือง */
+  color: var(--teal-btn);
+}
+
+.sb-icon {
+  /* ไม่ให้ไอคอนถูกบีบ */
+  flex: none;
+  width: 28px;
+  height: 28px;
+  min-width: 20px;
+}
+
+.sb-label {
+  /* ให้ข้อความยังเป็นสีเดิม */
+  color: var(--teal-btn);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.sb-user-wrap {
+  position: relative;
+  margin-top: auto;
+  padding: 8px;
+}
+
+.sb-user {
+  width: 100%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 22px;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  padding: 0 12px;
+}
+
+.sb-avatar {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--avatar-bg);
+  font-size: 10px;
+  margin-bottom: 10px;
+}
+
+.sb-user svg {
+  flex: none;
+  /* ขนาดไอคอนข้างในวงกลม */
+  width: 36px;
+  height: 36px;
+}
+
+.sb-username {
+  white-space: nowrap;
+  opacity: 0;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background 0.15s;
+  text-decoration: none;
+  color: var(--teal-btn);
+}
+
+.sb-userid {
+  white-space: nowrap;
+  opacity: 0;
+  font-size: 14px;
+  font-weight: 100;
+  transition: background 0.15s;
+  text-decoration: none;
+  color: gray;
+}
+
+.sb.is-open .sb-username,
+.sb.is-open .sb-userid {
+  opacity: 1;
+  transition-delay: 0.1s;
+}
+
+.sb-menu {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 100%;
+  margin-bottom: 4px;
+  padding: 4px 0;
+  background: #fff;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.12);
+  font-size: 14px;
+}
+
+.sb-menu-link,
+.sb-menu button {
+  display: block;
+  width: 100%;
+  padding: 8px 16px;
+  border: 0;
+  background: none;
+  text-align: left;
+  color: black;
+  text-decoration: none;
+  font: inherit;
+}
+
+.sb-menu-link:hover,
+.sb-menu button:hover {
+  background: #f8f8f8;
+}
+
+.sb-menu .strong {
+  font-weight: 700;
+}
+
+.sb-menu-line {
+  margin: 0 12px;
+  border-top: 2px solid var(--border);
+}
+
+.sb-menu-error {
+  color: #b3261e;
+  font-size: 12px;
+  margin: 4px 8px;
+}
+
+.sb-menu-info {
+  padding: 8px 16px;
+  font-size: 12px;
+  color: #777;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
