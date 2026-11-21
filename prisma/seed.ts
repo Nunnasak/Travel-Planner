@@ -386,7 +386,6 @@ async function main() {
         total_day: template.total_day,
         cover_url: template.cover_url,
         categories: planCategories,
-        is_public: isPublic,
         owner_id: owner.user_id,
       },
     });
@@ -410,6 +409,26 @@ async function main() {
           },
         });
       }
+    }
+
+    if (isPublic) {
+      const items = await prisma.scheduleItem.findMany({
+        where: { schedule_id: schedule.schedule_id },
+        select: { day_no: true, sequence_no: true, visit_time: true, location_id: true },
+      });
+      await prisma.schedule.create({
+        data: {
+          schedule_name: schedule.schedule_name,
+          description: schedule.description,
+          total_day: schedule.total_day,
+          cover_url: schedule.cover_url,
+          categories: schedule.categories,
+          is_public: true,
+          owner_id: schedule.owner_id,
+          published_from_id: schedule.schedule_id,
+          items: { create: items },
+        },
+      });
     }
   }
 
