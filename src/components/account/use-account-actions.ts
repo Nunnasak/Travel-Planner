@@ -52,7 +52,7 @@ export function useAccountActions() {
   }
 
   async function logoutAllDevices() {
-    const result = await request("POST", "/api/account/logout-all", {});
+    const result = await request("POST", "/api/auth/logout-all", {});
     if (!result.ok) {
       throw new Error(messageFrom(result, "form", "Could not log out of all devices."));
     }
