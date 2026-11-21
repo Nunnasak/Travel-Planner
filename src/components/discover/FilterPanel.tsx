@@ -73,7 +73,11 @@ export default function FilterPanel({ provinces }: { provinces: Province[] }) {
   return (
     <>
       <button type="button" ref={triggerRef} className="filter-trigger" onClick={() => setOpen(true)}>
-        Filter{active ? ` (${active})` : ""}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+          <path d="M4 6h16M7 12h10M10 18h4" />
+        </svg>
+        Filter
+        {active > 0 && <span className="filter-count">{active}</span>}
       </button>
 
       <aside
@@ -90,7 +94,9 @@ export default function FilterPanel({ provinces }: { provinces: Province[] }) {
             aria-label="Close filter"
             onClick={() => setOpen(false)}
           >
-            [X]
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
           </button>
         </div>
 
