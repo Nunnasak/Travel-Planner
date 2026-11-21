@@ -98,6 +98,7 @@ export class ScheduleService {
         created_at: true,
         updated_at: true,
         owner: { select: { user_id: true, username: true } },
+        _count: { select: { members: true } },
         items: {
           orderBy: [...ORDERED_ITEMS],
           select: {
@@ -111,7 +112,7 @@ export class ScheduleService {
       },
     });
 
-    const { items, ...rest } = schedule;
+    const { items, _count, ...rest } = schedule;
     const lastDay = Math.max(schedule.total_day, ...items.map((i) => i.day_no));
     const days = Array.from({ length: lastDay }, (_, index) => ({
       day_no: index + 1,
@@ -125,7 +126,7 @@ export class ScheduleService {
         })),
     }));
 
-    return { ...rest, access, can_edit: access !== "viewer", days };
+    return { ...rest, access, can_edit: access !== "viewer", member_count: _count.members, days };
   }
 
   async create(userId: number, input: unknown) {
@@ -135,7 +136,10 @@ export class ScheduleService {
 
   async update(scheduleId: number, userId: number, input: unknown) {
     const data = updateScheduleSchema.parse(input);
-    await this.assertCanEdit(scheduleId, userId);
+    const access = await this.assertCanEdit(scheduleId, userId);
+    if (data.is_public !== undefined && access !== "owner") {
+      throw new ForbiddenError("Only the owner can post this plan to Discover.");
+    }
 
     if (data.total_day !== undefined) {
       const last = await this.prisma.scheduleItem.aggregate({
