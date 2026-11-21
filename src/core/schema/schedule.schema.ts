@@ -21,7 +21,12 @@ export const createScheduleSchema = z.object({
     .int()
     .min(1, "A plan needs at least 1 day.")
     .max(MAX_DAYS, `A plan can have at most ${MAX_DAYS} days.`),
-  category: z.enum(CATEGORIES, { error: "Pick a category." }),
+  categories: z
+    .array(z.enum(CATEGORIES, { error: "Pick a category from the list." }), {
+      error: "Pick at least one category.",
+    })
+    .min(1, "Pick at least one category.")
+    .transform((list) => [...new Set(list)]),
   cover_url: z.preprocess(
     (value) => (value === "" ? null : value),
     z.url({ error: "Enter a full image URL (https://...)." }).nullable().optional(),
