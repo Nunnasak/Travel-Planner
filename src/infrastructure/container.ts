@@ -9,6 +9,9 @@ import { LogoutUser } from "@/core/service/logout-user";
 import { GetCurrentUser } from "@/core/service/get-current-user";
 import { CleanupSessions } from "@/core/service/cleanup-sessions";
 import { DiscoveryService } from "@/core/service/discovery.service";
+import { ScheduleService } from "@/core/service/schedule.service";
+import { ScheduleItemService } from "@/core/service/scheduleItem.service";
+import { LocationService } from "@/core/service/location.service";
 import { UpdateUsername } from "@/core/service/update-username";
 import { ChangePassword } from "@/core/service/change-password";
 import { DeleteAccount } from "@/core/service/delete-account";
@@ -32,3 +35,6 @@ export const container = {
 };
 
 export const discoveryService = new DiscoveryService(prisma);
+export const scheduleService = new ScheduleService(prisma);
+export const scheduleItemService = new ScheduleItemService(prisma, scheduleService);
+export const locationService = new LocationService(prisma);

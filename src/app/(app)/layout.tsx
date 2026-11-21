@@ -1,7 +1,12 @@
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+import Sidebar from "@/components/ui/sidebar";
+import { getSessionUser } from "@/lib/auth";
+
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  const user = await getSessionUser();
   return (
-    <div className="app-shell">
-      <main className="main">{children}</main>
-    </div>
+    <>
+      <Sidebar user={user ? { name: user.name, email: user.email, id: user.id } : null} />
+      <main className="app-content">{children}</main>
+    </>
   );
 }
