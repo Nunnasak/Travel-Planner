@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import CopyButton from "@/components/discover/CopyButton";
+import { DetailTopBar } from "@/components/discover/TopBar";
 import { categoryInfo } from "@/lib/categories";
 import { NotFoundError } from "@/core/errors/not-found.error";
 import { discoveryService } from "@/infrastructure/container";
@@ -41,67 +42,46 @@ export default async function PlanDetail({ params }: { params: Promise<{ schedul
   if (!plan) notFound();
   const cat = categoryInfo(plan.category);
 
-  // หา image_url แรกที่มีอยู่ในทริปมาใช้เป็นรูปปก
-  const coverUrl =
-    plan.days
-      .flatMap((d) => d.stops)
-      .find((s) => s.location.image_url)?.location.image_url ?? null;
-
   return (
-    <div className="page-content">
-      <div className="page-header">
-        <h1>{plan.schedule_name}</h1>
-        <CopyButton scheduleId={plan.schedule_id} />
-      </div>
+    <>
+      <DetailTopBar />
+      <div className="page-content">
+        <div className="page-header">
+          <h1>{plan.schedule_name}</h1>
+          <CopyButton scheduleId={plan.schedule_id} />
+        </div>
 
-      <div className="detail-grid">
-        <aside className="detail-side">
-          <div
-            className={`detail-cover ${!coverUrl ? "cover-x" : ""}`}
-            style={{ backgroundColor: cat.tint }}
-          >
-            {coverUrl ? (
-              <img src={coverUrl} alt={plan.schedule_name} className="cover-img" />
-            ) : (
+        <div className="detail-grid">
+          <aside className="detail-side">
+            <div className="detail-cover cover-x" style={{ backgroundColor: cat.tint }}>
               <span className="cover-badge">IMG</span>
-            )}
-          </div>
-          <h2>Description</h2>
-          <p className="detail-desc">{plan.description}</p>
-        </aside>
-
-        <section className="detail-plan">
-          <h2>Plan</h2>
-          {plan.days.map((d) => (
-            <div key={d.day_no}>
-              <div className="day-divider">DAY {d.day_no}</div>
-              {d.stops.map((s, i) => (
-                <div className="stop-row" key={s.item_id}>
-                  <div
-                    className={`stop-thumb ${!s.location.image_url ? "cover-x" : ""}`}
-                    style={{ backgroundColor: TINTS[(d.day_no + i) % TINTS.length] }}
-                  >
-                    {s.location.image_url ? (
-                      <img
-                        src={s.location.image_url}
-                        alt={s.location.name}
-                        className="cover-img"
-                      />
-                    ) : (
-                      <span className="cover-badge">IMG</span>
-                    )}
-                  </div>
-                  <div className="stop-info">
-                    <strong>{s.location.name}</strong>
-                    <span>{s.location.address}</span>
-                  </div>
-                  <span className="stop-time">{fmtTime(s.visit_time)}</span>
-                </div>
-              ))}
             </div>
-          ))}
-        </section>
+            <h2>Description</h2>
+            <p className="detail-desc">{plan.description}</p>
+          </aside>
+
+          <section className="detail-plan">
+            <h2>Plan</h2>
+            {plan.days.map((d) => (
+              <div key={d.day_no}>
+                <div className="day-divider">DAY {d.day_no}</div>
+                {d.stops.map((s, i) => (
+                  <div className="stop-row" key={s.item_id}>
+                    <div className="stop-thumb cover-x" style={{ backgroundColor: TINTS[(d.day_no + i) % TINTS.length] }}>
+                      <span className="cover-badge">IMG</span>
+                    </div>
+                    <div className="stop-info">
+                      <strong>{s.location.name}</strong>
+                      <span>{s.location.address}</span>
+                    </div>
+                    <span className="stop-time">{fmtTime(s.visit_time)}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </section>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

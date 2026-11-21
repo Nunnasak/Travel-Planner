@@ -5,7 +5,4 @@ export interface UserRepository {
   findByEmail(email: string): Promise<User | null>;
   findByUsername(username: string): Promise<User | null>;
   create(data: { email: string; name: string; passwordHash: string }): Promise<User>;
-  updateUsername(id: number, name: string): Promise<User>;
-  updatePasswordHash(id: number, passwordHash: string): Promise<void>;
-  delete(id: number): Promise<void>;
 }

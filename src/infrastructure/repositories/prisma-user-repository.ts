@@ -61,32 +61,5 @@ export class PrismaUserRepository implements UserRepository {
       throw error;
     }
   }
-  
-  async updateUsername(id: number, name: string): Promise<User> {
-    try {
-      const row = await this.prisma.user.update({
-        where: { user_id: id },
-        data: { username: name },
-      });
-      return toDomain(row);
-    } catch (error) {
-      if ((error as { code?: string }).code === "P2002") {
-        throw new DuplicateFieldsError({ username: true });
-      }
-      throw error;
-    }
-  }
-
-  async updatePasswordHash(id: number, passwordHash: string): Promise<void> {
-    await this.prisma.user.update({
-      where: { user_id: id },
-      data: { password_hash: passwordHash },
-    });
-  }
-
-  async delete(id: number): Promise<void> {
-    // sessions / schedules / schedule_members ถูกลบตาม ON DELETE CASCADE
-    await this.prisma.user.deleteMany({ where: { user_id: id } });
-  }
 }
 
