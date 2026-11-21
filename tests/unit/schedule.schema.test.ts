@@ -14,7 +14,7 @@ function issues(result: { success: boolean; error?: { issues: { path: PropertyKe
 }
 
 describe("createScheduleSchema", () => {
-  it("trims the name, turns empty optional fields into null and defaults is_public", () => {
+  it("trims the name and turns empty optional fields into null", () => {
     const parsed = createScheduleSchema.parse({
       ...valid,
       schedule_name: "  Bangkok trip  ",
@@ -28,7 +28,6 @@ describe("createScheduleSchema", () => {
       categories: ["CULTURE"],
       description: null,
       cover_url: null,
-      is_public: false,
     });
   });
 
@@ -67,8 +66,8 @@ describe("updateScheduleSchema", () => {
     });
   });
 
-  it("does not reset is_public when it is left out", () => {
-    expect(updateScheduleSchema.parse({ total_day: 4 })).not.toHaveProperty("is_public");
+  it("ignores is_public because posting to Discover has its own endpoint", () => {
+    expect(updateScheduleSchema.parse({ total_day: 4, is_public: true })).toEqual({ total_day: 4 });
   });
 
   it("still validates the fields it gets", () => {

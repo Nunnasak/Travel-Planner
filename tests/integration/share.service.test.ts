@@ -179,19 +179,3 @@ describe("ShareService.joinByToken", () => {
     await expect(share.joinByToken(await tokenOf(), thirdUserId)).resolves.toBe(ctx.scheduleId);
   });
 });
-
-describe("ScheduleService.update and Discover", () => {
-  it("only lets the owner post the plan to Discover", async () => {
-    await addMember(prisma, ctx.scheduleId, ctx.otherUserId, Role.EDITOR);
-
-    await expect(
-      schedules.update(ctx.scheduleId, ctx.otherUserId, { is_public: true }),
-    ).rejects.toBeInstanceOf(ForbiddenError);
-    await expect(
-      schedules.update(ctx.scheduleId, ctx.otherUserId, { description: "Editors can still edit" }),
-    ).resolves.toMatchObject({ description: "Editors can still edit" });
-    await expect(schedules.update(ctx.scheduleId, ctx.userId, { is_public: true })).resolves.toMatchObject({
-      is_public: true,
-    });
-  });
-});
