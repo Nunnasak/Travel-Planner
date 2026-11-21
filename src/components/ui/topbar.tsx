@@ -53,7 +53,7 @@ export default function Topbar() {
           </svg>
         </button>
       </form>
-      <Link href="/schedule/new" className="btn-coral topbar-end">Create Schedule</Link>
+      <Link href="/schedules/new" className="btn-coral topbar-end">Create Schedule</Link>
     </header>
   );
 }

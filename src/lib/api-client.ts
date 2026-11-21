@@ -31,10 +31,6 @@ export async function sendJson(
   return { ok: response.ok, status: response.status, data };
 }
 
-export function postJson(url: string, body: unknown): Promise<ApiResult> {
-  return sendJson("POST", url, body);
-}
-
 // Keep only the field errors the form actually has.
 export function pickFieldErrors<K extends string>(
   errors: Record<string, string> | undefined,

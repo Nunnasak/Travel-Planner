@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
-import { AccountForm } from "@/components/protected/account-form";
+import { AccountForm } from "@/components/account/account-form";
 
 export default async function AccountPage() {
   const user = await getSessionUser();

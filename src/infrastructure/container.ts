@@ -15,6 +15,7 @@ import { LocationService } from "@/core/service/location.service";
 import { UpdateUsername } from "@/core/service/update-username";
 import { ChangePassword } from "@/core/service/change-password";
 import { DeleteAccount } from "@/core/service/delete-account";
+import { LogoutAllDevices } from "@/core/service/logout-all-devices";
 
 // --- infrastructure ---
 const users = new PrismaUserRepository(prisma);
@@ -32,6 +33,7 @@ export const container = {
   updateUsername: new UpdateUsername(users),
   changePassword: new ChangePassword(users, hasher, sessions, tokens),
   deleteAccount: new DeleteAccount(users, hasher, sessions),
+  logoutAllDevices: new LogoutAllDevices(sessions),
 };
 
 export const discoveryService = new DiscoveryService(prisma);
