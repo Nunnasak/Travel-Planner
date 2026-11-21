@@ -364,7 +364,9 @@ async function main() {
     const template = SCHEDULE_TEMPLATES[i];
     const isPublic = i < 35; // 35 แผนแรกเป็น Public, 15 แผนหลังเป็น Private
     const owner = users[i % users.length];
-    const category = categories[i % categories.length];
+    const planCategories = i % 2 === 0
+      ? [categories[i % categories.length]]
+      : [categories[i % categories.length], categories[(i + 3) % categories.length]];
 
     // รวบรวม location_id ที่เกี่ยวข้องกับจังหวัดในแผนนี้
     let candidateLocations: number[] = [];
@@ -383,7 +385,7 @@ async function main() {
         description: template.description,
         total_day: template.total_day,
         cover_url: template.cover_url,
-        category,
+        categories: planCategories,
         is_public: isPublic,
         owner_id: owner.user_id,
       },
