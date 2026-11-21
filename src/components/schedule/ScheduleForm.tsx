@@ -8,13 +8,12 @@ import { pickFieldErrors, sendJson } from "@/lib/api-client";
 const FIELDS = ["schedule_name", "description", "total_day", "categories", "cover_url"] as const;
 type Field = (typeof FIELDS)[number];
 
-export type ScheduleFormValues = {
+type ScheduleFormValues = {
   schedule_name: string;
   description: string;
   total_day: number;
   categories: string[];
   cover_url: string;
-  is_public: boolean;
 };
 
 const EMPTY: ScheduleFormValues = {
@@ -23,23 +22,14 @@ const EMPTY: ScheduleFormValues = {
   total_day: 1,
   categories: [],
   cover_url: "",
-  is_public: false,
 };
 
-type Props = {
-  scheduleId?: number;
-  initial?: ScheduleFormValues;
-  onSaved?: () => void;
-  onCancel?: () => void;
-};
-
-export default function ScheduleForm({ scheduleId, initial = EMPTY, onSaved, onCancel }: Props) {
+export default function ScheduleForm() {
   const router = useRouter();
-  const [values, setValues] = useState(initial);
+  const [values, setValues] = useState(EMPTY);
   const [errors, setErrors] = useState<Partial<Record<Field, string>>>({});
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
-  const editing = scheduleId !== undefined;
 
   function set<K extends keyof ScheduleFormValues>(key: K, value: ScheduleFormValues[K]) {
     setValues((current) => ({ ...current, [key]: value }));
@@ -59,18 +49,10 @@ export default function ScheduleForm({ scheduleId, initial = EMPTY, onSaved, onC
 
     setSaving(true);
     try {
-      const result = editing
-        ? await sendJson("PATCH", `/api/schedules/${scheduleId}`, values)
-        : await sendJson("POST", "/api/schedules", values);
+      const result = await sendJson("POST", "/api/schedules", values);
 
       if (result.ok) {
-        if (onSaved) {
-          onSaved();
-          router.refresh();
-        } else {
-          router.push(`/schedules/${result.data.schedule_id}`);
-        }
-        setSaving(false);
+        router.push(`/schedules/${result.data.schedule_id}`);
         return;
       }
       if (result.status === 401) return router.push("/login");
@@ -156,26 +138,11 @@ export default function ScheduleForm({ scheduleId, initial = EMPTY, onSaved, onC
         error={errors.cover_url}
       />
 
-      <label className="check-row">
-        <input
-          type="checkbox"
-          className="check"
-          checked={values.is_public}
-          onChange={(e) => set("is_public", e.target.checked)}
-        />
-        Show this plan on Discover
-      </label>
-
       {formError && <p className="form-error" role="alert">{formError}</p>}
 
       <div className="form-actions">
-        {onCancel && (
-          <button type="button" className="btn-outline" onClick={onCancel} disabled={saving}>
-            Cancel
-          </button>
-        )}
         <button type="submit" className="btn-coral" disabled={saving}>
-          {saving ? "Saving…" : editing ? "Save changes" : "Create plan"}
+          {saving ? "Creating…" : "Create plan"}
         </button>
       </div>
     </form>
