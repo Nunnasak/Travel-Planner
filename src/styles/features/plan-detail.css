@@ -132,3 +132,68 @@
   justify-items: end;
   gap: 4px;
 }
+
+.detail-grid-map {
+  grid-template-columns: 240px minmax(0, 1fr) minmax(300px, 380px);
+  grid-template-areas: "info plan map";
+}
+
+.detail-grid-map > .detail-side {
+  grid-area: info;
+}
+
+.detail-grid-map > .detail-plan {
+  grid-area: plan;
+}
+
+.detail-map {
+  grid-area: map;
+  position: sticky;
+  top: calc(var(--topbar-h) + 16px);
+  display: grid;
+  gap: 8px;
+}
+
+.detail-map h2 {
+  margin: 0;
+  color: #1f2d2d;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.detail-map .map-frame {
+  height: min(55vh, 460px);
+}
+
+.detail-grid-map [id^="day-"] {
+  scroll-margin-top: calc(var(--topbar-h) + 12px);
+}
+
+@media (max-width: 1200px) {
+  .detail-grid-map {
+    grid-template-columns: 260px minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "info plan"
+      "map plan";
+  }
+
+  .detail-map .map-frame {
+    height: 280px;
+  }
+}
+
+@media (max-width: 800px) {
+  .detail-grid-map {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    grid-template-areas:
+      "info"
+      "map"
+      "plan";
+  }
+
+  .detail-map {
+    position: static;
+  }
+}

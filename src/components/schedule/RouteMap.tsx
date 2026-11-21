@@ -4,7 +4,7 @@ type MapStop = {
   location: { name: string; city: { city_name: string; province: { province_name: string } } };
 };
 
-type MapDay = { day_no: number; stops: MapStop[] };
+export type MapDay = { day_no: number; stops: MapStop[] };
 
 const MAX_STOPS = 10;
 
@@ -37,10 +37,18 @@ function openUrl(stops: MapStop[]) {
   return `https://www.google.com/maps/dir/?${params}`;
 }
 
-export default function RouteMap({ days }: { days: MapDay[] }) {
+type Props = {
+  days: MapDay[];
+  selected?: number;
+  onSelect?: (dayNo: number) => void;
+};
+
+export default function RouteMap({ days, selected, onSelect }: Props) {
   const firstWithStops = days.find((day) => day.stops.length > 0)?.day_no ?? 1;
-  const [selected, setSelected] = useState(firstWithStops);
-  const day = days.find((d) => d.day_no === selected) ?? days[0];
+  const [ownSelected, setOwnSelected] = useState(firstWithStops);
+  const current = selected ?? ownSelected;
+  const choose = onSelect ?? setOwnSelected;
+  const day = days.find((d) => d.day_no === current) ?? days[0];
   const stops = day?.stops.slice(0, MAX_STOPS) ?? [];
 
   return (
@@ -52,7 +60,7 @@ export default function RouteMap({ days }: { days: MapDay[] }) {
             type="button"
             role="tab"
             aria-selected={d.day_no === day?.day_no}
-            onClick={() => setSelected(d.day_no)}
+            onClick={() => choose(d.day_no)}
           >
             Day {d.day_no}
           </button>
