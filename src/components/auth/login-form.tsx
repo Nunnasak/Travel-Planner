@@ -111,7 +111,7 @@ export function LoginForm() {
             checked={agree}
             onChange={(e) => setAgree(e.target.checked)}
           />
-          <span>จำรหัสผ่าน 30 วัน</span>
+          <span>จดจำการเข้าสู่ระบบ 30 วัน</span>
         </label>
 
         {formError && (

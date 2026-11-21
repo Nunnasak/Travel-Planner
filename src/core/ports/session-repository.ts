@@ -6,4 +6,5 @@ export interface SessionRepository {
   deleteByTokenHash(tokenHash: string): Promise<void>;
   deleteAllByUserId(userId: number): Promise<void>;
   deleteExpired(): Promise<void>;
+  deleteAllByUserIdExcept(userId: number, keepTokenHash: string): Promise<void>;
 }
