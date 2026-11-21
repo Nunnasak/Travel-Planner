@@ -95,7 +95,7 @@ describe("ScheduleItemService.removeFromSchedule / editInSchedule", () => {
 
   it("does not find an item through another plan's id", async () => {
     const a = await add(0, 1);
-    const other = await schedules.create(ctx.userId, { schedule_name: "Other", total_day: 1, category: "NATURE" });
+    const other = await schedules.create(ctx.userId, { schedule_name: "Other", total_day: 1, categories: ["NATURE"] });
 
     await expect(items.removeFromSchedule(other.schedule_id, a.item_id, ctx.userId)).rejects.toBeInstanceOf(
       NotFoundError,

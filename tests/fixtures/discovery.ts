@@ -3,10 +3,11 @@ import { Category, PrismaClient } from "../../src/generated/prisma/client";
 export type DiscoveryContext = {
   bangkokId: number;
   chiangMaiId: number;
+  phraNakhonId: number;
   plans: {
     // public, 1 day, CULTURE, Bangkok only
     temples: number;
-    // public, 4 days, NATURE, Bangkok then Chiang Mai, items inserted out of order
+    // public, 4 days, NATURE + CULTURE, Bangkok then Chiang Mai, items inserted out of order
     northern: number;
     // public, 7 days, NATURE, Chiang Mai, has its own cover_url
     longTrip: number;
@@ -51,7 +52,7 @@ export async function seedDiscoveryContext(prisma: PrismaClient): Promise<Discov
       schedule_name: "Bangkok temples",
       description: "A day around the old town",
       total_day: 1,
-      category: Category.CULTURE,
+      categories: [Category.CULTURE],
       is_public: true,
       owner_id: owner.user_id,
       created_at: new Date("2026-01-01T00:00:00Z"),
@@ -69,7 +70,7 @@ export async function seedDiscoveryContext(prisma: PrismaClient): Promise<Discov
       schedule_name: "Northern escape",
       description: "Mountains and old temples",
       total_day: 4,
-      category: Category.NATURE,
+      categories: [Category.NATURE, Category.CULTURE],
       is_public: true,
       owner_id: owner.user_id,
       created_at: new Date("2026-01-02T00:00:00Z"),
@@ -86,7 +87,7 @@ export async function seedDiscoveryContext(prisma: PrismaClient): Promise<Discov
     data: {
       schedule_name: "Long trip",
       total_day: 7,
-      category: Category.NATURE,
+      categories: [Category.NATURE],
       cover_url: "https://img.test/long-trip-cover.jpg",
       is_public: true,
       owner_id: owner.user_id,
@@ -104,7 +105,7 @@ export async function seedDiscoveryContext(prisma: PrismaClient): Promise<Discov
       schedule_name: "Secret plan",
       description: "Private, must never show in discovery",
       total_day: 1,
-      category: Category.CULTURE,
+      categories: [Category.CULTURE],
       is_public: false,
       owner_id: owner.user_id,
       created_at: new Date("2026-01-04T00:00:00Z"),
@@ -119,6 +120,7 @@ export async function seedDiscoveryContext(prisma: PrismaClient): Promise<Discov
   return {
     bangkokId: bangkok.province_id,
     chiangMaiId: chiangMai.province_id,
+    phraNakhonId: phraNakhon.city_id,
     plans: {
       temples: temples.schedule_id,
       northern: northern.schedule_id,

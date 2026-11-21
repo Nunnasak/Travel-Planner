@@ -21,7 +21,7 @@ export async function seedScheduleContext(prisma: PrismaClient): Promise<Schedul
     data: {
       schedule_name: "Northern trip",
       total_day: 3,
-      category: Category.CULTURE,
+      categories: [Category.CULTURE],
       owner_id: user.user_id,
     },
   });
