@@ -17,7 +17,7 @@ async function orNull<T>(load: Promise<T>): Promise<T | null> {
 
 type SP = Promise<Record<string, string | string[] | undefined>>;
 // ถ้าเพิ่ม filter ใหม่ ต้องเพิ่มใน keep ของ SEARCH_PAGES["/discover"] ใน topbar.tsx ด้วย
-const KEYS = ["q", "province_id", "category", "days"] as const;
+const KEYS = ["q", "province_id", "city_id", "category", "days"] as const;
 
 export default async function DiscoverPage({ searchParams }: { searchParams: SP }) {
   const sp = await searchParams;

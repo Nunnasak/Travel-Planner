@@ -30,12 +30,14 @@ export class DiscoveryService {
     const query = discoveryQuerySchema.parse(input);
 
     const where: Prisma.ScheduleWhereInput = { is_public: true };
-    if (query.category) where.category = query.category;
+    if (query.category) where.categories = { hasSome: query.category };
     if (query.days !== undefined) {
       where.total_day =
         query.days === DAYS_OR_MORE ? { gte: DAYS_OR_MORE } : query.days;
     }
-    if (query.province_id !== undefined) {
+    if (query.city_id !== undefined) {
+      where.items = { some: { location: { city_id: query.city_id } } };
+    } else if (query.province_id !== undefined) {
       where.items = {
         some: { location: { city: { province_id: query.province_id } } },
       };
@@ -62,7 +64,7 @@ export class DiscoveryService {
           description: true,
           total_day: true,
           cover_url: true,
-          category: true,
+          categories: true,
           created_at: true,
           owner: { select: { user_id: true, username: true } },
           items: {
@@ -84,7 +86,7 @@ export class DiscoveryService {
         schedule_name: row.schedule_name,
         description: row.description,
         total_day: row.total_day,
-        category: row.category,
+        categories: row.categories,
         cover_url: row.cover_url ?? firstImage,
         created_at: row.created_at,
         owner: row.owner,
@@ -112,7 +114,7 @@ export class DiscoveryService {
         description: true,
         total_day: true,
         cover_url: true,
-        category: true,
+        categories: true,
         created_at: true,
         owner: { select: { user_id: true, username: true } },
         items: {
