@@ -7,3 +7,5 @@ export type PlanItem = DiscoveryPage["items"][number];
 export type PlanDetail = Awaited<ReturnType<DiscoveryService["getPublic"]>>;
 export type Stop = PlanDetail["days"][number]["stops"][number];
 export type Province = Awaited<ReturnType<DiscoveryService["listProvinces"]>>[number];
+
+export const DISCOVER_FILTER_KEYS = ["province_id", "city_id", "category", "days"] as const;

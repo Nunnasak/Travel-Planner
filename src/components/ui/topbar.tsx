@@ -2,16 +2,17 @@
 
 import { usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { DISCOVER_FILTER_KEYS } from "@/lib/discovery";
 
 type SearchPage = {
   placeholder: string;
-  keep: string[]; // filter ที่ต้องคงไว้ตอนค้นหาใหม่ (ไม่รวม q และ page)
+  keep: readonly string[]; // filter ที่ต้องคงไว้ตอนค้นหาใหม่ (ไม่รวม q และ page)
 };
 
 const SEARCH_PAGES: Record<string, SearchPage> = {
   "/discover": {
     placeholder: "Search plans, places, provinces…",
-    keep: ["province_id", "city_id", "category", "days"], // ให้ตรงกับ KEYS ใน discover/page.tsx
+    keep: DISCOVER_FILTER_KEYS,
   },
   "/schedules": {
     placeholder: "Search my schedules…",
