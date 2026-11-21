@@ -34,7 +34,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       <body>
         <Topbar/>
         <Sidebar user={user ? { name: user.name, email: user.email, id: user.id } : null} />
-        <div className="app-content">{children}</div>
+        {children}
       </body>
     </html>
   );
