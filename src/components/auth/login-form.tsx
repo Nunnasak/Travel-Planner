@@ -11,7 +11,7 @@ import { EMAIL_PATTERN } from "@/lib/validation";
 type Field = "email" | "password";
 type Errors = Partial<Record<Field, string>>;
 
-export function LoginForm() {
+export function LoginForm({ redirectTo = "/discover" }: { redirectTo?: string }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -49,7 +49,7 @@ export function LoginForm() {
       });
 
       if (result.ok) {
-        router.push("/discover");
+        router.push(redirectTo);
         router.refresh();
         return;
       }

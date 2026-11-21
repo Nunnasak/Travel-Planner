@@ -1,14 +1,14 @@
 import Link from "next/link";
 import CategoryTags from "@/components/ui/category-tags";
-import { coverTint } from "@/lib/categories";
+import { coverTintClass } from "@/lib/categories";
 import type { PlanItem } from "@/lib/discovery";
 
 export default function PlanCard({ plan }: { plan: PlanItem }) {
   return (
     <Link href={`/discover/${plan.schedule_id}`} className="plan-card">
       <div
-        className={`plan-cover ${plan.cover_url ? "" : "cover-x"}`}
-        style={plan.cover_url ? { backgroundImage: `url(${plan.cover_url})` } : { backgroundColor: coverTint(plan.categories) }}
+        className={`plan-cover ${plan.cover_url ? "" : `cover-x ${coverTintClass(plan.categories)}`}`}
+        style={plan.cover_url ? { backgroundImage: `url(${plan.cover_url})` } : undefined}
       >
         {!plan.cover_url && <span className="cover-badge">IMG</span>}
         <CategoryTags categories={plan.categories} max={2} />

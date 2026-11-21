@@ -1,21 +1,44 @@
 .filter-trigger {
-  padding: 10px 32px;
-  border: 2px solid #19b5a5;
-  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1.5px solid #19b5a5;
+  border-radius: 999px;
   background: #fff;
   color: #0b5d5b;
-  font-size: 1.2vw;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.filter-trigger svg {
+  width: 16px;
+  height: 16px;
 }
 
 .filter-trigger:hover {
   background-color: #19b5a5;
-  color: white;
+  color: #fff;
 }
 
 .filter-trigger:active {
   transform: scale(0.98);
+}
+
+.filter-count {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #dd4b33;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .filter-panel {
@@ -64,20 +87,33 @@
 }
 
 .filter-close {
-  padding: 4px 6px;
-  border: 0;
-  border-radius: 6px;
-  background: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid #eadfcb;
+  border-radius: 50%;
+  background: #fff;
   color: #6b7c7c;
-  font-size: 14px;
-  font-weight: 500;
   cursor: pointer;
-  transition: color 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.filter-close svg {
+  width: 16px;
+  height: 16px;
 }
 
 .filter-close:hover {
-  color: #232523;
-  background-color: #f1ede3;
+  border-color: #19b5a5;
+  background-color: #d3f3ee;
+  color: #0b5d5b;
+}
+
+.filter-close:focus-visible {
+  outline: 2px solid #19b5a5;
+  outline-offset: 2px;
 }
 
 .filter-close:active {

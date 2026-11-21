@@ -1,6 +1,5 @@
 import { notFound, redirect } from "next/navigation";
 import ScheduleEditor from "@/components/schedule/ScheduleEditor";
-import { BackTopBar } from "@/components/schedule/ScheduleTopBar";
 import { NotFoundError } from "@/core/errors/not-found.error";
 import { idSchema } from "@/core/schema/discovery.schema";
 import { scheduleService } from "@/infrastructure/container";
@@ -19,10 +18,5 @@ export default async function SchedulePage({ params }: { params: Promise<{ sched
   });
   if (!plan) notFound();
 
-  return (
-    <>
-      <BackTopBar />
-      <ScheduleEditor plan={plan} />
-    </>
-  );
+  return <ScheduleEditor plan={plan} />;
 }
