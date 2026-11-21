@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import ScheduleCard from "@/components/schedule/ScheduleCard";
-import { ScheduleTopBar } from "@/components/schedule/ScheduleTopBar";
 import { scheduleService } from "@/infrastructure/container";
 import { getSessionUser } from "@/lib/auth";
 
@@ -22,7 +21,6 @@ export default async function MySchedulePage({ searchParams }: { searchParams: S
 
   return (
     <>
-      <ScheduleTopBar q={q} />
       <div className="page-content">
         <div className="page-header">
           <h1>My Schedule</h1>
