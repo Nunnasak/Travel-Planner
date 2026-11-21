@@ -129,3 +129,55 @@ describe("ScheduleService.update / delete", () => {
     await expect(prisma.scheduleItem.count()).resolves.toBe(0);
   });
 });
+
+describe("ScheduleService.copy", () => {
+  it("copies a public plan with every stop into a new private plan of the user", async () => {
+    await schedules.update(ctx.scheduleId, ctx.userId, { is_public: true, categories: ["NATURE", "CULTURE"] });
+    await items.addToSchedule(ctx.scheduleId, ctx.userId, { location_id: ctx.locationIds[0], day_no: 1, visit_time: "09:00" });
+    await items.addToSchedule(ctx.scheduleId, ctx.userId, { location_id: ctx.locationIds[1], day_no: 1, visit_time: "11:00" });
+    await items.addToSchedule(ctx.scheduleId, ctx.userId, { location_id: ctx.locationIds[2], day_no: 2, visit_time: "08:30" });
+
+    const copy = await schedules.copy(ctx.scheduleId, ctx.otherUserId);
+    const plan = await schedules.getForUser(copy.schedule_id, ctx.otherUserId);
+
+    expect(copy).toMatchObject({
+      owner_id: ctx.otherUserId,
+      is_public: false,
+      schedule_name: "Northern trip (copy)",
+      categories: ["NATURE", "CULTURE"],
+    });
+    expect(plan.days.map((day) => day.stops.map((stop) => [stop.location.location_id, stop.visit_time]))).toEqual([
+      [
+        [ctx.locationIds[0], "09:00"],
+        [ctx.locationIds[1], "11:00"],
+      ],
+      [[ctx.locationIds[2], "08:30"]],
+      [],
+    ]);
+  });
+
+  it("leaves the original plan untouched", async () => {
+    await schedules.update(ctx.scheduleId, ctx.userId, { is_public: true });
+    await items.addToSchedule(ctx.scheduleId, ctx.userId, { location_id: ctx.locationId, day_no: 1, visit_time: "09:00" });
+
+    await schedules.copy(ctx.scheduleId, ctx.otherUserId);
+
+    await expect(prisma.scheduleItem.count({ where: { schedule_id: ctx.scheduleId } })).resolves.toBe(1);
+    await expect(prisma.schedule.findUnique({ where: { schedule_id: ctx.scheduleId } })).resolves.toMatchObject({
+      owner_id: ctx.userId,
+      is_public: true,
+    });
+  });
+
+  it("hides a private plan from someone who is not a member", async () => {
+    await expect(schedules.copy(ctx.scheduleId, ctx.otherUserId)).rejects.toBeInstanceOf(NotFoundError);
+  });
+
+  it("lets a member copy a private plan they can see", async () => {
+    await addMember(prisma, ctx.scheduleId, ctx.otherUserId, Role.VIEWER);
+
+    await expect(schedules.copy(ctx.scheduleId, ctx.otherUserId)).resolves.toMatchObject({
+      owner_id: ctx.otherUserId,
+    });
+  });
+});
