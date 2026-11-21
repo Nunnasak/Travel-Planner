@@ -13,7 +13,7 @@ type Props = {
 };
 
 function metaLine(plan: ScheduleDetail, days: number) {
-  const parts = [`${days} ${days === 1 ? "day" : "days"}`, plan.is_public ? "On Discover" : "Private"];
+  const parts = [`${days} ${days === 1 ? "day" : "days"}`, plan.post ? "Posted on Discover" : "Private"];
   if (plan.member_count > 0) {
     parts.push(`Shared with ${plan.member_count} ${plan.member_count === 1 ? "person" : "people"}`);
   }

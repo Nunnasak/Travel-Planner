@@ -36,7 +36,7 @@ export class ShareService {
       select: {
         share_token: true,
         link_access: true,
-        is_public: true,
+        post: { select: { schedule_id: true, updated_at: true } },
         owner: { select: { user_id: true, username: true, email: true } },
         members: {
           select: { role: true, user: { select: { user_id: true, username: true, email: true } } },
@@ -53,7 +53,7 @@ export class ShareService {
 
     return {
       can_manage: canManage,
-      is_public: schedule.is_public,
+      post: schedule.post,
       link_access: schedule.link_access,
       share_path: `/share/${token}`,
       owner: person(schedule.owner),

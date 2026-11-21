@@ -29,6 +29,20 @@ function visibleTo(userId: number): Prisma.ScheduleWhereInput {
   return { OR: [{ owner_id: userId }, { members: { some: { user_id: userId } } }] };
 }
 
+const POST_SELECT = { select: { schedule_id: true, updated_at: true } } satisfies Prisma.Schedule$postArgs;
+
+const SNAPSHOT_SELECT = {
+  schedule_name: true,
+  description: true,
+  total_day: true,
+  cover_url: true,
+  categories: true,
+  items: {
+    orderBy: [{ day_no: "asc" }, { sequence_no: "asc" }],
+    select: { day_no: true, sequence_no: true, visit_time: true, location_id: true },
+  },
+} satisfies Prisma.ScheduleSelect;
+
 export class ScheduleService {
   constructor(private readonly prisma: PrismaClient) {}
 
@@ -37,10 +51,11 @@ export class ScheduleService {
       where: { schedule_id: scheduleId },
       select: {
         owner_id: true,
+        published_from_id: true,
         members: { where: { user_id: userId }, select: { role: true } },
       },
     });
-    if (!schedule) throw new NotFoundError("Plan not found.");
+    if (!schedule || schedule.published_from_id !== null) throw new NotFoundError("Plan not found.");
     if (schedule.owner_id === userId) return "owner";
     const role = schedule.members[0]?.role;
     if (role === "EDITOR") return "editor";
@@ -56,7 +71,7 @@ export class ScheduleService {
 
   async listMine(userId: number) {
     const rows = await this.prisma.schedule.findMany({
-      where: visibleTo(userId),
+      where: { AND: [visibleTo(userId), { published_from_id: null }] },
       orderBy: { updated_at: "desc" },
       select: {
         schedule_id: true,
@@ -65,9 +80,9 @@ export class ScheduleService {
         total_day: true,
         cover_url: true,
         categories: true,
-        is_public: true,
         updated_at: true,
         owner_id: true,
+        post: POST_SELECT,
         items: {
           orderBy: [...ORDERED_ITEMS],
           select: { location: { select: { image_url: true } } },
@@ -94,9 +109,9 @@ export class ScheduleService {
         total_day: true,
         cover_url: true,
         categories: true,
-        is_public: true,
         created_at: true,
         updated_at: true,
+        post: POST_SELECT,
         owner: { select: { user_id: true, username: true } },
         _count: { select: { members: true } },
         items: {
@@ -136,10 +151,7 @@ export class ScheduleService {
 
   async update(scheduleId: number, userId: number, input: unknown) {
     const data = updateScheduleSchema.parse(input);
-    const access = await this.assertCanEdit(scheduleId, userId);
-    if (data.is_public !== undefined && access !== "owner") {
-      throw new ForbiddenError("Only the owner can post this plan to Discover.");
-    }
+    await this.assertCanEdit(scheduleId, userId);
 
     if (data.total_day !== undefined) {
       const last = await this.prisma.scheduleItem.aggregate({
@@ -161,17 +173,7 @@ export class ScheduleService {
   async copy(scheduleId: number, userId: number) {
     const source = await this.prisma.schedule.findFirst({
       where: { schedule_id: scheduleId, OR: [{ is_public: true }, visibleTo(userId)] },
-      select: {
-        schedule_name: true,
-        description: true,
-        total_day: true,
-        cover_url: true,
-        categories: true,
-        items: {
-          orderBy: [...ORDERED_ITEMS],
-          select: { day_no: true, sequence_no: true, visit_time: true, location_id: true },
-        },
-      },
+      select: SNAPSHOT_SELECT,
     });
     if (!source) throw new NotFoundError("Plan not found.");
 
@@ -180,11 +182,51 @@ export class ScheduleService {
       data: {
         ...rest,
         schedule_name: `${schedule_name.slice(0, 93)} (copy)`,
-        is_public: false,
         owner_id: userId,
         items: { create: items },
       },
     });
+  }
+
+  private async assertOwner(scheduleId: number, userId: number, message: string) {
+    const access = await this.access(scheduleId, userId);
+    if (access !== "owner") throw new ForbiddenError(message);
+  }
+
+  async publish(scheduleId: number, userId: number) {
+    await this.assertOwner(scheduleId, userId, "Only the owner can post this plan to Discover.");
+    const source = await this.prisma.schedule.findUniqueOrThrow({
+      where: { schedule_id: scheduleId },
+      select: { ...SNAPSHOT_SELECT, post: POST_SELECT },
+    });
+    const { items, post, ...fields } = source;
+
+    return this.prisma.$transaction(async (tx) => {
+      if (post) {
+        await tx.scheduleItem.deleteMany({ where: { schedule_id: post.schedule_id } });
+        return tx.schedule.update({
+          where: { schedule_id: post.schedule_id },
+          data: { ...fields, items: { create: items } },
+          select: { schedule_id: true, updated_at: true },
+        });
+      }
+      return tx.schedule.create({
+        data: {
+          ...fields,
+          is_public: true,
+          owner_id: userId,
+          published_from_id: scheduleId,
+          items: { create: items },
+        },
+        select: { schedule_id: true, updated_at: true },
+      });
+    });
+  }
+
+  async unpublish(scheduleId: number, userId: number) {
+    await this.assertOwner(scheduleId, userId, "Only the owner can remove this plan from Discover.");
+    const removed = await this.prisma.schedule.deleteMany({ where: { published_from_id: scheduleId } });
+    if (removed.count === 0) throw new NotFoundError("This plan isn't on Discover.");
   }
 
   async delete(scheduleId: number, userId: number) {

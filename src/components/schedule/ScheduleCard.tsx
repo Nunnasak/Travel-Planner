@@ -45,7 +45,7 @@ export default function ScheduleCard({ plan }: { plan: MySchedule }) {
         >
           {!plan.cover_url && <span className="cover-badge">IMG</span>}
           <CategoryTags categories={plan.categories} max={2} />
-          {plan.is_public && <span className="tag tag-public">Public</span>}
+          {plan.post && <span className="tag tag-public">On Discover</span>}
         </div>
         <div className="plan-body">
           <h3>{plan.schedule_name}</h3>

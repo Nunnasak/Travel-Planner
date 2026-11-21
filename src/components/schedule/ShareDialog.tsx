@@ -80,14 +80,16 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
     }
   }
 
-  async function togglePublic() {
+  async function changePost(method: "POST" | "DELETE") {
     if (!sharing) return;
+    if (method === "DELETE" && !confirm("Remove this plan from Discover? Your plan stays as it is.")) return;
     setBusy(true);
     setError("");
     try {
-      const result = await sendJson("PATCH", base, { is_public: !sharing.is_public });
-      if (!result.ok) return setError(result.data.message ?? "Couldn't update the plan.");
-      setSharing({ ...sharing, is_public: !sharing.is_public });
+      const result = await sendJson(method, `${base}/post`);
+      if (!result.ok) return setError(result.data.message ?? "Couldn't update Discover.");
+      const post = method === "POST" ? (result.data as unknown as Sharing["post"]) : null;
+      setSharing({ ...sharing, post });
       router.refresh();
     } catch {
       setError("Cannot reach the server. Check your connection and try again.");
@@ -293,20 +295,37 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
             {copied && <p className="share-hint" role="status">{copied}</p>}
 
             {manage && (
-              <label className="share-public">
-                <span>
-                  <strong>Show on Discover</strong>
-                  <span>Anyone can find and duplicate this plan.</span>
-                </span>
-                <input
-                  type="checkbox"
-                  role="switch"
-                  className="share-switch"
-                  checked={sharing.is_public}
-                  disabled={busy}
-                  onChange={togglePublic}
-                />
-              </label>
+              <section className="share-public">
+                <div className="share-public-text">
+                  <strong>Post to Discover</strong>
+                  {sharing.post ? (
+                    <span>
+                      Posted {new Date(sharing.post.updated_at).toLocaleString()}. Changes you make later stay
+                      private until you update the post.{" "}
+                      <a href={`/discover/${sharing.post.schedule_id}`} target="_blank" rel="noopener noreferrer">
+                        View post
+                      </a>
+                    </span>
+                  ) : (
+                    <span>Post a copy of this plan as it is now. Anyone can find and duplicate it.</span>
+                  )}
+                </div>
+                <div className="share-public-actions">
+                  {sharing.post && (
+                    <button
+                      type="button"
+                      className="btn-outline danger"
+                      disabled={busy}
+                      onClick={() => changePost("DELETE")}
+                    >
+                      Remove
+                    </button>
+                  )}
+                  <button type="button" className="btn-outline" disabled={busy} onClick={() => changePost("POST")}>
+                    {sharing.post ? "Update post" : "Post"}
+                  </button>
+                </div>
+              </section>
             )}
 
             {error && <p className="form-error" role="alert">{error}</p>}
