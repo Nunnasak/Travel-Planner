@@ -1,0 +1,35 @@
+.app-content {
+  margin-left: var(--sidebar-w);
+  min-height: calc(100vh - var(--topbar-h));
+}
+
+.page-content {
+  display: grid;
+  gap: 24px;
+  padding: 12px 36px 0 36px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.page-header h1 {
+  margin: 0;
+  color: #0b5d5b;
+  font-family: var(--font-mitr), sans-serif;
+  font-size: 3.2vw;
+  font-weight: 700;
+}
+
+.empty {
+  padding: 64px 0;
+  text-align: center;
+  color: #6b7c7c;
+}
+
+.empty .btn-coral {
+  margin-top: 12px;
+}

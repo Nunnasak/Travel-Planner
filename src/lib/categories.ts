@@ -24,3 +24,7 @@ export function categoryInfo(key: string): CategoryInfo {
 }
 
 export const CATEGORY_KEYS = Object.keys(MAP) as CategoryKey[];
+
+export function coverTint(keys: string[]): string {
+  return categoryInfo(keys[0] ?? "").tint;
+}

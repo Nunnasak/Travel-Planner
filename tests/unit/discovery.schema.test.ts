@@ -41,11 +41,17 @@ describe("discoveryQuerySchema", () => {
         q: "  temple  ",
         province_id: "3",
         category: "CULTURE",
+        city_id: "7",
         days: "2",
         page: "2",
         page_size: "20",
       }),
-    ).toEqual({ q: "temple", province_id: 3, category: "CULTURE", days: 2, page: 2, page_size: 20 });
+    ).toEqual({ q: "temple", province_id: 3, city_id: 7, category: ["CULTURE"], days: 2, page: 2, page_size: 20 });
+  });
+
+  it("reads several categories from a comma separated value or repeated keys", () => {
+    expect(discoveryQuerySchema.parse({ category: "NATURE,CULTURE" }).category).toEqual(["NATURE", "CULTURE"]);
+    expect(discoveryQuerySchema.parse({ category: ["NATURE", "MARINE"] }).category).toEqual(["NATURE", "MARINE"]);
   });
 
   it.each(["1", "2", "3", "4"])("accepts days = %s", (days) => {
@@ -61,6 +67,8 @@ describe("discoveryQuerySchema", () => {
     ["province_id", "99999999999"],
     ["category", "culture"],
     ["category", "UNKNOWN"],
+    ["category", "NATURE,UNKNOWN"],
+    ["city_id", "abc"],
     ["page", "0"],
     ["page", "10001"],
     ["page", "9007199254740991"],
@@ -71,6 +79,6 @@ describe("discoveryQuerySchema", () => {
     const result = discoveryQuerySchema.safeParse({ [field]: value });
 
     expect(result.success).toBe(false);
-    expect(result.error?.issues[0]?.path).toEqual([field]);
+    expect(result.error?.issues[0]?.path[0]).toBe(field);
   });
 });

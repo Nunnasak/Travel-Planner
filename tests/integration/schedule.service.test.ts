@@ -32,7 +32,7 @@ describe("ScheduleService.create / listMine", () => {
     const plan = await schedules.create(ctx.userId, {
       schedule_name: "Weekend",
       total_day: 2,
-      category: "NATURE",
+      categories: ["NATURE"],
     });
 
     expect(plan).toMatchObject({ owner_id: ctx.userId, is_public: false, total_day: 2 });
@@ -47,9 +47,9 @@ describe("ScheduleService.create / listMine", () => {
     const shared = await schedules.create(ctx.otherUserId, {
       schedule_name: "Shared",
       total_day: 1,
-      category: "CULTURE",
+      categories: ["CULTURE"],
     });
-    await schedules.create(ctx.otherUserId, { schedule_name: "Private", total_day: 1, category: "CULTURE" });
+    await schedules.create(ctx.otherUserId, { schedule_name: "Private", total_day: 1, categories: ["CULTURE"] });
     await addMember(prisma, shared.schedule_id, ctx.userId, Role.VIEWER);
 
     const mine = await schedules.listMine(ctx.userId);

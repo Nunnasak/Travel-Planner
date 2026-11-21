@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import CopyButton from "@/components/discover/CopyButton";
-import { categoryInfo } from "@/lib/categories";
+import CategoryTags from "@/components/ui/category-tags";
+import { coverTint } from "@/lib/categories";
 import { NotFoundError } from "@/core/errors/not-found.error";
 import { discoveryService } from "@/infrastructure/container";
 import type { PlanDetail as Plan } from "@/lib/discovery";
@@ -39,7 +40,6 @@ export default async function PlanDetail({ params }: { params: Promise<{ schedul
   const { scheduleId } = await params;
   const plan = await loadPlan(scheduleId);
   if (!plan) notFound();
-  const cat = categoryInfo(plan.category);
 
   // หา image_url แรกที่มีอยู่ในทริปมาใช้เป็นรูปปก
   const coverUrl =
@@ -58,7 +58,7 @@ export default async function PlanDetail({ params }: { params: Promise<{ schedul
         <aside className="detail-side">
           <div
             className={`detail-cover ${!coverUrl ? "cover-x" : ""}`}
-            style={{ backgroundColor: cat.tint }}
+            style={{ backgroundColor: coverTint(plan.categories) }}
           >
             {coverUrl ? (
               <img src={coverUrl} alt={plan.schedule_name} className="cover-img" />
@@ -68,6 +68,8 @@ export default async function PlanDetail({ params }: { params: Promise<{ schedul
           </div>
           <h2>Description</h2>
           <p className="detail-desc">{plan.description}</p>
+          <h2>Category</h2>
+          <CategoryTags categories={plan.categories} className="tag-list" />
         </aside>
 
         <section className="detail-plan">

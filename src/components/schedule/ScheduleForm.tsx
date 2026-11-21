@@ -5,14 +5,14 @@ import { Input } from "@/components/ui/input";
 import { CATEGORY_KEYS, categoryInfo } from "@/lib/categories";
 import { pickFieldErrors, sendJson } from "@/lib/api-client";
 
-const FIELDS = ["schedule_name", "description", "total_day", "category", "cover_url"] as const;
+const FIELDS = ["schedule_name", "description", "total_day", "categories", "cover_url"] as const;
 type Field = (typeof FIELDS)[number];
 
 export type ScheduleFormValues = {
   schedule_name: string;
   description: string;
   total_day: number;
-  category: string;
+  categories: string[];
   cover_url: string;
   is_public: boolean;
 };
@@ -21,7 +21,7 @@ const EMPTY: ScheduleFormValues = {
   schedule_name: "",
   description: "",
   total_day: 1,
-  category: "",
+  categories: [],
   cover_url: "",
   is_public: false,
 };
@@ -52,7 +52,7 @@ export default function ScheduleForm({ scheduleId, initial = EMPTY, onSaved, onC
 
     const next: Partial<Record<Field, string>> = {};
     if (!values.schedule_name.trim()) next.schedule_name = "Enter a plan name.";
-    if (!values.category) next.category = "Pick a category.";
+    if (values.categories.length === 0) next.categories = "Pick at least one category.";
     if (!(values.total_day >= 1)) next.total_day = "A plan needs at least 1 day.";
     setErrors(next);
     if (Object.keys(next).length > 0) return;
@@ -110,33 +110,40 @@ export default function ScheduleForm({ scheduleId, initial = EMPTY, onSaved, onC
         {errors.description && <p className="field-error">{errors.description}</p>}
       </div>
 
-      <div className="form-row">
-        <Input
-          label="Days"
-          name="total_day"
-          type="number"
-          min={1}
-          max={30}
-          value={values.total_day}
-          onChange={(e) => set("total_day", Number(e.target.value))}
-          error={errors.total_day}
-        />
-        <div className="field">
-          <label htmlFor="category">Category</label>
-          <select
-            id="category"
-            className="select"
-            value={values.category}
-            onChange={(e) => set("category", e.target.value)}
-            aria-invalid={errors.category ? true : undefined}
-          >
-            <option value="">Select category</option>
-            {CATEGORY_KEYS.map((key) => (
-              <option key={key} value={key}>{categoryInfo(key).label}</option>
-            ))}
-          </select>
-          {errors.category && <p className="field-error">{errors.category}</p>}
-        </div>
+      <Input
+        label="Days"
+        name="total_day"
+        type="number"
+        min={1}
+        max={30}
+        value={values.total_day}
+        onChange={(e) => set("total_day", Number(e.target.value))}
+        error={errors.total_day}
+      />
+
+      <div className="field">
+        <fieldset className="category-picker" aria-invalid={errors.categories ? true : undefined}>
+          <legend>Categories (pick one or more)</legend>
+          {CATEGORY_KEYS.map((key) => {
+            const checked = values.categories.includes(key);
+            return (
+              <label key={key} className={`category-option ${checked ? "is-checked" : ""}`}>
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() =>
+                    set(
+                      "categories",
+                      checked ? values.categories.filter((k) => k !== key) : [...values.categories, key],
+                    )
+                  }
+                />
+                {categoryInfo(key).label}
+              </label>
+            );
+          })}
+        </fieldset>
+        {errors.categories && <p className="field-error">{errors.categories}</p>}
       </div>
 
       <Input

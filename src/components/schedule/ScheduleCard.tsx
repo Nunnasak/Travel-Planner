@@ -2,12 +2,12 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { categoryInfo } from "@/lib/categories";
+import CategoryTags from "@/components/ui/category-tags";
+import { coverTint } from "@/lib/categories";
 import type { MySchedule } from "@/lib/schedule";
 
 export default function ScheduleCard({ plan }: { plan: MySchedule }) {
   const router = useRouter();
-  const cat = categoryInfo(plan.category);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -41,10 +41,10 @@ export default function ScheduleCard({ plan }: { plan: MySchedule }) {
       <Link href={`/schedules/${plan.schedule_id}`} className="schedule-card-link">
         <div
           className={`plan-cover ${plan.cover_url ? "" : "cover-x"}`}
-          style={plan.cover_url ? { backgroundImage: `url(${plan.cover_url})` } : { backgroundColor: cat.tint }}
+          style={plan.cover_url ? { backgroundImage: `url(${plan.cover_url})` } : { backgroundColor: coverTint(plan.categories) }}
         >
           {!plan.cover_url && <span className="cover-badge">IMG</span>}
-          <span className="tag">{cat.label}</span>
+          <CategoryTags categories={plan.categories} max={2} />
           {plan.is_public && <span className="tag tag-public">Public</span>}
         </div>
         <div className="plan-body">

@@ -1,0 +1,48 @@
+.tag {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 4px 8px;
+  border-radius: 10px;
+  background: #fff;
+  color: #0b5d5b;
+  font-size: 11px;
+}
+
+.tag-public {
+  left: auto;
+  right: 56px;
+  background: #19b5a5;
+  color: #fff;
+}
+
+.tag-row {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 120px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tag-chip {
+  padding: 4px 8px;
+  border-radius: 10px;
+  background: #fff;
+  color: #0b5d5b;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 12px;
+}
+
+.tag-list .tag-chip {
+  border: 1px solid #eadfcb;
+  font-size: 12px;
+}

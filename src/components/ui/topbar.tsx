@@ -11,7 +11,7 @@ type SearchPage = {
 const SEARCH_PAGES: Record<string, SearchPage> = {
   "/discover": {
     placeholder: "Search plans, places, provinces…",
-    keep: ["province_id", "category", "days"], // ให้ตรงกับ KEYS ใน discover/page.tsx
+    keep: ["province_id", "city_id", "category", "days"], // ให้ตรงกับ KEYS ใน discover/page.tsx
   },
   "/schedules": {
     placeholder: "Search my schedules…",

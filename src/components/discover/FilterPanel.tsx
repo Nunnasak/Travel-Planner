@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { categoryInfo, CATEGORY_KEYS } from "@/lib/categories";
 import type { Province } from "@/lib/discovery";
@@ -12,8 +12,27 @@ export default function FilterPanel({ provinces }: { provinces: Province[] }) {
   const [catQuery, setCatQuery] = useState("");
 
   const province = sp.get("province_id") ?? "";
-  const category = sp.get("category") ?? "";
-  const active = (province ? 1 : 0) + (category ? 1 : 0);
+  const city = sp.get("city_id") ?? "";
+  const selected = (sp.get("category") ?? "").split(",").filter(Boolean);
+  const active = (province ? 1 : 0) + (city ? 1 : 0) + selected.length;
+  const [cities, setCities] = useState<{ city_id: number; city_name: string }[]>([]);
+
+  useEffect(() => {
+    if (!province) return setCities([]);
+    let cancelled = false;
+    fetch(`/api/provinces/${province}/cities`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((list) => !cancelled && setCities(list))
+      .catch(() => !cancelled && setCities([]));
+    return () => {
+      cancelled = true;
+    };
+  }, [province]);
+
+  function toggleCategory(key: string) {
+    const next = selected.includes(key) ? selected.filter((k) => k !== key) : [...selected, key];
+    update({ category: next.join(",") });
+  }
 
   function update(changes: Record<string, string>) {
     const next = new URLSearchParams(sp.toString());
@@ -54,7 +73,7 @@ export default function FilterPanel({ provinces }: { provinces: Province[] }) {
           <select
             className="select"
             value={province}
-            onChange={(e) => update({ province_id: e.target.value })}
+            onChange={(e) => update({ province_id: e.target.value, city_id: "" })}
           >
             <option value="">Province</option>
             {provinces.map((p) => (
@@ -69,8 +88,19 @@ export default function FilterPanel({ provinces }: { provinces: Province[] }) {
         </div>
 
         <div className="select-wrap">
-          <select className="select" disabled title="Not supported by the API yet">
-            <option>District</option>
+          <select
+            className="select"
+            value={city}
+            disabled={!province}
+            title={province ? undefined : "Pick a province first"}
+            onChange={(e) => update({ city_id: e.target.value })}
+          >
+            <option value="">District</option>
+            {cities.map((c) => (
+              <option key={c.city_id} value={c.city_id}>
+                {c.city_name}
+              </option>
+            ))}
           </select>
           <svg className="select-chevron" viewBox="0 0 12 8" fill="none" aria-hidden="true">
             <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -106,14 +136,14 @@ export default function FilterPanel({ provinces }: { provinces: Province[] }) {
               />
               <div className="check-list">
                 {cats.map((k) => {
-                  const isChecked = category === k;
+                  const isChecked = selected.includes(k);
                   return (
                     <label key={k} className={`check-row ${isChecked ? "is-checked" : ""}`}>
                       <input
                         type="checkbox"
                         className="check"
                         checked={isChecked}
-                        onChange={() => update({ category: isChecked ? "" : k })}
+                        onChange={() => toggleCategory(k)}
                       />
                       <span className="check-box" aria-hidden="true" />
                       <span className="check-label">{categoryInfo(k).label}</span>
@@ -129,7 +159,7 @@ export default function FilterPanel({ provinces }: { provinces: Province[] }) {
           <button
             type="button"
             className="filter-clear"
-            onClick={() => update({ province_id: "", category: "" })}
+            onClick={() => update({ province_id: "", city_id: "", category: "" })}
           >
             Clear filters
           </button>

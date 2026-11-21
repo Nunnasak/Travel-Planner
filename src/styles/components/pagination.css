@@ -1,0 +1,31 @@
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 36px;
+}
+
+.pg {
+  min-width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  padding: 0 10px;
+  border: 1px solid #eadfcb;
+  border-radius: 14px;
+  background: #fff;
+  color: #1f2d2d;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.pg[aria-current="page"] {
+  border-color: #19b5a5;
+  background: #19b5a5;
+  color: #fff;
+}
+
+.pg-disabled {
+  opacity: 0.45;
+}

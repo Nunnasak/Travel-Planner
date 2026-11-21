@@ -37,14 +37,25 @@ const MAX_PAGE = 10_000;
 // Query string of GET /api/discovery
 //   q           search in plan name, description and place names
 //   province_id plans that have at least one stop in this province
-//   category    plan category
+//   city_id     plans that have at least one stop in this district
+//   category    one or more categories, comma separated (NATURE,CULTURE)
 //   days        1, 2 or 3 match exactly; 4 means "4 days or more"
 export const DAYS_OR_MORE = 4;
 
 export const discoveryQuerySchema = z.object({
   q: z.preprocess(emptyToUndefined, z.string().trim().max(100).optional()),
   province_id: z.preprocess(emptyToUndefined, idSchema.optional()),
-  category: z.preprocess(emptyToUndefined, z.enum(CATEGORIES).optional()),
+  city_id: z.preprocess(emptyToUndefined, idSchema.optional()),
+  category: z.preprocess(
+    (value) => {
+      if (value === "" || value === null || value === undefined) return undefined;
+      const list = (Array.isArray(value) ? value : [value]).flatMap((part) =>
+        typeof part === "string" ? part.split(",").filter(Boolean) : [part],
+      );
+      return list.length ? list : undefined;
+    },
+    z.array(z.enum(CATEGORIES)).max(CATEGORIES.length).optional(),
+  ),
   days: z.preprocess(
     emptyToUndefined,
     z.coerce.number().int().min(1).max(DAYS_OR_MORE).optional()

@@ -53,6 +53,22 @@ describe("DiscoveryService.list", () => {
     ]);
   });
 
+  it("matches a plan that has any of the picked categories", async () => {
+    await expect(listIds({ category: "CULTURE" })).resolves.toEqual([ctx.plans.northern, ctx.plans.temples]);
+    await expect(listIds({ category: "CULTURE,NATURE" })).resolves.toEqual([
+      ctx.plans.longTrip,
+      ctx.plans.northern,
+      ctx.plans.temples,
+    ]);
+  });
+
+  it("filters by district through any stop of the plan", async () => {
+    await expect(listIds({ city_id: String(ctx.phraNakhonId) })).resolves.toEqual([
+      ctx.plans.northern,
+      ctx.plans.temples,
+    ]);
+  });
+
   it("matches days 1-3 exactly", async () => {
     await expect(listIds({ days: "1" })).resolves.toEqual([ctx.plans.temples]);
     await expect(listIds({ days: "2" })).resolves.toEqual([]);
@@ -117,7 +133,7 @@ describe("DiscoveryService.list", () => {
     expect(card(ctx.plans.northern)).toMatchObject({
       schedule_name: "Northern escape",
       total_day: 4,
-      category: "NATURE",
+      categories: ["NATURE", "CULTURE"],
       provinces: ["Bangkok", "Chiang Mai"],
       place_count: 2,
       cover_url: "https://img.test/wat-pho.jpg",

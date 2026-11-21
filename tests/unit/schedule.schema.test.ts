@@ -7,7 +7,7 @@ import {
 import { createLocationSchema } from "@/core/schema/location.schema";
 import { addScheduleItemSchema, editScheduleItemSchema } from "@/core/schema/scheduleItem.schema";
 
-const valid = { schedule_name: "Bangkok trip", total_day: 2, category: "CULTURE" };
+const valid = { schedule_name: "Bangkok trip", total_day: 2, categories: ["CULTURE"] };
 
 function issues(result: { success: boolean; error?: { issues: { path: PropertyKey[] }[] } }) {
   return result.error?.issues.map((issue) => String(issue.path[0])) ?? [];
@@ -25,11 +25,18 @@ describe("createScheduleSchema", () => {
     expect(parsed).toEqual({
       schedule_name: "Bangkok trip",
       total_day: 2,
-      category: "CULTURE",
+      categories: ["CULTURE"],
       description: null,
       cover_url: null,
       is_public: false,
     });
+  });
+
+  it("keeps several categories and drops repeats", () => {
+    expect(createScheduleSchema.parse({ ...valid, categories: ["NATURE", "CULTURE", "NATURE"] }).categories).toEqual([
+      "NATURE",
+      "CULTURE",
+    ]);
   });
 
   it("accepts total_day sent as a string from a form", () => {
@@ -42,7 +49,9 @@ describe("createScheduleSchema", () => {
     ["total_day", { total_day: 0 }],
     ["total_day", { total_day: 31 }],
     ["total_day", { total_day: 1.5 }],
-    ["category", { category: "BEACH" }],
+    ["categories", { categories: [] }],
+    ["categories", { categories: ["BEACH"] }],
+    ["categories", { categories: "CULTURE" }],
     ["cover_url", { cover_url: "not a url" }],
   ])("rejects a bad %s", (field, override) => {
     const result = createScheduleSchema.safeParse({ ...valid, ...override });

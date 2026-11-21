@@ -1,0 +1,78 @@
+.btn {
+  width: 100%;
+  height: 48px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--coral);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.05s;
+}
+
+.btn:hover {
+  background: var(--coral-hover);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:focus-visible {
+  outline: 3px solid rgba(221, 75, 51, 0.35);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.btn-coral {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 22px;
+  background-color: #dd4b33;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 999px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.18s ease, transform 0.15s ease;
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 16px;
+  border: 1px solid #19b5a5;
+  border-radius: 16px;
+  background: #fff;
+  color: #0b5d5b;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-outline:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.btn-outline.danger {
+  border-color: #dd4b33;
+  color: #dd4b33;
+}
+
+.btn-outline.small {
+  height: 26px;
+  padding: 0 12px;
+  font-size: 12px;
+}
