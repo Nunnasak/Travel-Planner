@@ -94,9 +94,9 @@ describe("ScheduleService.update / delete", () => {
   it("lets an editor change the plan", async () => {
     await addMember(prisma, ctx.scheduleId, ctx.otherUserId, Role.EDITOR);
 
-    const plan = await schedules.update(ctx.scheduleId, ctx.otherUserId, { is_public: true });
+    const plan = await schedules.update(ctx.scheduleId, ctx.otherUserId, { schedule_name: "Renamed by editor" });
 
-    expect(plan.is_public).toBe(true);
+    expect(plan.schedule_name).toBe("Renamed by editor");
   });
 
   it("refuses to shorten a plan below a day that still has places", async () => {
