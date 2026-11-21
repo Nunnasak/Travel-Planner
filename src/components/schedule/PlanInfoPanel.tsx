@@ -4,7 +4,6 @@ import CategoryTags from "@/components/ui/category-tags";
 import { MAX_DAYS } from "@/core/schema/schedule.schema";
 import { CATEGORY_KEYS, categoryInfo, coverTintClass } from "@/lib/categories";
 import type { ScheduleDetail } from "@/lib/schedule";
-import RouteMap from "./RouteMap";
 import type { PlanPatch } from "./usePlanPatch";
 
 type Props = {
@@ -162,8 +161,6 @@ export default function PlanInfoPanel({ plan, onSave }: Props) {
       )}
 
       <p className="plan-meta">{metaLine(plan, days)}</p>
-      <h2>Map</h2>
-      <RouteMap days={plan.days} />
     </aside>
   );
 }

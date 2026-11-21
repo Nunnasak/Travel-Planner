@@ -1,15 +1,19 @@
 "use client";
 import { useState } from "react";
-import type { ScheduleDay, ScheduleStop } from "@/lib/schedule";
+type MapStop = {
+  location: { name: string; city: { city_name: string; province: { province_name: string } } };
+};
+
+export type MapDay = { day_no: number; stops: MapStop[] };
 
 const MAX_STOPS = 10;
 
-function placeQuery(stop: ScheduleStop) {
+function placeQuery(stop: MapStop) {
   const { name, city } = stop.location;
   return `${name} ${city.city_name} ${city.province.province_name}`;
 }
 
-function embedUrl(stops: ScheduleStop[]) {
+function embedUrl(stops: MapStop[]) {
   if (stops.length === 1) {
     return `https://maps.google.com/maps?q=${encodeURIComponent(placeQuery(stops[0]))}&output=embed`;
   }
@@ -18,7 +22,7 @@ function embedUrl(stops: ScheduleStop[]) {
   return `https://maps.google.com/maps?saddr=${encodeURIComponent(first)}&daddr=${daddr}&output=embed`;
 }
 
-function openUrl(stops: ScheduleStop[]) {
+function openUrl(stops: MapStop[]) {
   const places = stops.map(placeQuery);
   if (places.length === 1) {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(places[0])}`;
@@ -33,10 +37,18 @@ function openUrl(stops: ScheduleStop[]) {
   return `https://www.google.com/maps/dir/?${params}`;
 }
 
-export default function RouteMap({ days }: { days: ScheduleDay[] }) {
+type Props = {
+  days: MapDay[];
+  selected?: number;
+  onSelect?: (dayNo: number) => void;
+};
+
+export default function RouteMap({ days, selected, onSelect }: Props) {
   const firstWithStops = days.find((day) => day.stops.length > 0)?.day_no ?? 1;
-  const [selected, setSelected] = useState(firstWithStops);
-  const day = days.find((d) => d.day_no === selected) ?? days[0];
+  const [ownSelected, setOwnSelected] = useState(firstWithStops);
+  const current = selected ?? ownSelected;
+  const choose = onSelect ?? setOwnSelected;
+  const day = days.find((d) => d.day_no === current) ?? days[0];
   const stops = day?.stops.slice(0, MAX_STOPS) ?? [];
 
   return (
@@ -48,7 +60,7 @@ export default function RouteMap({ days }: { days: ScheduleDay[] }) {
             type="button"
             role="tab"
             aria-selected={d.day_no === day?.day_no}
-            onClick={() => setSelected(d.day_no)}
+            onClick={() => choose(d.day_no)}
           >
             Day {d.day_no}
           </button>

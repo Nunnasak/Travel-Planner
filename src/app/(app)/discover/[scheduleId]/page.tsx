@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import CopyButton from "@/components/discover/CopyButton";
+import PlanMapColumn from "@/components/schedule/PlanMapColumn";
 import CategoryTags from "@/components/ui/category-tags";
 import CoverImage from "@/components/ui/cover-image";
 import { NotFoundError } from "@/core/errors/not-found.error";
@@ -37,7 +38,7 @@ export default async function PlanDetail({ params }: { params: Promise<{ schedul
         <CopyButton scheduleId={plan.schedule_id} />
       </div>
 
-      <div className="detail-grid">
+      <div className="detail-grid detail-grid-map">
         <aside className="detail-side">
           <div className={`detail-cover ${coverUrl ? "" : `cover-x ${coverTintClass(plan.categories)}`}`}>
             {coverUrl ? (
@@ -55,7 +56,7 @@ export default async function PlanDetail({ params }: { params: Promise<{ schedul
         <section className="detail-plan">
           <h2>Plan</h2>
           {plan.days.map((d) => (
-            <div key={d.day_no}>
+            <div key={d.day_no} id={`day-${d.day_no}`}>
               <div className="day-divider">DAY {d.day_no}</div>
               {d.stops.map((s, i) => (
                 <div className="stop-row" key={s.item_id}>
@@ -80,6 +81,11 @@ export default async function PlanDetail({ params }: { params: Promise<{ schedul
             </div>
           ))}
         </section>
+
+        <aside className="detail-map" aria-label="Map">
+          <h2>Map</h2>
+          <PlanMapColumn days={plan.days} />
+        </aside>
       </div>
     </div>
   );
