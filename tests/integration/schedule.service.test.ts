@@ -94,9 +94,9 @@ describe("ScheduleService.update / delete", () => {
   it("lets an editor change the plan", async () => {
     await addMember(prisma, ctx.scheduleId, ctx.otherUserId, Role.EDITOR);
 
-    const plan = await schedules.update(ctx.scheduleId, ctx.otherUserId, { is_public: true });
+    const plan = await schedules.update(ctx.scheduleId, ctx.otherUserId, { schedule_name: "Renamed by editor" });
 
-    expect(plan.is_public).toBe(true);
+    expect(plan.schedule_name).toBe("Renamed by editor");
   });
 
   it("refuses to shorten a plan below a day that still has places", async () => {
@@ -131,18 +131,20 @@ describe("ScheduleService.update / delete", () => {
 });
 
 describe("ScheduleService.copy", () => {
-  it("copies a public plan with every stop into a new private plan of the user", async () => {
-    await schedules.update(ctx.scheduleId, ctx.userId, { is_public: true, categories: ["NATURE", "CULTURE"] });
+  it("copies a Discover post with every stop into a new private plan of the user", async () => {
+    await schedules.update(ctx.scheduleId, ctx.userId, { categories: ["NATURE", "CULTURE"] });
     await items.addToSchedule(ctx.scheduleId, ctx.userId, { location_id: ctx.locationIds[0], day_no: 1, visit_time: "09:00" });
     await items.addToSchedule(ctx.scheduleId, ctx.userId, { location_id: ctx.locationIds[1], day_no: 1, visit_time: "11:00" });
     await items.addToSchedule(ctx.scheduleId, ctx.userId, { location_id: ctx.locationIds[2], day_no: 2, visit_time: "08:30" });
+    const post = await schedules.publish(ctx.scheduleId, ctx.userId);
 
-    const copy = await schedules.copy(ctx.scheduleId, ctx.otherUserId);
+    const copy = await schedules.copy(post.schedule_id, ctx.otherUserId);
     const plan = await schedules.getForUser(copy.schedule_id, ctx.otherUserId);
 
     expect(copy).toMatchObject({
       owner_id: ctx.otherUserId,
       is_public: false,
+      published_from_id: null,
       schedule_name: "Northern trip (copy)",
       categories: ["NATURE", "CULTURE"],
     });
@@ -156,14 +158,14 @@ describe("ScheduleService.copy", () => {
     ]);
   });
 
-  it("leaves the original plan untouched", async () => {
-    await schedules.update(ctx.scheduleId, ctx.userId, { is_public: true });
+  it("leaves the post untouched", async () => {
     await items.addToSchedule(ctx.scheduleId, ctx.userId, { location_id: ctx.locationId, day_no: 1, visit_time: "09:00" });
+    const post = await schedules.publish(ctx.scheduleId, ctx.userId);
 
-    await schedules.copy(ctx.scheduleId, ctx.otherUserId);
+    await schedules.copy(post.schedule_id, ctx.otherUserId);
 
-    await expect(prisma.scheduleItem.count({ where: { schedule_id: ctx.scheduleId } })).resolves.toBe(1);
-    await expect(prisma.schedule.findUnique({ where: { schedule_id: ctx.scheduleId } })).resolves.toMatchObject({
+    await expect(prisma.scheduleItem.count({ where: { schedule_id: post.schedule_id } })).resolves.toBe(1);
+    await expect(prisma.schedule.findUnique({ where: { schedule_id: post.schedule_id } })).resolves.toMatchObject({
       owner_id: ctx.userId,
       is_public: true,
     });

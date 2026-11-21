@@ -23,6 +23,14 @@ enum Category {
   @@map("category")
 }
 
+enum LinkAccess {
+  RESTRICTED @map("restricted")
+  VIEWER     @map("viewer")
+  EDITOR     @map("editor")
+
+  @@map("link_access")
+}
+
 enum Role {
   EDITOR @map("editor")
   VIEWER @map("viewer")
@@ -68,11 +76,16 @@ model Schedule {
   cover_url     String?
   categories    Category[] @default([])
   is_public     Boolean  @default(false)
+  share_token   String?    @unique
+  link_access   LinkAccess @default(RESTRICTED)
+  published_from_id Int?   @unique
   owner_id      Int
 
   owner   User           @relation("ScheduleOwner", fields: [owner_id], references: [user_id], onDelete: Cascade)
   items   ScheduleItem[]
   members ScheduleMember[]
+  published_from Schedule? @relation("DiscoverPost", fields: [published_from_id], references: [schedule_id], onDelete: Cascade)
+  post           Schedule? @relation("DiscoverPost")
 
   @@index([owner_id])
   @@index([is_public])

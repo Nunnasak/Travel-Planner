@@ -31,12 +31,9 @@ export const createScheduleSchema = z.object({
     (value) => (value === "" ? null : value),
     z.url({ error: "Enter a full image URL (https://...)." }).nullable().optional(),
   ),
-  is_public: z.boolean().default(false),
 });
 
-export const updateScheduleSchema = createScheduleSchema
-  .partial()
-  .extend({ is_public: z.boolean().optional() });
+export const updateScheduleSchema = createScheduleSchema.partial();
 
 export const reorderScheduleSchema = z.object({
   days: z
