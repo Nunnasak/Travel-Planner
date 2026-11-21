@@ -2,7 +2,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { sendJson } from "@/lib/api-client";
-import { categoryInfo } from "@/lib/categories";
+import CategoryTags from "@/components/ui/category-tags";
+import { coverTint } from "@/lib/categories";
 import type { ScheduleDetail } from "@/lib/schedule";
 import DayList from "./DayList";
 import RouteMap from "./RouteMap";
@@ -10,7 +11,6 @@ import ScheduleForm from "./ScheduleForm";
 
 export default function ScheduleEditor({ plan }: { plan: ScheduleDetail }) {
   const router = useRouter();
-  const cat = categoryInfo(plan.category);
   const [editing, setEditing] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -90,7 +90,7 @@ export default function ScheduleEditor({ plan }: { plan: ScheduleDetail }) {
               schedule_name: plan.schedule_name,
               description: plan.description ?? "",
               total_day: plan.total_day,
-              category: plan.category,
+              categories: plan.categories,
               cover_url: plan.cover_url ?? "",
               is_public: plan.is_public,
             }}
@@ -103,14 +103,14 @@ export default function ScheduleEditor({ plan }: { plan: ScheduleDetail }) {
           <aside className="detail-side">
             <div
               className={`detail-cover ${plan.cover_url ? "" : "cover-x"}`}
-              style={plan.cover_url ? { backgroundImage: `url(${plan.cover_url})` } : { backgroundColor: cat.tint }}
+              style={plan.cover_url ? { backgroundImage: `url(${plan.cover_url})` } : { backgroundColor: coverTint(plan.categories) }}
             >
               {!plan.cover_url && <span className="cover-badge">IMG</span>}
             </div>
             <h2>Description</h2>
             <p className="detail-desc">{plan.description || "No description yet."}</p>
             <h2>Category</h2>
-            <p className="detail-desc">{cat.label}</p>
+            <CategoryTags categories={plan.categories} className="tag-list" />
             <p className="plan-meta">
               {plan.total_day} {plan.total_day === 1 ? "day" : "days"} · {plan.is_public ? "Public" : "Private"}
               {plan.access !== "owner" && ` · by ${plan.owner.username}`}
