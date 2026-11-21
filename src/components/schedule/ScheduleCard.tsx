@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import CategoryTags from "@/components/ui/category-tags";
-import { coverTint } from "@/lib/categories";
+import { coverTintClass } from "@/lib/categories";
 import type { MySchedule } from "@/lib/schedule";
 
 export default function ScheduleCard({ plan }: { plan: MySchedule }) {
@@ -40,8 +40,8 @@ export default function ScheduleCard({ plan }: { plan: MySchedule }) {
     <article className={`plan-card schedule-card ${busy ? "is-busy" : ""}`}>
       <Link href={`/schedules/${plan.schedule_id}`} className="schedule-card-link">
         <div
-          className={`plan-cover ${plan.cover_url ? "" : "cover-x"}`}
-          style={plan.cover_url ? { backgroundImage: `url(${plan.cover_url})` } : { backgroundColor: coverTint(plan.categories) }}
+          className={`plan-cover ${plan.cover_url ? "" : `cover-x ${coverTintClass(plan.categories)}`}`}
+          style={plan.cover_url ? { backgroundImage: `url(${plan.cover_url})` } : undefined}
         >
           {!plan.cover_url && <span className="cover-badge">IMG</span>}
           <CategoryTags categories={plan.categories} max={2} />

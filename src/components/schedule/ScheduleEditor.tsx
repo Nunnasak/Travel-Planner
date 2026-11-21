@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { sendJson } from "@/lib/api-client";
 import CategoryTags from "@/components/ui/category-tags";
-import { coverTint } from "@/lib/categories";
+import { coverTintClass } from "@/lib/categories";
 import type { ScheduleDetail } from "@/lib/schedule";
 import DayList from "./DayList";
 import RouteMap from "./RouteMap";
@@ -102,8 +102,8 @@ export default function ScheduleEditor({ plan }: { plan: ScheduleDetail }) {
         <div className="detail-grid">
           <aside className="detail-side">
             <div
-              className={`detail-cover ${plan.cover_url ? "" : "cover-x"}`}
-              style={plan.cover_url ? { backgroundImage: `url(${plan.cover_url})` } : { backgroundColor: coverTint(plan.categories) }}
+              className={`detail-cover ${plan.cover_url ? "" : `cover-x ${coverTintClass(plan.categories)}`}`}
+              style={plan.cover_url ? { backgroundImage: `url(${plan.cover_url})` } : undefined}
             >
               {!plan.cover_url && <span className="cover-badge">IMG</span>}
             </div>
