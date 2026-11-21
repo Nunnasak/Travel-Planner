@@ -1,8 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { categoryInfo, CATEGORY_KEYS } from "@/lib/categories";
+import { DAYS_OR_MORE } from "@/core/schema/discovery.schema";
 import type { Province } from "@/lib/discovery";
+
+const DAY_OPTIONS = Array.from({ length: DAYS_OR_MORE }, (_, i) => i + 1);
 
 export default function FilterPanel({ provinces }: { provinces: Province[] }) {
   const router = useRouter();
@@ -10,11 +13,14 @@ export default function FilterPanel({ provinces }: { provinces: Province[] }) {
   const [open, setOpen] = useState(false);
   const [catOpen, setCatOpen] = useState(true);
   const [catQuery, setCatQuery] = useState("");
+  const panelRef = useRef<HTMLElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   const province = sp.get("province_id") ?? "";
   const city = sp.get("city_id") ?? "";
   const selected = (sp.get("category") ?? "").split(",").filter(Boolean);
-  const active = (province ? 1 : 0) + (city ? 1 : 0) + selected.length;
+  const days = sp.get("days") ?? "";
+  const active = (province ? 1 : 0) + (city ? 1 : 0) + (days ? 1 : 0) + selected.length;
   const [cities, setCities] = useState<{ city_id: number; city_name: string }[]>([]);
 
   useEffect(() => {
@@ -28,6 +34,24 @@ export default function FilterPanel({ provinces }: { provinces: Province[] }) {
       cancelled = true;
     };
   }, [province]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    const onClick = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (panelRef.current?.contains(target) || triggerRef.current?.contains(target)) return;
+      setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onClick);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onClick);
+    };
+  }, [open]);
 
   function toggleCategory(key: string) {
     const next = selected.includes(key) ? selected.filter((k) => k !== key) : [...selected, key];
@@ -48,11 +72,12 @@ export default function FilterPanel({ provinces }: { provinces: Province[] }) {
 
   return (
     <>
-      <button type="button" className="filter-trigger" onClick={() => setOpen(true)}>
+      <button type="button" ref={triggerRef} className="filter-trigger" onClick={() => setOpen(true)}>
         Filter{active ? ` (${active})` : ""}
       </button>
 
       <aside
+        ref={panelRef}
         className={`filter-panel ${open ? "is-open" : ""}`}
         aria-label="Filters"
         aria-hidden={!open}
@@ -99,6 +124,25 @@ export default function FilterPanel({ provinces }: { provinces: Province[] }) {
             {cities.map((c) => (
               <option key={c.city_id} value={c.city_id}>
                 {c.city_name}
+              </option>
+            ))}
+          </select>
+          <svg className="select-chevron" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+            <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+
+        <div className="select-wrap">
+          <select
+            className="select"
+            value={days}
+            aria-label="Days"
+            onChange={(e) => update({ days: e.target.value })}
+          >
+            <option value="">Days</option>
+            {DAY_OPTIONS.map((n) => (
+              <option key={n} value={n}>
+                {n === DAYS_OR_MORE ? `${n}+ days` : `${n} ${n === 1 ? "day" : "days"}`}
               </option>
             ))}
           </select>
@@ -159,7 +203,7 @@ export default function FilterPanel({ provinces }: { provinces: Province[] }) {
           <button
             type="button"
             className="filter-clear"
-            onClick={() => update({ province_id: "", city_id: "", category: "" })}
+            onClick={() => update({ province_id: "", city_id: "", days: "", category: "" })}
           >
             Clear filters
           </button>
