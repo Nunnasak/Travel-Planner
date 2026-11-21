@@ -138,7 +138,7 @@ export default function DayList({ scheduleId, totalDays, days, canEdit }: Props)
           onDrop: (event: DragEvent) => event.preventDefault(),
         };
         return [
-          <div key={`day-${day.day_no}`} className="day-divider" {...dropOnDay}>
+          <div key={`day-${day.day_no}`} id={`day-${day.day_no}`} className="day-divider" {...dropOnDay}>
             DAY {day.day_no}
           </div>,
           day.stops.length === 0 ? (

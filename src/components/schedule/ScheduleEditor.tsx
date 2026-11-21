@@ -4,6 +4,7 @@ import type { ScheduleDetail } from "@/lib/schedule";
 import DayList from "./DayList";
 import InlineTitle from "./InlineTitle";
 import PlanInfoPanel from "./PlanInfoPanel";
+import PlanMapColumn from "./PlanMapColumn";
 import ShareDialog from "./ShareDialog";
 import { usePlanPatch } from "./usePlanPatch";
 
@@ -26,7 +27,7 @@ export default function ScheduleEditor({ plan }: { plan: ScheduleDetail }) {
 
       {state.kind === "error" && <p className="form-error" role="alert">{state.message}</p>}
 
-      <div className="detail-grid">
+      <div className="detail-grid detail-grid-map">
         <PlanInfoPanel plan={plan} onSave={save} />
 
         <section className="detail-plan">
@@ -40,6 +41,11 @@ export default function ScheduleEditor({ plan }: { plan: ScheduleDetail }) {
             canEdit={plan.can_edit}
           />
         </section>
+
+        <aside className="detail-map" aria-label="Map">
+          <h2>Map</h2>
+          <PlanMapColumn days={plan.days} />
+        </aside>
       </div>
 
       {sharing && <ShareDialog scheduleId={plan.schedule_id} onClose={() => setSharing(false)} />}
