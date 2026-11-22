@@ -17,7 +17,7 @@
 
 .share-add {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 100px auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 8px;
   align-items: center;
 }
@@ -46,12 +46,6 @@
 .share-add .btn-outline {
   height: 38px;
   border-radius: 10px;
-}
-
-.share-role {
-  width: auto;
-  height: 34px;
-  padding: 0 10px;
 }
 
 .share-people {
@@ -169,15 +163,6 @@
   font-size: 14px;
 }
 
-.share-link-select {
-  width: auto;
-  justify-self: start;
-  padding: 4px 8px;
-  border-color: transparent;
-  font-size: 14px;
-  font-weight: 600;
-}
-
 .share-reset {
   justify-self: start;
   padding: 0;
@@ -260,4 +245,8 @@
 
 .share-denied p {
   margin: 0;
+}
+
+.share-access-text .menu-button {
+  justify-self: start;
 }
