@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { imageUrlSchema } from "./image.schema";
 import { idSchema } from "./discovery.schema";
 
 export const locationSearchSchema = z.object({
@@ -20,8 +21,5 @@ export const createLocationSchema = z.object({
     .min(1, "Enter the address.")
     .max(300, "Keep the address under 300 characters."),
   city_id: idSchema,
-  image_url: z.preprocess(
-    (value) => (value === "" ? null : value),
-    z.url({ error: "Enter a full image URL (https://...)." }).nullable().optional(),
-  ),
+  image_url: imageUrlSchema,
 });

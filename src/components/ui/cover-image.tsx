@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { UPLOAD_PATH } from "@/core/schema/image.schema";
 
 const OPTIMIZED_HOSTS = ["images.unsplash.com"];
 
@@ -6,6 +7,7 @@ export const CARD_IMAGE_SIZES =
   "(max-width: 700px) 100vw, (max-width: 1100px) 50vw, (max-width: 1500px) 33vw, 25vw";
 
 function canOptimize(src: string) {
+  if (src.startsWith(UPLOAD_PATH)) return true;
   try {
     const url = new URL(src);
     return url.protocol === "https:" && OPTIMIZED_HOSTS.includes(url.hostname);
@@ -14,9 +16,9 @@ function canOptimize(src: string) {
   }
 }
 
-type Props = { src: string; alt: string; sizes: string; eager?: boolean };
+type Props = { src: string; alt: string; sizes: string; eager?: boolean; onError?: () => void };
 
-export default function CoverImage({ src, alt, sizes, eager }: Props) {
+export default function CoverImage({ src, alt, sizes, eager, onError }: Props) {
   return (
     <Image
       src={src}
@@ -27,6 +29,7 @@ export default function CoverImage({ src, alt, sizes, eager }: Props) {
       fetchPriority={eager ? "high" : "auto"}
       unoptimized={!canOptimize(src)}
       draggable={false}
+      onError={onError}
       className="cover-image"
     />
   );

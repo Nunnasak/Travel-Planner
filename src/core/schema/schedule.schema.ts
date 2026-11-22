@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { imageUrlSchema } from "./image.schema";
 import { CATEGORIES, idSchema } from "./discovery.schema";
 
 export const MAX_DAYS = 30;
@@ -27,10 +28,7 @@ export const createScheduleSchema = z.object({
     })
     .min(1, "Pick at least one category.")
     .transform((list) => [...new Set(list)]),
-  cover_url: z.preprocess(
-    (value) => (value === "" ? null : value),
-    z.url({ error: "Enter a full image URL (https://...)." }).nullable().optional(),
-  ),
+  cover_url: imageUrlSchema,
 });
 
 export const updateScheduleSchema = createScheduleSchema.partial();
