@@ -1,12 +1,16 @@
 import type { PrismaClient } from "../../generated/prisma/client";
 import { BadRequestError } from "../errors/bad-request.error";
 import { createLocationSchema, locationSearchSchema } from "../schema/location.schema";
+import type { MapLinkService } from "./map-link.service";
 
 const LOCATION_SELECT = {
   location_id: true,
   name: true,
   address: true,
   image_url: true,
+  map_url: true,
+  latitude: true,
+  longitude: true,
   city: {
     select: {
       city_id: true,
@@ -17,7 +21,10 @@ const LOCATION_SELECT = {
 } as const;
 
 export class LocationService {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(
+    private readonly prisma: PrismaClient,
+    private readonly mapLinks: MapLinkService,
+  ) {}
 
   async search(input: unknown) {
     const { q } = locationSearchSchema.parse(input);
@@ -46,7 +53,8 @@ export class LocationService {
       select: { city_id: true },
     });
     if (!city) throw new BadRequestError("That district doesn't exist.", "city_id");
-    return this.prisma.location.create({ data, select: LOCATION_SELECT });
+    const coordinates = data.map_url ? await this.mapLinks.locate(data.map_url) : null;
+    return this.prisma.location.create({ data: { ...data, ...coordinates }, select: LOCATION_SELECT });
   }
 
   async listCities(provinceId: number) {

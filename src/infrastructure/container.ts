@@ -12,6 +12,8 @@ import { DiscoveryService } from "@/core/service/discovery.service";
 import { ScheduleService } from "@/core/service/schedule.service";
 import { ScheduleItemService } from "@/core/service/scheduleItem.service";
 import { LocationService } from "@/core/service/location.service";
+import { MapLinkService } from "@/core/service/map-link.service";
+import { FetchUrlResolver } from "./storage/fetch-url-resolver";
 import { ShareService } from "@/core/service/share.service";
 import { ImageUploadService } from "@/core/service/image-upload.service";
 import { LocalImageStorage } from "./storage/local-image-storage";
@@ -43,7 +45,7 @@ export const container = {
 export const discoveryService = new DiscoveryService(prisma);
 export const scheduleService = new ScheduleService(prisma);
 export const scheduleItemService = new ScheduleItemService(prisma, scheduleService);
-export const locationService = new LocationService(prisma);
+export const locationService = new LocationService(prisma, new MapLinkService(new FetchUrlResolver()));
 export const shareService = new ShareService(prisma, scheduleService);
 export const imageStorage = new LocalImageStorage(process.env.UPLOAD_DIR ?? "uploads");
 export const imageUploadService = new ImageUploadService(imageStorage, new SharpImageProcessor());

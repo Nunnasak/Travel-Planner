@@ -9,6 +9,9 @@ const LOCATION_SELECT = {
   name: true,
   address: true,
   image_url: true,
+  map_url: true,
+  latitude: true,
+  longitude: true,
   city: {
     select: {
       city_name: true,
