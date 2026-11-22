@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient, Category } from "../src/generated/prisma/client";
+import { THAILAND_DISTRICTS } from "./data/thailand-districts";
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
@@ -284,8 +285,20 @@ async function main() {
     locationsByProvinceName[provinceName] = [];
     const featuredList = FEATURED_LOCATIONS_BY_PROVINCE[provinceName];
 
-    // สร้าง Map เก็บ city_name -> city_id เพื่อไม่ให้สร้างอำเภอซ้ำในจังหวัดเดียวกัน
-    const cityMap = new Map<string, number>();
+    await prisma.city.createMany({
+      data: THAILAND_DISTRICTS[provinceName].map((city_name) => ({
+        city_name,
+        province_id: province.province_id,
+      })),
+    });
+    const cityMap = new Map(
+      (
+        await prisma.city.findMany({
+          where: { province_id: province.province_id },
+          select: { city_id: true, city_name: true },
+        })
+      ).map((city) => [city.city_name, city.city_id]),
+    );
 
     if (featuredList && featuredList.length > 0) {
       for (const loc of featuredList) {
@@ -318,12 +331,8 @@ async function main() {
       const defaultCityName =
         provinceName === 'กรุงเทพมหานคร' ? 'เขตพระนคร' : `อำเภอเมือง${provinceName}`;
 
-      const defaultCity = await prisma.city.create({
-        data: {
-          city_name: defaultCityName,
-          province_id: province.province_id,
-        },
-      });
+      const defaultCityId = cityMap.get(defaultCityName);
+      if (defaultCityId === undefined) throw new Error(`Missing district ${defaultCityName}`);
 
       const defaultLocations = [
         {
@@ -343,7 +352,7 @@ async function main() {
           data: {
             name: loc.name,
             address: loc.address,
-            city_id: defaultCity.city_id,
+            city_id: defaultCityId,
             image_url: loc.image_url,
           },
         });
