@@ -1,7 +1,13 @@
 "use client";
 import { useState } from "react";
+
 type MapStop = {
-  location: { name: string; city: { city_name: string; province: { province_name: string } } };
+  location: {
+    name: string;
+    latitude?: number | null;
+    longitude?: number | null;
+    city: { city_name: string; province: { province_name: string } };
+  };
 };
 
 export type MapDay = { day_no: number; stops: MapStop[] };
@@ -9,7 +15,8 @@ export type MapDay = { day_no: number; stops: MapStop[] };
 const MAX_STOPS = 10;
 
 function placeQuery(stop: MapStop) {
-  const { name, city } = stop.location;
+  const { name, city, latitude, longitude } = stop.location;
+  if (latitude != null && longitude != null) return `${latitude},${longitude}`;
   return `${name} ${city.city_name} ${city.province.province_name}`;
 }
 

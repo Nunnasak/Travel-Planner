@@ -22,4 +22,8 @@ export const createLocationSchema = z.object({
     .max(300, "Keep the address under 300 characters."),
   city_id: idSchema,
   image_url: imageUrlSchema,
+  map_url: z.preprocess(
+    (value) => (typeof value === "string" && value.trim() === "" ? null : value),
+    z.string().trim().max(2000, "This link is too long.").nullable().optional(),
+  ),
 });

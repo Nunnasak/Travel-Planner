@@ -440,8 +440,3 @@
   text-decoration: underline;
   cursor: pointer;
 }
-
-.place-photo {
-  display: grid;
-  gap: 8px;
-}
