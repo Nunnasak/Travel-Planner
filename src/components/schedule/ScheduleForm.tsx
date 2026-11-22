@@ -1,12 +1,17 @@
 "use client";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
-import { Input } from "@/components/ui/input";
-import { CATEGORY_KEYS, categoryInfo } from "@/lib/categories";
+import { useState, type FormEvent, type ReactNode } from "react";
+import { MAX_DAYS } from "@/core/schema/schedule.schema";
 import { pickFieldErrors, sendJson } from "@/lib/api-client";
+import { CATEGORY_KEYS, categoryInfo, tintClass } from "@/lib/categories";
+import PlanCardPreview from "./PlanCardPreview";
 
 const FIELDS = ["schedule_name", "description", "total_day", "categories", "cover_url"] as const;
 type Field = (typeof FIELDS)[number];
+
+const NAME_MAX = 100;
+const DESCRIPTION_MAX = 1000;
 
 type ScheduleFormValues = {
   schedule_name: string;
@@ -24,16 +29,49 @@ const EMPTY: ScheduleFormValues = {
   cover_url: "",
 };
 
+function previewable(url: string) {
+  const value = url.trim();
+  if (!URL.canParse(value)) return null;
+  const { protocol } = new URL(value);
+  return protocol === "https:" || protocol === "http:" ? value : null;
+}
+
+function Section({ step, title, hint, children }: { step: number; title: string; hint?: string; children: ReactNode }) {
+  return (
+    <section className="create-section" aria-labelledby={`create-step-${step}`}>
+      <header className="create-section-head">
+        <span className="create-step" aria-hidden="true">{step}</span>
+        <div>
+          <h2 id={`create-step-${step}`}>{title}</h2>
+          {hint && <p>{hint}</p>}
+        </div>
+      </header>
+      {children}
+    </section>
+  );
+}
+
 export default function ScheduleForm() {
   const router = useRouter();
   const [values, setValues] = useState(EMPTY);
   const [errors, setErrors] = useState<Partial<Record<Field, string>>>({});
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [brokenCover, setBrokenCover] = useState("");
+
+  const coverUrl = previewable(values.cover_url);
+  const previewCover = coverUrl && coverUrl !== brokenCover ? coverUrl : null;
 
   function set<K extends keyof ScheduleFormValues>(key: K, value: ScheduleFormValues[K]) {
     setValues((current) => ({ ...current, [key]: value }));
     setErrors((current) => ({ ...current, [key]: undefined }));
+  }
+
+  function toggleCategory(key: string) {
+    set(
+      "categories",
+      values.categories.includes(key) ? values.categories.filter((k) => k !== key) : [...values.categories, key],
+    );
   }
 
   async function submit(event: FormEvent) {
@@ -69,82 +107,141 @@ export default function ScheduleForm() {
   }
 
   return (
-    <form className="schedule-form" onSubmit={submit} noValidate>
-      <Input
-        label="Plan name"
-        name="schedule_name"
-        placeholder="Bangkok Weekend Trip"
-        value={values.schedule_name}
-        onChange={(e) => set("schedule_name", e.target.value)}
-        error={errors.schedule_name}
-      />
-
-      <div className="field">
-        <label htmlFor="description">Description</label>
-        <textarea
-          id="description"
-          rows={4}
-          placeholder="Write here…"
-          value={values.description}
-          onChange={(e) => set("description", e.target.value)}
-          aria-invalid={errors.description ? true : undefined}
-        />
-        {errors.description && <p className="field-error">{errors.description}</p>}
-      </div>
-
-      <Input
-        label="Days"
-        name="total_day"
-        type="number"
-        min={1}
-        max={30}
-        value={values.total_day}
-        onChange={(e) => set("total_day", Number(e.target.value))}
-        error={errors.total_day}
-      />
-
-      <div className="field">
-        <fieldset className="category-picker" aria-invalid={errors.categories ? true : undefined}>
-          <legend>Categories (pick one or more)</legend>
-          {CATEGORY_KEYS.map((key) => {
-            const checked = values.categories.includes(key);
-            return (
-              <label key={key} className={`category-option ${checked ? "is-checked" : ""}`}>
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  onChange={() =>
-                    set(
-                      "categories",
-                      checked ? values.categories.filter((k) => k !== key) : [...values.categories, key],
-                    )
-                  }
-                />
-                {categoryInfo(key).label}
+    <div className="create-layout">
+      <form className="create-form" onSubmit={submit} noValidate>
+        <Section step={1} title="Name your trip">
+          <div className="field">
+            <div className="field-label-row">
+              <label htmlFor="schedule_name">Plan name</label>
+              <span className="field-count">{values.schedule_name.length}/{NAME_MAX}</span>
+            </div>
+            <input
+              id="schedule_name"
+              name="schedule_name"
+              autoFocus
+              maxLength={NAME_MAX}
+              placeholder="Bangkok Weekend Trip"
+              value={values.schedule_name}
+              onChange={(e) => set("schedule_name", e.target.value)}
+              aria-invalid={errors.schedule_name ? true : undefined}
+            />
+            {errors.schedule_name && <p className="field-error">{errors.schedule_name}</p>}
+          </div>
+          <div className="field">
+            <div className="field-label-row">
+              <label htmlFor="description">
+                Description <span className="field-optional">optional</span>
               </label>
-            );
-          })}
-        </fieldset>
-        {errors.categories && <p className="field-error">{errors.categories}</p>}
-      </div>
+              <span className="field-count">{values.description.length}/{DESCRIPTION_MAX}</span>
+            </div>
+            <textarea
+              id="description"
+              rows={4}
+              maxLength={DESCRIPTION_MAX}
+              placeholder="What is this trip about?"
+              value={values.description}
+              onChange={(e) => set("description", e.target.value)}
+              aria-invalid={errors.description ? true : undefined}
+            />
+            {errors.description && <p className="field-error">{errors.description}</p>}
+          </div>
+        </Section>
 
-      <Input
-        label="Cover image URL (optional)"
-        name="cover_url"
-        type="url"
-        placeholder="https://..."
-        value={values.cover_url}
-        onChange={(e) => set("cover_url", e.target.value)}
-        error={errors.cover_url}
-      />
+        <Section step={2} title="How long?" hint={`You can change this later, up to ${MAX_DAYS} days.`}>
+          <div className="stepper create-days" role="group" aria-label="Number of days">
+            <button
+              type="button"
+              aria-label="One day less"
+              disabled={values.total_day <= 1}
+              onClick={() => set("total_day", values.total_day - 1)}
+            >
+              −
+            </button>
+            <span aria-live="polite">
+              {values.total_day} {values.total_day === 1 ? "day" : "days"}
+            </span>
+            <button
+              type="button"
+              aria-label="One day more"
+              disabled={values.total_day >= MAX_DAYS}
+              onClick={() => set("total_day", values.total_day + 1)}
+            >
+              +
+            </button>
+          </div>
+          {errors.total_day && <p className="field-error">{errors.total_day}</p>}
+        </Section>
 
-      {formError && <p className="form-error" role="alert">{formError}</p>}
+        <Section step={3} title="What kind of trip?" hint="Pick one or more.">
+          <div
+            className="category-picker"
+            role="group"
+            aria-label="Categories"
+            aria-invalid={errors.categories ? true : undefined}
+          >
+            {CATEGORY_KEYS.map((key) => {
+              const picked = values.categories.includes(key);
+              const info = categoryInfo(key);
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  className={`category-option ${picked ? "is-checked" : ""}`}
+                  aria-pressed={picked}
+                  onClick={() => toggleCategory(key)}
+                >
+                  <span className={`category-dot ${tintClass(info.tint)}`} aria-hidden="true" />
+                  {info.label}
+                </button>
+              );
+            })}
+          </div>
+          {errors.categories && <p className="field-error">{errors.categories}</p>}
+        </Section>
 
-      <div className="form-actions">
-        <button type="submit" className="btn-coral" disabled={saving}>
-          {saving ? "Creating…" : "Create plan"}
-        </button>
-      </div>
-    </form>
+        <Section step={4} title="Cover photo" hint="Optional. Paste a link to a photo.">
+          <div className="field">
+            <input
+              id="cover_url"
+              name="cover_url"
+              type="url"
+              aria-label="Cover image URL"
+              placeholder="https://…"
+              value={values.cover_url}
+              onChange={(e) => set("cover_url", e.target.value)}
+              aria-invalid={errors.cover_url ? true : undefined}
+            />
+            {errors.cover_url && <p className="field-error">{errors.cover_url}</p>}
+            {!errors.cover_url && coverUrl && coverUrl === brokenCover && (
+              <p className="field-error">Couldn&apos;t load this image. Check the link.</p>
+            )}
+          </div>
+        </Section>
+
+        {formError && <p className="form-error" role="alert">{formError}</p>}
+
+        <div className="create-actions">
+          <Link href="/schedules" className="btn-outline">
+            Cancel
+          </Link>
+          <button type="submit" className="btn-coral" disabled={saving}>
+            {saving ? "Creating…" : "Create plan"}
+          </button>
+        </div>
+      </form>
+
+      <aside className="create-preview" aria-label="Preview">
+        <h2>Preview</h2>
+        <PlanCardPreview
+          name={values.schedule_name}
+          description={values.description}
+          days={values.total_day}
+          categories={values.categories}
+          coverUrl={previewCover}
+          onCoverError={() => coverUrl && setBrokenCover(coverUrl)}
+        />
+        <p>This is how the plan will look in My Schedule. You&apos;ll add places on the next page.</p>
+      </aside>
+    </div>
   );
 }
