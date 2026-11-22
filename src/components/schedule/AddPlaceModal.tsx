@@ -16,7 +16,7 @@ type Place = {
 type Province = { province_id: number; province_name: string };
 type City = { city_id: number; city_name: string };
 
-const FIELDS = ["location_id", "name", "address", "city_id", "image_url", "day_no", "visit_time"] as const;
+const FIELDS = ["location_id", "name", "address", "city_id", "image_url", "map_url", "day_no", "visit_time"] as const;
 type Field = (typeof FIELDS)[number];
 
 type Props = {
@@ -37,6 +37,7 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [mapUrl, setMapUrl] = useState("");
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [provinceId, setProvinceId] = useState("");
   const [cities, setCities] = useState<City[]>([]);
@@ -122,6 +123,7 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
           address,
           city_id: Number(cityId),
           image_url: imageUrl,
+          map_url: mapUrl,
         });
         if (!created.ok) {
           const fieldErrors = pickFieldErrors(created.data.errors, FIELDS);
@@ -288,7 +290,7 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
                   </div>
                 </div>
                 <div className="field">
-                  <label htmlFor="place-image">Photo (optional)</label>
+                  <span className="field-label">Photo (optional)</span>
                   {imageUrl.startsWith(UPLOAD_PATH) ? (
                     <div className="uploaded-row">
                       <span>Using your uploaded photo</span>
@@ -297,27 +299,38 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
                       </button>
                     </div>
                   ) : (
-                    <div className="place-photo">
-                      <ImageDropzone
-                        compact
-                        onUploaded={(url) => {
-                          setImageUrl(url);
-                          clear("image_url");
-                        }}
-                      />
-                      <input
-                        id="place-image"
-                        type="url"
-                        placeholder="or paste a link (https://…)"
-                        value={imageUrl}
-                        onChange={(e) => {
-                          setImageUrl(e.target.value);
-                          clear("image_url");
-                        }}
-                      />
-                    </div>
+                    <ImageDropzone
+                      compact
+                      onUploaded={(url) => {
+                        setImageUrl(url);
+                        clear("image_url");
+                      }}
+                    />
                   )}
                   {errors.image_url && <p className="field-error">{errors.image_url}</p>}
+                </div>
+                <div className="field">
+                  <label htmlFor="place-map">Google Maps link (optional)</label>
+                  <input
+                    id="place-map"
+                    type="url"
+                    inputMode="url"
+                    placeholder="https://maps.app.goo.gl/…"
+                    value={mapUrl}
+                    onChange={(e) => {
+                      setMapUrl(e.target.value);
+                      clear("map_url");
+                    }}
+                    aria-invalid={errors.map_url ? true : undefined}
+                    aria-describedby="place-map-hint"
+                  />
+                  {errors.map_url ? (
+                    <p className="field-error">{errors.map_url}</p>
+                  ) : (
+                    <p id="place-map-hint" className="field-hint">
+                      Open the place in Google Maps, tap Share and paste the link here to pin the exact spot.
+                    </p>
+                  )}
                 </div>
               </>
             )}
