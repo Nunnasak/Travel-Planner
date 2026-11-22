@@ -81,3 +81,39 @@
 .modal .select {
   height: 38px;
 }
+
+.confirm-backdrop {
+  z-index: 60;
+}
+
+.confirm-dialog {
+  width: min(380px, 100%);
+  gap: 10px;
+  padding: 22px;
+}
+
+.confirm-dialog h2 {
+  margin: 0;
+  color: #0b5d5b;
+  font-family: var(--font-mitr), sans-serif;
+  font-size: 18px;
+}
+
+.confirm-dialog p {
+  margin: 0;
+  color: #6b7c7c;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.confirm-actions button {
+  height: 36px;
+  border-radius: 999px;
+}

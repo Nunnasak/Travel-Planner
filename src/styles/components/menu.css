@@ -1,0 +1,125 @@
+.menu-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 34px;
+  padding: 0 10px 0 12px;
+  border-radius: 10px;
+  color: #1f2d2d;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.menu-button-outline {
+  min-width: 96px;
+  border: 1px solid #d5c7aa;
+  background: #fff;
+}
+
+.menu-button-outline:hover:not(:disabled) {
+  border-color: #19b5a5;
+}
+
+.menu-button-plain {
+  margin-left: -10px;
+  border: 1px solid transparent;
+  background: transparent;
+  font-size: 14px;
+}
+
+.menu-button-plain:hover:not(:disabled) {
+  background: #fff8ec;
+}
+
+.menu-button[aria-expanded="true"] {
+  border-color: #19b5a5;
+  box-shadow: 0 0 0 3px rgba(25, 181, 165, 0.15);
+}
+
+.menu-button:focus-visible {
+  outline: 2px solid #19b5a5;
+  outline-offset: 2px;
+}
+
+.menu-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.menu-chevron {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  color: #6b7c7c;
+  transition: transform 0.2s;
+}
+
+.menu-chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.menu-list {
+  position: fixed;
+  z-index: 70;
+  display: grid;
+  gap: 2px;
+  max-height: 260px;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid #eadfcb;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(11, 93, 91, 0.18);
+}
+
+.menu-list:focus {
+  outline: none;
+}
+
+.menu-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.menu-option.is-active {
+  background: #fff8ec;
+}
+
+.menu-option[aria-selected="true"] {
+  background: #d3f3ee;
+}
+
+.menu-option-text {
+  display: grid;
+  gap: 2px;
+}
+
+.menu-option-text strong {
+  color: #1f2d2d;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.menu-option-text span {
+  color: #6b7c7c;
+  font-size: 12px;
+}
+
+.menu-check {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: #0b8478;
+}
