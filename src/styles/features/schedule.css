@@ -99,8 +99,7 @@
   resize: vertical;
 }
 
-.schedule-form textarea:focus,
-.schedule-form .select:focus {
+.schedule-form textarea:focus {
   outline: 2px solid #19b5a5;
   outline-offset: -1px;
 }

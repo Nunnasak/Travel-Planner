@@ -1,11 +1,18 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import SelectMenu from "@/components/ui/select-menu";
 import { categoryInfo, CATEGORY_KEYS } from "@/lib/categories";
 import { DAYS_OR_MORE } from "@/core/schema/discovery.schema";
 import type { Province } from "@/lib/discovery";
 
-const DAY_OPTIONS = Array.from({ length: DAYS_OR_MORE }, (_, i) => i + 1);
+const DAY_OPTIONS = [
+  { value: "", label: "Days" },
+  ...Array.from({ length: DAYS_OR_MORE }, (_, i) => {
+    const n = i + 1;
+    return { value: String(n), label: n === DAYS_OR_MORE ? `${n}+ days` : `${n} ${n === 1 ? "day" : "days"}` };
+  }),
+];
 
 export default function FilterPanel({ provinces }: { provinces: Province[] }) {
   const router = useRouter();
@@ -38,7 +45,7 @@ export default function FilterPanel({ provinces }: { provinces: Province[] }) {
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape" && !event.defaultPrevented) setOpen(false);
     };
     const onClick = (event: MouseEvent) => {
       const target = event.target as Node;
@@ -100,62 +107,30 @@ export default function FilterPanel({ provinces }: { provinces: Province[] }) {
           </button>
         </div>
 
-        <div className="select-wrap">
-          <select
-            className="select"
-            value={province}
-            onChange={(e) => update({ province_id: e.target.value, city_id: "" })}
-          >
-            <option value="">Province</option>
-            {provinces.map((p) => (
-              <option key={p.province_id} value={p.province_id}>
-                {p.province_name}
-              </option>
-            ))}
-          </select>
-          <svg className="select-chevron" viewBox="0 0 12 8" fill="none" aria-hidden="true">
-            <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
+        <SelectMenu
+          block
+          label="Province"
+          value={province}
+          options={[
+            { value: "", label: "Province" },
+            ...provinces.map((p) => ({ value: String(p.province_id), label: p.province_name })),
+          ]}
+          onChange={(next) => update({ province_id: next, city_id: "" })}
+        />
 
-        <div className="select-wrap">
-          <select
-            className="select"
-            value={city}
-            disabled={!province}
-            title={province ? undefined : "Pick a province first"}
-            onChange={(e) => update({ city_id: e.target.value })}
-          >
-            <option value="">District</option>
-            {cities.map((c) => (
-              <option key={c.city_id} value={c.city_id}>
-                {c.city_name}
-              </option>
-            ))}
-          </select>
-          <svg className="select-chevron" viewBox="0 0 12 8" fill="none" aria-hidden="true">
-            <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
+        <SelectMenu
+          block
+          label="District"
+          value={city}
+          disabled={!province}
+          options={[
+            { value: "", label: province ? "District" : "District (pick a province first)" },
+            ...cities.map((c) => ({ value: String(c.city_id), label: c.city_name })),
+          ]}
+          onChange={(next) => update({ city_id: next })}
+        />
 
-        <div className="select-wrap">
-          <select
-            className="select"
-            value={days}
-            aria-label="Days"
-            onChange={(e) => update({ days: e.target.value })}
-          >
-            <option value="">Days</option>
-            {DAY_OPTIONS.map((n) => (
-              <option key={n} value={n}>
-                {n === DAYS_OR_MORE ? `${n}+ days` : `${n} ${n === 1 ? "day" : "days"}`}
-              </option>
-            ))}
-          </select>
-          <svg className="select-chevron" viewBox="0 0 12 8" fill="none" aria-hidden="true">
-            <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
+        <SelectMenu block label="Days" value={days} options={DAY_OPTIONS} onChange={(next) => update({ days: next })} />
 
         <div className="accordion">
           <button

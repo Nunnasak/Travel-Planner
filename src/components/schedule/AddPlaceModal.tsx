@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { pickFieldErrors, sendJson } from "@/lib/api-client";
+import SelectMenu from "@/components/ui/select-menu";
 
 type Place = {
   location_id: number;
@@ -47,7 +48,7 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape" && !event.defaultPrevented) onClose();
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
@@ -251,36 +252,36 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
                 <div className="form-row half">
                   <div className="field">
                     <label htmlFor="place-province">Province</label>
-                    <select
+                    <SelectMenu
+                      block
                       id="place-province"
-                      className="select"
+                      label="Province"
                       value={provinceId}
-                      onChange={(e) => changeProvince(e.target.value)}
-                    >
-                      <option value="">Select Province</option>
-                      {provinces.map((p) => (
-                        <option key={p.province_id} value={p.province_id}>{p.province_name}</option>
-                      ))}
-                    </select>
+                      options={[
+                        { value: "", label: "Select Province" },
+                        ...provinces.map((p) => ({ value: String(p.province_id), label: p.province_name })),
+                      ]}
+                      onChange={changeProvince}
+                    />
                   </div>
                   <div className="field">
                     <label htmlFor="place-city">District</label>
-                    <select
+                    <SelectMenu
+                      block
                       id="place-city"
-                      className="select"
+                      label="District"
                       value={cityId}
                       disabled={!provinceId}
-                      onChange={(e) => {
-                        setCityId(e.target.value);
+                      invalid={Boolean(errors.city_id)}
+                      options={[
+                        { value: "", label: "Select District" },
+                        ...cities.map((c) => ({ value: String(c.city_id), label: c.city_name })),
+                      ]}
+                      onChange={(next) => {
+                        setCityId(next);
                         clear("city_id");
                       }}
-                      aria-invalid={errors.city_id ? true : undefined}
-                    >
-                      <option value="">Select District</option>
-                      {cities.map((c) => (
-                        <option key={c.city_id} value={c.city_id}>{c.city_name}</option>
-                      ))}
-                    </select>
+                    />
                     {errors.city_id && <p className="field-error">{errors.city_id}</p>}
                   </div>
                 </div>

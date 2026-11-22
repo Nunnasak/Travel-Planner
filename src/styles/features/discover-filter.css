@@ -64,7 +64,7 @@
 }
 
 .filter-panel.is-open {
-  transform: translateX(0);
+  transform: none;
   visibility: visible;
   pointer-events: auto;
 }
