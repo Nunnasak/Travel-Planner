@@ -34,227 +34,1334 @@ const ALL_77_PROVINCES: string[] = [
   'สตูล', 'สงขลา', 'สุราษฎร์ธานี', 'ยะลา',
 ];
 
-// 2. ข้อมูลอำเภอและสถานที่ท่องเที่ยวไฮไลต์แยกตามจังหวัด
-interface LocationSeed {
+const IMG = {
+  temple: 'https://images.unsplash.com/photo-1528181304800-259b08848526',
+  grandPalace: 'https://images.unsplash.com/photo-1563492065599-3520f775eeed',
+  chiangMai: 'https://images.unsplash.com/photo-1598970434795-0c54fe7c0648',
+  whiteTemple: 'https://images.unsplash.com/photo-1578157695179-d7b7ddeb2f53',
+  oldTown: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5',
+  streetFood: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482',
+  market: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365',
+  cafe: 'https://images.unsplash.com/photo-1512552288940-3a300922a275',
+  mountain: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
+  peak: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b',
+  forest: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05',
+  waterfall: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470',
+  beach: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e',
+  island: 'https://images.unsplash.com/photo-1519046904884-53103b34b206',
+  andaman: 'https://images.unsplash.com/photo-1537956965359-7573183d1f57',
+  cliffSea: 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a',
+  coast: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21',
+};
+
+interface RouteStop {
+  time: string; // HH:mm
+  province: string;
   city: string;
   name: string;
   address: string;
   image_url: string;
 }
 
-const FEATURED_LOCATIONS_BY_PROVINCE: Record<string, LocationSeed[]> = {
-  'กรุงเทพมหานคร': [
-    { city: 'เขตพระนคร', name: 'วัดพระศรีรัตนศาสดาราม (วัดพระแก้ว)', address: 'ถนนหน้าพระลาน แขวงพระบรมมหาราชวัง เขตพระนคร กรุงเทพฯ', image_url: 'https://images.unsplash.com/photo-1563492065599-3520f775eeed' },
-    { city: 'เขตบางกอกใหญ่', name: 'วัดอรุณราชวรารามราชวรมหาวิหาร', address: '158 ถนนวังเดิม แขวงวัดอรุณ เขตบางกอกใหญ่ กรุงเทพฯ', image_url: 'https://images.unsplash.com/photo-1528181304800-259b08848526' },
-    { city: 'เขตสัมพันธวงศ์', name: 'ถนนเยาวราช & ถนนทรงวาด', address: 'แขวงสัมพันธวงศ์ เขตสัมพันธวงศ์ กรุงเทพฯ', image_url: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482' },
-    { city: 'เขตปทุมวัน', name: 'หอศิลปวัฒนธรรมแห่งกรุงเทพมหานคร (BACC)', address: '939 ถนนพระรามที่ 1 แขวงวังใหม่ เขตปทุมวัน กรุงเทพฯ', image_url: 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a' },
-    { city: 'เขตจตุจักร', name: 'ตลาดนัดจตุจักร', address: 'ถนนกำแพงเพชร 2 แขวงจตุจักร เขตจตุจักร กรุงเทพฯ', image_url: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365' },
-  ],
-  'เชียงใหม่': [
-    { city: 'อำเภอเมืองเชียงใหม่', name: 'วัดพระธาตุดอยสุเทพราชวรวิหาร', address: 'ตำบลสุเทพ อำเภอเมืองเชียงใหม่ เชียงใหม่', image_url: 'https://images.unsplash.com/photo-1598970434795-0c54fe7c0648' },
-    { city: 'อำเภอเมืองเชียงใหม่', name: 'ถนนนิมมานเหมินท์ & One Nimman', address: 'ตำบลสุเทพ อำเภอเมืองเชียงใหม่ เชียงใหม่', image_url: 'https://images.unsplash.com/photo-1512552288940-3a300922a275' },
-    { city: 'อำเภอแม่ริม', name: 'ม่อนแจ่ม', address: 'ตำบลแม่แรม อำเภอแม่ริม เชียงใหม่', image_url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb' },
-    { city: 'อำเภอจอมทอง', name: 'อุทยานแห่งชาติดอยอินทนนท์', address: 'ตำบลบ้านหลวง อำเภอจอมทอง เชียงใหม่', image_url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b' },
-    { city: 'อำเภอแม่ออน', name: 'หมู่บ้านแม่กำปอง', address: 'ตำบลห้วยแก้ว อำเภอแม่ออน เชียงใหม่', image_url: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470' },
-  ],
-  'เชียงราย': [
-    { city: 'อำเภอเมืองเชียงราย', name: 'วัดร่องขุ่น', address: 'ตำบลป่าอ้อดอนชัย อำเภอเมืองเชียงราย เชียงราย', image_url: 'https://images.unsplash.com/photo-1578157695179-d7b7ddeb2f53' },
-    { city: 'อำเภอเมืองเชียงราย', name: 'วัดร่องเสือเต้น', address: 'ตำบลริมกก อำเภอเมืองเชียงราย เชียงราย', image_url: 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a' },
-    { city: 'อำเภอแม่ฟ้าหลวง', name: 'พระตำหนักดอยตุง & สวนแม่ฟ้าหลวง', address: 'ตำบลแม่ฟ้าหลวง อำเภอแม่ฟ้าหลวง เชียงราย', image_url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05' },
-    { city: 'อำเภอเทิง', name: 'วนอุทยานภูชี้ฟ้า', address: 'ตำบลตับเต่า อำเภอเทิง เชียงราย', image_url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b' },
-  ],
-  'น่าน': [
-    { city: 'อำเภอเมืองน่าน', name: 'วัดภูมินทร์', address: 'ตำบลในเวียง อำเภอเมืองน่าน น่าน', image_url: 'https://images.unsplash.com/photo-1528181304800-259b08848526' },
-    { city: 'อำเภอปัว', name: 'ฟาร์มเห็ดบ้านหัวน้ำ & วังศิลาแลง', address: 'ตำบลศิลาแลง อำเภอปัว น่าน', image_url: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470' },
-    { city: 'อำเภอบ่อเกลือ', name: 'หมู่บ้านสะปัน & บ่อเกลือสินเธาว์', address: 'ตำบลดงพญา อำเภอบ่อเกลือ น่าน', image_url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb' },
-  ],
-  'แม่ฮ่องสอน': [
-    { city: 'อำเภอปาย', name: 'สะพานประวัติศาสตร์ท่าปาย & ถนนคนเดินปาย', address: 'ตำบลเวียงใต้ อำเภอปาย แม่ฮ่องสอน', image_url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb' },
-    { city: 'อำเภอเมืองแม่ฮ่องสอน', name: 'บ้านรักไทย', address: 'ตำบลหมอกจำแป่ อำเภอเมืองแม่ฮ่องสอน แม่ฮ่องสอน', image_url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05' },
-    { city: 'อำเภอเมืองแม่ฮ่องสอน', name: 'ปางอุ๋ง (โครงการพระราชดำริปางตอง 2)', address: 'ตำบลหมอกจำแป่ อำเภอเมืองแม่ฮ่องสอน แม่ฮ่องสอน', image_url: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470' },
-  ],
-  'ภูเก็ต': [
-    { city: 'อำเภอเมืองภูเก็ต', name: 'ย่านเมืองเก่าภูเก็ต (ซอยรมณีย์)', address: 'ถนนถลาง ตำบลตลาดใหญ่ อำเภอเมืองภูเก็ต ภูเก็ต', image_url: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5' },
-    { city: 'อำเภอเมืองภูเก็ต', name: 'แหลมพรหมเทพ', address: 'ตำบลราไวย์ อำเภอเมืองภูเก็ต ภูเก็ต', image_url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e' },
-    { city: 'อำเภอกะทู้', name: 'หาดป่าตอง', address: 'ตำบลป่าตอง อำเภอกะทู้ ภูเก็ต', image_url: 'https://images.unsplash.com/photo-1519046904884-53103b34b206' },
-    { city: 'อำเภอถลาง', name: 'หาดในทอน & อุทยานแห่งชาติสิรินาถ', address: 'ตำบลสาคู อำเภอถลาง ภูเก็ต', image_url: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21' },
-  ],
-  'กระบี่': [
-    { city: 'อำเภอเมืองกระบี่', name: 'หาดอ่าวนาง & หาดไร่เลย์', address: 'ตำบลอ่าวนาง อำเภอเมืองกระบี่ กระบี่', image_url: 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a' },
-    { city: 'อำเภอเมืองกระบี่', name: 'หมู่เกาะพีพี (อ่าวมาหยา)', address: 'ตำบลอ่าวนาง อำเภอเมืองกระบี่ กระบี่', image_url: 'https://images.unsplash.com/photo-1537956965359-7573183d1f57' },
-    { city: 'อำเภอคลองท่อม', name: 'สระมรกต & น้ำตกร้อนคลองท่อม', address: 'ตำบลคลองท่อมเหนือ อำเภอคลองท่อม กระบี่', image_url: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470' },
-  ],
-  'สุราษฎร์ธานี': [
-    { city: 'อำเภอบ้านตาขุน', name: 'เขื่อนรัชชประภา (กุ้ยหลินเมืองไทย)', address: 'ตำบลเขาพัง อำเภอบ้านตาขุน สุราษฎร์ธานี', image_url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb' },
-    { city: 'อำเภอเกาะสมุย', name: 'หาดเฉวง & หินตาหินยาย', address: 'ตำบลบ่อผุด อำเภอเกาะสมุย สุราษฎร์ธานี', image_url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e' },
-    { city: 'อำเภอเกาะพะงัน', name: 'หาดริ้น & เกาะเต่า', address: 'ตำบลบ้านใต้ อำเภอเกาะพะงัน สุราษฎร์ธานี', image_url: 'https://images.unsplash.com/photo-1519046904884-53103b34b206' },
-  ],
-  'พังงา': [
-    { city: 'อำเภอตะกั่วทุ่ง', name: 'จุดชมวิวเสม็ดนางชี', address: 'ตำบลคลองเคียน อำเภอตะกั่วทุ่ง พังงา', image_url: 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a' },
-    { city: 'อำเภอคุระบุรี', name: 'อุทยานแห่งชาติหมู่เกาะสิมิลัน', address: 'ตำบลเกาะพระทอง อำเภอคุระบุรี พังงา', image_url: 'https://images.unsplash.com/photo-1537956965359-7573183d1f57' },
-    { city: 'อำเภอตะกั่วป่า', name: 'ย่านเมืองเก่าตะกั่วป่า & หาดเขาหลัก', address: 'ตำบลตะกั่วป่า อำเภอตะกั่วป่า พังงา', image_url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e' },
-  ],
-  'ชลบุรี': [
-    { city: 'อำเภอบางละมุง', name: 'หาดพัทยา & แหลมบาลีฮาย', address: 'ตำบลหนองปรือ อำเภอบางละมุง ชลบุรี', image_url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e' },
-    { city: 'อำเภอบางละมุง', name: 'เกาะล้าน (หาดตาแหวน)', address: 'ตำบลนาเกลือ อำเภอบางละมุง ชลบุรี', image_url: 'https://images.unsplash.com/photo-1519046904884-53103b34b206' },
-    { city: 'อำเภอเมืองชลบุรี', name: 'หาดบางแสน & ตลาดปลาบางแสน', address: 'ตำบลแสนสุข อำเภอเมืองชลบุรี ชลบุรี', image_url: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21' },
-    { city: 'อำเภอสัตหีบ', name: 'หาดเตยงาม & เกาะแสมสาร', address: 'ตำบลสัตหีบ อำเภอสัตหีบ ชลบุรี', image_url: 'https://images.unsplash.com/photo-1537956965359-7573183d1f57' },
-  ],
-  'ระยอง': [
-    { city: 'อำเภอเมืองระยอง', name: 'อุทยานแห่งชาติเขาแหลมหญ้า-หมู่เกาะเสม็ด', address: 'ตำบลเพ อำเภอเมืองระยอง ระยอง', image_url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e' },
-    { city: 'อำเภอแกลง', name: 'ทุ่งโปรงทอง ปากน้ำประแส', address: 'ตำบลปากน้ำกระแส อำเภอแกลง ระยอง', image_url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05' },
-  ],
-  'ตราด': [
-    { city: 'อำเภอเกาะช้าง', name: 'หาดทรายขาว & น้ำตกคลองพลู เกาะช้าง', address: 'ตำบลเกาะช้าง อำเภอเกาะช้าง ตราด', image_url: 'https://images.unsplash.com/photo-1519046904884-53103b34b206' },
-    { city: 'อำเภอเกาะกูด', name: 'หาดคลองเจ้า เกาะกูด', address: 'ตำบลเกาะกูด อำเภอเกาะกูด ตราด', image_url: 'https://images.unsplash.com/photo-1537956965359-7573183d1f57' },
-  ],
-  'กาญจนบุรี': [
-    { city: 'อำเภอเมืองกาญจนบุรี', name: 'สะพานข้ามแม่น้ำแคว', address: 'ตำบลท่ามะขาม อำเภอเมืองกาญจนบุรี กาญจนบุรี', image_url: 'https://images.unsplash.com/photo-1528181304800-259b08848526' },
-    { city: 'อำเภอศรีสวัสดิ์', name: 'อุทยานแห่งชาติเอราวัณ', address: 'ตำบลท่ากระดาน อำเภอศรีสวัสดิ์ กาญจนบุรี', image_url: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470' },
-    { city: 'อำเภอสังขละบุรี', name: 'สะพานมอญ (สะพานอุตตมานุสรณ์)', address: 'ตำบลหนองลู อำเภอสังขละบุรี กาญจนบุรี', image_url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb' },
-  ],
-  'ประจวบคีรีขันธ์': [
-    { city: 'อำเภอหัวหิน', name: 'สถานีรถไฟหัวหิน & ตลาดโต้รุ่งหัวหิน', address: 'ตำบลหัวหิน อำเภอหัวหิน ประจวบคีรีขันธ์', image_url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e' },
-    { city: 'อำเภอสามร้อยยอด', name: 'อุทยานแห่งชาติเขาสามร้อยยอด (ถ้ำพระยานคร)', address: 'ตำบลเขาแดง อำเภอสามร้อยยอด ประจวบคีรีขันธ์', image_url: 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a' },
-  ],
-  'เพชรบุรี': [
-    { city: 'อำเภอชะอำ', name: 'ชายหาดชะอำ', address: 'ตำบลชะอำ อำเภอชะอำ เพชรบุรี', image_url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e' },
-    { city: 'อำเภอเมืองเพชรบุรี', name: 'อุทยานประวัติศาสตร์พระนครคีรี (เขาวัง)', address: 'ตำบลคลองกระแชง อำเภอเมืองเพชรบุรี เพชรบุรี', image_url: 'https://images.unsplash.com/photo-1528181304800-259b08848526' },
-    { city: 'อำเภอแก่งกระจาน', name: 'อุทยานแห่งชาติแก่งกระจาน (พะเนินทุ่ง)', address: 'ตำบลแก่งกระจาน อำเภอแก่งกระจาน เพชรบุรี', image_url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b' },
-  ],
-  'นครราชสีมา': [
-    { city: 'อำเภอปากช่อง', name: 'อุทยานแห่งชาติเขาใหญ่', address: 'ตำบลหมูสี อำเภอปากช่อง นครราชสีมา', image_url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05' },
-    { city: 'อำเภอปากช่อง', name: 'ทอสคานา วัลเล่ย์ & คาเฟ่เขาใหญ่', address: 'ตำบลโป่งตาลอง อำเภอปากช่อง นครราชสีมา', image_url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb' },
-    { city: 'อำเภอเมืองนครราชสีมา', name: 'อนุสาวรีย์ท้าวสุรนารี (ย่าโม)', address: 'ตำบลในเมือง อำเภอเมืองนครราชสีมา นครราชสีมา', image_url: 'https://images.unsplash.com/photo-1528181304800-259b08848526' },
-  ],
-  'เลย': [
-    { city: 'อำเภอเชียงคาน', name: 'ถนนคนเดินเชียงคาน & ภูทอก', address: 'ตำบลเชียงคาน อำเภอเชียงคาน เลย', image_url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb' },
-    { city: 'อำเภอภูกระดึง', name: 'อุทยานแห่งชาติภูกระดึง', address: 'ตำบลศรีฐาน อำเภอภูกระดึง เลย', image_url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b' },
-  ],
-  'ขอนแก่น': [
-    { city: 'อำเภอเมืองขอนแก่น', name: 'วัดหนองแวง (พระมหาธาตุแก่นนคร) & บึงแก่นนคร', address: 'ตำบลในเมือง อำเภอเมืองขอนแก่น ขอนแก่น', image_url: 'https://images.unsplash.com/photo-1528181304800-259b08848526' },
-    { city: 'อำเภอภูผาม่าน', name: 'ผาม่านฝัน & ถ้ำค้างคาวภูผาม่าน', address: 'ตำบลภูผาม่าน อำเภอภูผาม่าน ขอนแก่น', image_url: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470' },
-  ],
-  'อุบลราชธานี': [
-    { city: 'อำเภอโขงเจียม', name: 'อุทยานแห่งชาติผาแต้ม & แม่น้ำสองสี', address: 'ตำบลห้วยไผ่ อำเภอโขงเจียม อุบลราชธานี', image_url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b' },
-    { city: 'อำเภอโพธิ์ไทร', name: 'สามพันโบก (แกรนด์แคนยอนเมืองไทย)', address: 'ตำบลเหล่างาม อำเภอโพธิ์ไทร อุบลราชธานี', image_url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb' },
-  ],
-  'พระนครศรีอยุธยา': [
-    { city: 'อำเภอพระนครศรีอยุธยา', name: 'วัดมหาธาตุ & อุทยานประวัติศาสตร์พระนครศรีอยุธยา', address: 'ตำบลท่าวาสุกรี อำเภอพระนครศรีอยุธยา พระนครศรีอยุธยา', image_url: 'https://images.unsplash.com/photo-1528181304800-259b08848526' },
-    { city: 'อำเภอพระนครศรีอยุธยา', name: 'วัดไชยวัฒนาราม & ตลาดน้ำอโยธยา', address: 'ตำบลบ้านป้อม อำเภอพระนครศรีอยุธยา พระนครศรีอยุธยา', image_url: 'https://images.unsplash.com/photo-1563492065599-3520f775eeed' },
-  ],
-  'เพชรบูรณ์': [
-    { city: 'อำเภอเขาค้อ', name: 'วัดพระธาตุผาซ่อนแก้ว & ทุ่งกังหันลมเขาค้อ', address: 'ตำบลแคมป์สน อำเภอเขาค้อ เพชรบูรณ์', image_url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb' },
-    { city: 'อำเภอหล่มเก่า', name: 'ภูทับเบิก', address: 'ตำบลวังบาล อำเภอหล่มเก่า เพชรบูรณ์', image_url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b' },
-  ],
-  'สุโขทัย': [
-    { city: 'อำเภอเมืองสุโขทัย', name: 'อุทยานประวัติศาสตร์สุโขทัย', address: 'ตำบลเมืองเก่า อำเภอเมืองสุโขทัย สุโขทัย', image_url: 'https://images.unsplash.com/photo-1528181304800-259b08848526' },
-  ],
-  'สมุทรสงคราม': [
-    { city: 'อำเภออัมพวา', name: 'ตลาดน้ำอัมพวา & ตลาดร่มหุบ', address: 'ตำบลอัมพวา อำเภออัมพวา สมุทรสงคราม', image_url: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365' },
-  ],
-  'นครนายก': [
-    { city: 'อำเภอเมืองนครนายก', name: 'เขื่อนขุนด่านปราการชล & น้ำตกสาริกา', address: 'ตำบลหินตั้ง อำเภอเมืองนครนายก นครนายก', image_url: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470' },
-  ],
-  'สงขลา': [
-    { city: 'อำเภอเมืองสงขลา', name: 'หาดสมิหลา & ย่านเมืองเก่าสงขลา', address: 'ตำบลบ่อยาง อำเภอเมืองสงขลา สงขลา', image_url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e' },
-    { city: 'อำเภอหาดใหญ่', name: 'ตลาดกิมหยง & สวนสาธารณะเทศบาลนครหาดใหญ่', address: 'ตำบลหาดใหญ่ อำเภอหาดใหญ่ สงขลา', image_url: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365' },
-  ],
-  'ตรัง': [
-    { city: 'อำเภอกันตัง', name: 'ถ้ำมรกต เกาะมุก & หาดปากเมง', address: 'ตำบลเกาะลิบง อำเภอกันตัง ตรัง', image_url: 'https://images.unsplash.com/photo-1537956965359-7573183d1f57' },
-  ],
-  'สตูล': [
-    { city: 'อำเภอเมืองสตูล', name: 'อุทยานแห่งชาติตะรุเตา (เกาะหลีเป๊ะ)', address: 'ตำบลเกาะสาหร่าย อำเภอเมืองสตูล สตูล', image_url: 'https://images.unsplash.com/photo-1519046904884-53103b34b206' },
-  ],
-  'ระนอง': [
-    { city: 'อำเภอเมืองระนอง', name: 'บ่อน้ำร้อนรักษะวาริน & ภูเขาหญ้า', address: 'ตำบลเขานิเวศน์ อำเภอเมืองระนอง ระนอง', image_url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05' },
-  ],
-  'นครศรีธรรมราช': [
-    { city: 'อำเภอลานสกา', name: 'หมู่บ้านคีรีวง', address: 'ตำบลกำโลน อำเภอลานสกา นครศรีธรรมราช', image_url: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470' },
-    { city: 'อำเภอเมืองนครศรีธรรมราช', name: 'วัดพระมหาธาตุวรมหาวิหาร', address: 'ตำบลในเมือง อำเภอเมืองนครศรีธรรมราช นครศรีธรรมราช', image_url: 'https://images.unsplash.com/photo-1528181304800-259b08848526' },
-  ],
-  'ยะลา': [
-    { city: 'อำเภอเบตง', name: 'ทะเลหมอกอัยเยอร์เวง & สตรีทอาร์ตเบตง', address: 'ตำบลอัยเยอร์เวง อำเภอเบตง ยะลา', image_url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb' },
-  ],
-};
-
-// 3. ข้อมูลแม่แบบ 50 แผนการเดินทาง (35 แผนแรก is_public = true, 15 แผนหลัง is_public = false)
-const SCHEDULE_TEMPLATES: Array<{
+interface RealisticScheduleTemplate {
   name: string;
   description: string;
-  total_day: number;
-  provinces: string[];
   cover_url: string;
-}> = [
-  // --- 35 แผน Public (index 0..34) ---
-  { name: 'เที่ยวเชียงใหม่ 3 วัน 2 คืน สัมผัสลมหนาวม่อนแจ่ม', description: 'เส้นทางยอดฮิต ไหว้พระธาตุดอยสุเทพ เดินเล่นนิมมาน พักโฮมสเตย์ม่อนแจ่มและแม่กำปอง', total_day: 3, provinces: ['เชียงใหม่'], cover_url: 'https://images.unsplash.com/photo-1598970434795-0c54fe7c0648' },
-  { name: 'ตะลุยกรุง 2 วัน 1 คืน ไหว้พระริมเจ้าพระยา-กินของอร่อยเยาวราช', description: 'ทริปสั้นๆ ในกรุงเทพฯ เยี่ยมชมวัดพระแก้ว วัดอรุณ เดินถ่ายรูปย่านทรงวาด', total_day: 2, provinces: ['กรุงเทพมหานคร'], cover_url: 'https://images.unsplash.com/photo-1563492065599-3520f775eeed' },
-  { name: 'ภูเก็ต 4 วัน 3 คืน ดำน้ำดูปะการัง-เดินเล่นเมืองเก่า', description: 'ครบเครื่องทั้งทะเลอันดามัน แหลมพรหมเทพ และคาเฟ่ชิคๆ ย่านเมืองเก่าภูเก็ต', total_day: 4, provinces: ['ภูเก็ต'], cover_url: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5' },
-  { name: 'กระบี่ 3 วัน 2 คืน อ่าวนาง-เกาะพีพี-สระมรกต', description: 'พักผ่อนริมหาดอ่าวนาง นั่งเรือหางยาวเที่ยวเกาะพีพี และแช่น้ำตกร้อนคลองท่อม', total_day: 3, provinces: ['กระบี่'], cover_url: 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a' },
-  { name: 'Road Trip เชียงใหม่ - แม่ฮ่องสอน 5 วัน 4 คืน', description: 'พิชิตโค้งสู่ปาย ปางอุ๋ง และบ้านรักไทย จิบชาอุ่นๆ ริมทะเลสาบยามเช้า', total_day: 5, provinces: ['เชียงใหม่', 'แม่ฮ่องสอน'], cover_url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb' },
-  { name: 'น่านเนิบเนิบ 3 วัน 2 คืน ปัว-สะปัน-บ่อเกลือ', description: 'พักใจกลางหุบเขา สูดอากาศบริสุทธิ์ที่หมู่บ้านสะปัน และชมภาพกระซิบรักวัดภูมินทร์', total_day: 3, provinces: ['น่าน'], cover_url: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470' },
-  { name: 'เชียงราย 3 วัน 2 คืน แอ่วดอยตุง-ชมศิลปะวัดร่องขุ่น', description: 'สัมผัสอากาศเย็นบนดอยตุง ชมทะเลหมอกภูชี้ฟ้า และแวะถ่ายรูปวัดร่องเสือเต้น', total_day: 3, provinces: ['เชียงราย'], cover_url: 'https://images.unsplash.com/photo-1578157695179-d7b7ddeb2f53' },
-  { name: 'พัทยา-เกาะล้าน 2 วัน 1 คืน ทริปใกล้กรุงสุดชิล', description: 'ข้ามเรือไปเล่นน้ำใสที่เกาะล้าน ตกเย็นดินเนอร์ซีฟู้ดริมหาดพัทยา', total_day: 2, provinces: ['ชลบุรี'], cover_url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e' },
-  { name: 'เขาใหญ่-ปากช่อง 2 วัน 1 คืน คาเฟ่และธรรมชาติ', description: 'เดินป่าศึกษาธรรมชาติเขาใหญ่ แวะเช็กอินคาเฟ่สไตล์ยุโรปและฟาร์มโคนม', total_day: 2, provinces: ['นครราชสีมา'], cover_url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05' },
-  { name: 'กาญจนบุรี 3 วัน 2 คืน สังขละบุรี-น้ำตกเอราวัณ', description: 'ตื่นเช้าใส่บาตรสะพานมอญ แวะเล่นน้ำตกเอราวัณ และนั่งรถไฟสายมรณะ', total_day: 3, provinces: ['กาญจนบุรี'], cover_url: 'https://images.unsplash.com/photo-1528181304800-259b08848526' },
-  { name: 'เชียงคาน-ภูกระดึง 4 วัน 3 คืน สัมผัสลมหนาวเมืองเลย', description: 'พิชิตยอดภูกระดึงและเดินชิลริมโขงถนนคนเดินเชียงคาน', total_day: 4, provinces: ['เลย'], cover_url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b' },
-  { name: 'สุราษฎร์ธานี 4 วัน 3 คืน เขื่อนเชี่ยวหลาน-เกาะสมุย', description: 'นอนแพริมน้ำเขื่อนรัชชประภา ต่อด้วยพักผ่อนริมหาดเฉวง เกาะสมุย', total_day: 4, provinces: ['สุราษฎร์ธานี'], cover_url: 'https://images.unsplash.com/photo-1519046904884-53103b34b206' },
-  { name: 'หัวหิน-สามร้อยยอด 2 วัน 1 คืน พักผ่อนริมทะเล', description: 'เดินตลาดโต้รุ่งหัวหิน แวะถ่ายรูปสถานีรถไฟคลาสสิกและถ้ำพระยานคร', total_day: 2, provinces: ['ประจวบคีรีขันธ์'], cover_url: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21' },
-  { name: 'One Day Trip อยุธยา ไหว้พระ 5 วัด กินกุ้งแม่น้ำเผา', description: 'เที่ยวชมโบราณสถานมรดกโลกใกล้กรุงเทพฯ เดินทางสะดวกภายใน 1 วัน', total_day: 1, provinces: ['พระนครศรีอยุธยา'], cover_url: 'https://images.unsplash.com/photo-1528181304800-259b08848526' },
-  { name: 'เขาค้อ-ภูทับเบิก 3 วัน 2 คืน ล่าทะเลหมอกเพชรบูรณ์', description: 'ไหว้พระธาตุผาซ่อนแก้ว กางเต็นท์ดูดาวและทะเลหมอกบนภูทับเบิก', total_day: 3, provinces: ['เพชรบูรณ์'], cover_url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb' },
-  { name: 'เกาะช้าง-เกาะกูด 4 วัน 3 คืน ทะเลตะวันออกน้ำใส', description: 'หนีความวุ่นวายไปติดเกาะ ดำน้ำตื้นและพายคายัคชมป่าชายเลน', total_day: 4, provinces: ['ตราด'], cover_url: 'https://images.unsplash.com/photo-1537956965359-7573183d1f57' },
-  { name: 'พังงา 3 วัน 2 คืน เสม็ดนางชี-หมู่เกาะสิมิลัน', description: 'ชมวิวพระอาทิตย์ขึ้นที่เสม็ดนางชี และดำน้ำเกาะสิมิลันช่วงไฮซีซัน', total_day: 3, provinces: ['พังงา'], cover_url: 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a' },
-  { name: 'อัมพวา-สมุทรสงคราม 2 วัน 1 คืน นอนโฮมสเตย์ริมคลอง', description: 'ชมตลาดร่มหุบ ล่องเรือดูหิ่งห้อย และชิมอาหารพื้นบ้านตลาดน้ำอัมพวา', total_day: 2, provinces: ['สมุทรสงคราม'], cover_url: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365' },
-  { name: 'นครนายก 1 วันเต็ม เล่นน้ำตก-ชมสันเขื่อนขุนด่าน', description: 'ทริปประหยัดเวลา ขับรถจากกรุงเทพฯ เพียง 1.5 ชั่วโมง สูดโอโซนเต็มปอด', total_day: 1, provinces: ['นครนายก'], cover_url: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470' },
-  { name: 'อุบลราชธานี 3 วัน 2 คืน สามพันโบก-ผาแต้ม', description: 'ชมแสงแรกก่อนใครในสยามที่ผาแต้ม และถ่ายรูปหินสวยที่สามพันโบก', total_day: 3, provinces: ['อุบลราชธานี'], cover_url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b' },
-  { name: 'ขอนแก่น-ภูผาม่าน 2 วัน 1 คืน ชมค้างคาวและทุ่งนา', description: 'ไหว้พระมหาธาตุแก่นนคร พักโฮมสเตย์วิวภูผาม่านสุดอลังการ', total_day: 2, provinces: ['ขอนแก่น'], cover_url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05' },
-  { name: 'ระยอง 2 วัน 1 คืน เกาะเสม็ด-ทุ่งโปรงทอง', description: 'เดินสะพานไม้ชมป่าชายเลนทุ่งโปรงทอง และพักผ่อนริมหาดทรายแก้ว', total_day: 2, provinces: ['ระยอง'], cover_url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e' },
-  { name: 'เพชรบุรี-ชะอำ-แก่งกระจาน 3 วัน 2 คืน', description: 'เที่ยวครบทั้งทะเล ภูเขา และประวัติศาสตร์ที่พระนครคีรี', total_day: 3, provinces: ['เพชรบุรี'], cover_url: 'https://images.unsplash.com/photo-1528181304800-259b08848526' },
-  { name: 'สุโขทัย 2 วัน 1 คืน ปั่นจักรยานชมเมืองมรดกโลก', description: 'ซึมซับประวัติศาสตร์อาณาจักรสุโขทัย ชิมก๋วยเตี๋ยวสุโขทัยสูตรดั้งเดิม', total_day: 2, provinces: ['สุโขทัย'], cover_url: 'https://images.unsplash.com/photo-1563492065599-3520f775eeed' },
-  { name: 'นครศรีธรรมราช 3 วัน 2 คืน หมู่บ้านคีรีวง-วัดพระมหาธาตุ', description: 'สูดอากาศที่ดีที่สุดในประเทศไทยที่คีรีวง และสักการะพระบรมธาตุเมืองนคร', total_day: 3, provinces: ['นครศรีธรรมราช'], cover_url: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470' },
-  { name: 'ตรัง-สตูล 4 วัน 3 คืน ถ้ำมรกต-เกาะหลีเป๊ะ', description: 'เส้นทางทะเลใต้ฝั่งอันดามัน น้ำใสราวกระจก อาหารอร่อยระดับตำนาน', total_day: 4, provinces: ['ตรัง', 'สตูล'], cover_url: 'https://images.unsplash.com/photo-1537956965359-7573183d1f57' },
-  { name: 'สงขลา-หาดใหญ่ 3 วัน 2 คืน ตะลุยกินติ่มซำ-เดินเมืองเก่า', description: 'อิ่มอร่อยกับของกินหาดใหญ่ ถ่ายรูปสตรีทอาร์ตสงขลา และชมนางเงือกแหลมสมิหลา', total_day: 3, provinces: ['สงขลา'], cover_url: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365' },
-  { name: 'ระนอง 2 วัน 1 คืน แช่น้ำแร่-ชมภูเขาหญ้า', description: 'เมืองรองสุดสโลว์ไลฟ์ แช่บ่อน้ำร้อนรักษะวารินและจิบกาแฟโรบัสต้าแท้', total_day: 2, provinces: ['ระนอง'], cover_url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05' },
-  { name: 'เบตง ยะลา 3 วัน 2 คืน ทะเลหมอกอัยเยอร์เวง', description: 'ใต้สุดแดนสยาม ชมสกายวอล์คทะเลหมอก ชิมไก่สับเบตงและเฉาก๊วยโบราณ', total_day: 3, provinces: ['ยะลา'], cover_url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb' },
-  { name: 'ทริปสายบุญ ภาคกลาง 2 วัน 1 คืน อยุธยา-อ่างทอง-สิงห์บุรี', description: 'เส้นทางไหว้พระขอพรเสริมสิริมงคล 9 วัดดังลุ่มแม่น้ำเจ้าพระยา', total_day: 2, provinces: ['พระนครศรีอยุธยา', 'อ่างทอง', 'สิงห์บุรี'], cover_url: 'https://images.unsplash.com/photo-1528181304800-259b08848526' },
-  { name: 'เที่ยวจันทบุรี 2 วัน 1 คืน ชุมชนริมน้ำจันทบูร-เนินนางพญา', description: 'ขับรถเลียบถนนเฉลิมบูรพาชลทิต กินปูทะเลสดๆ และเดินเล่นชุมชนเก่า', total_day: 2, provinces: ['จันทบุรี'], cover_url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e' },
-  { name: 'ราชบุรี-สวนผึ้ง 2 วัน 1 คืน ฟาร์มแกะและธารน้ำร้อนบ่อคลึง', description: 'พักผ่อนท่ามกลางขุนเขาตะนาวศรี แวะตลาดโอ๊ะป่อยยามเช้า', total_day: 2, provinces: ['ราชบุรี'], cover_url: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470' },
-  { name: 'ลำปาง-ลำพูน 3 วัน 2 คืน นั่งรถม้า-ไหว้พระธาตุหริภุญชัย', description: 'สัมผัสเสน่ห์เมืองรองล้านนา วัดพระธาตุลำปางหลวงและวัดพระธาตุหริภุญชัย', total_day: 3, provinces: ['ลำปาง', 'ลำพูน'], cover_url: 'https://images.unsplash.com/photo-1598970434795-0c54fe7c0648' },
-  { name: 'อุดรธานี-หนองคาย 3 วัน 2 คืน ทะเลบัวแดง-คำชะโนด', description: 'ล่องเรือชมทะเลบัวแดงยามเช้า สักการะคำชะโนด และชมวิวริมโขงหนองคาย', total_day: 3, provinces: ['อุดรธานี', 'หนองคาย'], cover_url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05' },
-  { name: 'นครปฐม-สุพรรณบุรี 1 วันเต็ม ไหว้พระปฐมเจดีย์-ตลาดสามชุก', description: 'ทริปครอบครัวใกล้กรุงเทพฯ อิ่มอร่อยตลอดเส้นทาง', total_day: 1, provinces: ['นครปฐม', 'สุพรรณบุรี'], cover_url: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365' },
+  days: RouteStop[][]; // แต่ละวันเรียงลำดับตามเส้นทางจริงบน Google Maps (เช้า -> บ่าย -> เย็น -> ค่ำ)
+}
 
-  // --- 15 แผน Private (index 35..49) ---
-  { name: '[Private] แพลนฮันนีมูนเกาะกูด 4 วัน 3 คืน', description: 'ทริปส่วนตัวพักพูลวิลล่าริมทะเล', total_day: 4, provinces: ['ตราด'], cover_url: 'https://images.unsplash.com/photo-1537956965359-7573183d1f57' },
-  { name: '[Private] เที่ยวเชียงใหม่กับครอบครัวช่วงปีใหม่', description: 'รวมร้านอาหารสำหรับผู้สูงอายุและเด็กเล็ก', total_day: 4, provinces: ['เชียงใหม่'], cover_url: 'https://images.unsplash.com/photo-1598970434795-0c54fe7c0648' },
-  { name: '[Private] Workation ภูเก็ต 5 วัน', description: 'คาเฟ่ทำงานวิวทะเลและที่พักอินเทอร์เน็ตแรง', total_day: 5, provinces: ['ภูเก็ต'], cover_url: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5' },
-  { name: '[Private] ทริปถ่ายรูปคาเฟ่กรุงเทพฯ 1 วัน', description: 'ตะลุย 5 คาเฟ่เปิดใหม่ย่านอารีย์-เจริญกรุง', total_day: 1, provinces: ['กรุงเทพมหานคร'], cover_url: 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a' },
-  { name: '[Private] เที่ยวน่านคนเดียว 3 วัน 2 คืน', description: 'แพลนเช่ารถขับเที่ยวปัว-บ่อเกลือแบบชิลๆ', total_day: 3, provinces: ['น่าน'], cover_url: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470' },
-  { name: '[Private] ทริปบริษัท Outing พัทยา 2 วัน 1 คืน', description: 'กิจกรรมทีมบิลดิ้งและงานเลี้ยงตอนเย็น', total_day: 2, provinces: ['ชลบุรี'], cover_url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e' },
-  { name: '[Private] กางเต็นท์เขาใหญ่สุดสัปดาห์', description: 'เช็กลิสต์จุดกางเต็นท์ลำตะคองและจุดส่องสัตว์', total_day: 2, provinces: ['นครราชสีมา'], cover_url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05' },
-  { name: '[Private] วิ่งเทรลอินทนนท์ 3 วัน 2 คืน', description: 'เตรียมตัวก่อนแข่งและจุดพักฟื้นหลังวิ่ง', total_day: 3, provinces: ['เชียงใหม่'], cover_url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b' },
-  { name: '[Private] ไหว้พระแก้ปีชง 2569 กรุงเทพ-นนทบุรี', description: 'วัดมังกรกมลาวาส วัดบรมราชากาญจนาภิเษก', total_day: 1, provinces: ['กรุงเทพมหานคร', 'นนทบุรี'], cover_url: 'https://images.unsplash.com/photo-1563492065599-3520f775eeed' },
-  { name: '[Private] ทริปดำน้ำหลีเป๊ะกับแก๊งเพื่อน', description: 'จองเรือหางยาวเหมาลำโซนใน-โซนนอก', total_day: 4, provinces: ['สตูล'], cover_url: 'https://images.unsplash.com/photo-1519046904884-53103b34b206' },
-  { name: '[Private] เยี่ยมญาติและเที่ยวพิษณุโลก-สุโขทัย', description: 'ไหว้พระพุทธชินราชและแวะอุทยานประวัติศาสตร์', total_day: 3, provinces: ['พิษณุโลก', 'สุโขทัย'], cover_url: 'https://images.unsplash.com/photo-1528181304800-259b08848526' },
-  { name: '[Private] ขับรถเที่ยวแม่ฮ่องสอนวงกลม 4 วัน', description: 'เชียงใหม่ - แม่สะเรียง - แม่ฮ่องสอน - ปาย', total_day: 4, provinces: ['แม่ฮ่องสอน'], cover_url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb' },
-  { name: '[Private] พักผ่อนหัวหิน 2 วัน 1 คืน แบบไม่เร่งรีบ', description: 'เน้นนอนโรงแรมริมหาดและกินอาหารทะเล', total_day: 2, provinces: ['ประจวบคีรีขันธ์'], cover_url: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21' },
-  { name: '[Private] ทริปถ่ายดาวภูชี้ฟ้า เชียงราย', description: 'เตรียมอุปกรณ์ถ่ายภาพทางช้างเผือก', total_day: 3, provinces: ['เชียงราย'], cover_url: 'https://images.unsplash.com/photo-1578157695179-d7b7ddeb2f53' },
-  { name: '[Private] สำรวจเส้นทางกาแฟภาคใต้ ชุมพร-ระนอง', description: 'เยี่ยมชมไร่กาแฟและโรงคั่วท้องถิ่น', total_day: 3, provinces: ['ชุมพร', 'ระนอง'], cover_url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05' },
+// 2. ข้อมูลแม่แบบ 50 แผนการเดินทางจริง (40 แผนแรก Public / 10 แผนหลัง Private)
+// ทุกแผนจัดลำดับสถานที่ตามเส้นทางจริงบน Google Maps ไม่ย้อนไป-กลับ และไม่ซ้ำสถานที่เดิมข้ามวัน
+const SCHEDULE_TEMPLATES: RealisticScheduleTemplate[] = [
+  // =========================================================================
+  // 40 แผน PUBLIC (index 0 .. 39)
+  // =========================================================================
+  {
+    name: 'เชียงใหม่ 3 วัน 2 คืน: เมืองเก่า-ดอยสุเทพ-แม่ริม-แม่กำปอง',
+    description: 'เส้นทางเที่ยวยอดฮิต แยกโซนชัดเจนวันต่อวัน ไม่ขับรถย้อนไปมา ครบทั้งไหว้พระ คาเฟ่ และหมู่บ้านกลางหุบเขา',
+    cover_url: IMG.chiangMai,
+    days: [
+      // วันที่ 1: โซนคูเมือง & ดอยสุเทพ
+      [
+        { time: '08:30', province: 'เชียงใหม่', city: 'อำเภอเมืองเชียงใหม่', name: 'วัดพระสิงห์วรมหาวิหาร', address: 'ถนนสามล้าน ตำบลพระสิงห์ อำเภอเมืองเชียงใหม่ เชียงใหม่', image_url: IMG.chiangMai },
+        { time: '10:30', province: 'เชียงใหม่', city: 'อำเภอเมืองเชียงใหม่', name: 'วัดพระธาตุดอยสุเทพราชวรวิหาร', address: 'ตำบลสุเทพ อำเภอเมืองเชียงใหม่ เชียงใหม่', image_url: IMG.temple },
+        { time: '13:00', province: 'เชียงใหม่', city: 'อำเภอเมืองเชียงใหม่', name: 'ข้าวซอยแม่สาย ย่านสันติธรรม', address: 'ซอยราชพฤกษ์ ตำบลช้างเผือก อำเภอเมืองเชียงใหม่ เชียงใหม่', image_url: IMG.streetFood },
+        { time: '15:30', province: 'เชียงใหม่', city: 'อำเภอเมืองเชียงใหม่', name: 'ถนนนิมมานเหมินท์ & One Nimman', address: 'ตำบลสุเทพ อำเภอเมืองเชียงใหม่ เชียงใหม่', image_url: IMG.cafe },
+        { time: '19:00', province: 'เชียงใหม่', city: 'อำเภอเมืองเชียงใหม่', name: 'ประตูท่าแพ & ถนนคนเดินท่าแพ', address: 'ถนนมูลเมือง ตำบลศรีภูมิ อำเภอเมืองเชียงใหม่ เชียงใหม่', image_url: IMG.market },
+      ],
+      // วันที่ 2: เส้นทางแม่ริม - ม่อนแจ่ม
+      [
+        { time: '09:00', province: 'เชียงใหม่', city: 'อำเภอแม่ริม', name: 'สวนพฤกษศาสตร์สมเด็จพระนางเจ้าสิริกิติ์', address: 'ตำบลแม่แรม อำเภอแม่ริม เชียงใหม่', image_url: IMG.forest },
+        { time: '11:30', province: 'เชียงใหม่', city: 'อำเภอแม่ริม', name: 'โป่งแยง จังเกิ้ล โคสเตอร์ & ซิปไลน์', address: 'ตำบลโป่งแยง อำเภอแม่ริม เชียงใหม่', image_url: IMG.mountain },
+        { time: '13:30', province: 'เชียงใหม่', city: 'อำเภอแม่ริม', name: 'คาเฟ่และร้านอาหารริมลำธารแม่สา', address: 'ตำบลแม่แรม อำเภอแม่ริม เชียงใหม่', image_url: IMG.cafe },
+        { time: '16:00', province: 'เชียงใหม่', city: 'อำเภอแม่ริม', name: 'ม่อนแจ่ม', address: 'ตำบลแม่แรม อำเภอแม่ริม เชียงใหม่', image_url: IMG.mountain },
+      ],
+      // วันที่ 3: เส้นทางสันกำแพง - แม่ออน
+      [
+        { time: '09:00', province: 'เชียงใหม่', city: 'อำเภอแม่ออน', name: 'น้ำพุร้อนสันกำแพง', address: 'ตำบลบ้านสหกรณ์ อำเภอแม่ออน เชียงใหม่', image_url: IMG.waterfall },
+        { time: '11:00', province: 'เชียงใหม่', city: 'อำเภอแม่ออน', name: 'หมู่บ้านแม่กำปอง', address: 'ตำบลห้วยแก้ว อำเภอแม่ออน เชียงใหม่', image_url: IMG.mountain },
+        { time: '13:30', province: 'เชียงใหม่', city: 'อำเภอแม่ออน', name: 'ร้านกาแฟชมนกชมไม้ แม่กำปอง', address: 'ตำบลห้วยแก้ว อำเภอแม่ออน เชียงใหม่', image_url: IMG.cafe },
+        { time: '15:30', province: 'เชียงใหม่', city: 'อำเภอแม่ออน', name: 'น้ำตกแม่กำปอง', address: 'ตำบลห้วยแก้ว อำเภอแม่ออน เชียงใหม่', image_url: IMG.waterfall },
+      ],
+    ],
+  },
+  {
+    name: 'กรุงเทพฯ 2 วัน 1 คืน: ลัดเลาะเกาะรัตนโกสินทร์-ฝั่งธนฯ-เยาวราช',
+    description: 'เดินเที่ยวและนั่งเรือด่วนเจ้าพระยาตามแนวรถไฟฟ้า MRT เก็บครบวัดสำคัญ คาเฟ่ทรงวาด และสตรีทฟู้ดเยาวราช',
+    cover_url: IMG.grandPalace,
+    days: [
+      // วันที่ 1: เกาะรัตนโกสินทร์ & ฝั่งธนบุรี
+      [
+        { time: '08:30', province: 'กรุงเทพมหานคร', city: 'เขตพระนคร', name: 'วัดพระศรีรัตนศาสดาราม (วัดพระแก้ว)', address: 'ถนนหน้าพระลาน แขวงพระบรมมหาราชวัง เขตพระนคร กรุงเทพฯ', image_url: IMG.grandPalace },
+        { time: '10:30', province: 'กรุงเทพมหานคร', city: 'เขตพระนคร', name: 'วัดพระเชตุพนวิมลมังคลาราม (วัดโพธิ์)', address: '2 ถนนสนามไชย แขวงพระบรมมหาราชวัง เขตพระนคร กรุงเทพฯ', image_url: IMG.temple },
+        { time: '12:30', province: 'กรุงเทพมหานคร', city: 'เขตพระนคร', name: 'ร้านอาหารริมน้ำย่านท่าเตียน', address: 'ถนนมหาราช แขวงพระบรมมหาราชวัง เขตพระนคร กรุงเทพฯ', image_url: IMG.streetFood },
+        { time: '15:00', province: 'กรุงเทพมหานคร', city: 'เขตบางกอกใหญ่', name: 'วัดอรุณราชวรารามราชวรมหาวิหาร', address: '158 ถนนวังเดิม แขวงวัดอรุณ เขตบางกอกใหญ่ กรุงเทพฯ', image_url: IMG.temple },
+        { time: '18:00', province: 'กรุงเทพมหานคร', city: 'เขตพระนคร', name: 'ปากคลองตลาด & สะพานพุทธ', address: 'ถนนจักรเพชร แขวงวังบูรพาภิรมย์ เขตพระนคร กรุงเทพฯ', image_url: IMG.market },
+      ],
+      // วันที่ 2: ทรงวาด - เยาวราช - ปทุมวัน
+      [
+        { time: '09:30', province: 'กรุงเทพมหานคร', city: 'เขตสัมพันธวงศ์', name: 'ถนนทรงวาด & คาเฟ่ย่านตลาดน้อย', address: 'ถนนทรงวาด แขวงจักรวรรดิ เขตสัมพันธวงศ์ กรุงเทพฯ', image_url: IMG.cafe },
+        { time: '12:00', province: 'กรุงเทพมหานคร', city: 'เขตสัมพันธวงศ์', name: 'วัดไตรมิตรวิทยารามวรวิหาร', address: '661 ถนนเจริญกรุง แขวงตลาดน้อย เขตสัมพันธวงศ์ กรุงเทพฯ', image_url: IMG.temple },
+        { time: '14:30', province: 'กรุงเทพมหานคร', city: 'เขตปทุมวัน', name: 'หอศิลปวัฒนธรรมแห่งกรุงเทพมหานคร (BACC)', address: '939 ถนนพระรามที่ 1 แขวงวังใหม่ เขตปทุมวัน กรุงเทพฯ', image_url: IMG.oldTown },
+        { time: '18:30', province: 'กรุงเทพมหานคร', city: 'เขตสัมพันธวงศ์', name: 'ถนนเยาวราช (สตรีทฟู้ดยามค่ำ)', address: 'ถนนเยาวราช แขวงสัมพันธวงศ์ เขตสัมพันธวงศ์ กรุงเทพฯ', image_url: IMG.streetFood },
+      ],
+    ],
+  },
+  {
+    name: 'ภูเก็ต 4 วัน 3 คืน: เมืองเก่า-แหลมพรหมเทพ-กะตะ-หาดในทอน',
+    description: 'ไล่เส้นทางจากตัวเมืองลงใต้สุดแหลมพรหมเทพ ต่อด้วยหาดฝั่งตะวันตก และจบโซนเหนือใกล้สนามบิน',
+    cover_url: IMG.oldTown,
+    days: [
+      // วันที่ 1: เมืองเก่าภูเก็ต & เขารัง
+      [
+        { time: '09:30', province: 'ภูเก็ต', city: 'อำเภอเมืองภูเก็ต', name: 'ย่านเมืองเก่าภูเก็ต (ถนนถลาง-ซอยรมณีย์)', address: 'ถนนถลาง ตำบลตลาดใหญ่ อำเภอเมืองภูเก็ต ภูเก็ต', image_url: IMG.oldTown },
+        { time: '12:00', province: 'ภูเก็ต', city: 'อำเภอเมืองภูเก็ต', name: 'ร้านหมี่ต้นโพธิ์ วงเวียนหอนาฬิกา', address: 'ถนนภูเก็ต ตำบลตลาดใหญ่ อำเภอเมืองภูเก็ต ภูเก็ต', image_url: IMG.streetFood },
+        { time: '14:00', province: 'ภูเก็ต', city: 'อำเภอเมืองภูเก็ต', name: 'พิพิธภัณฑ์ภูเก็ตไทยหัว', address: '28 ถนนกระบี่ ตำบลตลาดเหนือ อำเภอเมืองภูเก็ต ภูเก็ต', image_url: IMG.oldTown },
+        { time: '17:00', province: 'ภูเก็ต', city: 'อำเภอเมืองภูเก็ต', name: 'จุดชมวิวเขารัง', address: 'ถนนคอซิมบี้ ตำบลรัษฎา อำเภอเมืองภูเก็ต ภูเก็ต', image_url: IMG.mountain },
+        { time: '19:00', province: 'ภูเก็ต', city: 'อำเภอเมืองภูเก็ต', name: 'ตลาดนัดชิลล์วา', address: 'ถนนเยาวราช ตำบลรัษฎา อำเภอเมืองภูเก็ต ภูเก็ต', image_url: IMG.market },
+      ],
+      // วันที่ 2: โซนใต้ ฉลอง - ราไวย์ - แหลมพรหมเทพ
+      [
+        { time: '09:00', province: 'ภูเก็ต', city: 'อำเภอเมืองภูเก็ต', name: 'วัดไชยธาราราม (วัดฉลอง)', address: '70 หมู่ 6 ตำบลฉลอง อำเภอเมืองภูเก็ต ภูเก็ต', image_url: IMG.temple },
+        { time: '11:00', province: 'ภูเก็ต', city: 'อำเภอเมืองภูเก็ต', name: 'จุดชมวิวสามอ่าว (กะรน-กะตะ-ในหาน)', address: 'ตำบลราไวย์ อำเภอเมืองภูเก็ต ภูเก็ต', image_url: IMG.cliffSea },
+        { time: '13:00', province: 'ภูเก็ต', city: 'อำเภอเมืองภูเก็ต', name: 'ตลาดซีฟู้ดหาดราไวย์', address: 'ตำบลราไวย์ อำเภอเมืองภูเก็ต ภูเก็ต', image_url: IMG.streetFood },
+        { time: '15:30', province: 'ภูเก็ต', city: 'อำเภอเมืองภูเก็ต', name: 'หาดในหาน', address: 'ตำบลราไวย์ อำเภอเมืองภูเก็ต ภูเก็ต', image_url: IMG.beach },
+        { time: '17:45', province: 'ภูเก็ต', city: 'อำเภอเมืองภูเก็ต', name: 'แหลมพรหมเทพ', address: 'ตำบลราไวย์ อำเภอเมืองภูเก็ต ภูเก็ต', image_url: IMG.coast },
+      ],
+      // วันที่ 3: หาดฝั่งตะวันตก กะตะ - กะรน - ป่าตอง
+      [
+        { time: '09:30', province: 'ภูเก็ต', city: 'อำเภอเมืองภูเก็ต', name: 'หาดกะตะ', address: 'ตำบลกะรน อำเภอเมืองภูเก็ต ภูเก็ต', image_url: IMG.beach },
+        { time: '12:30', province: 'ภูเก็ต', city: 'อำเภอเมืองภูเก็ต', name: 'คาเฟ่ริมผา ย่านกะรน', address: 'ตำบลกะรน อำเภอเมืองภูเก็ต ภูเก็ต', image_url: IMG.cafe },
+        { time: '15:30', province: 'ภูเก็ต', city: 'อำเภอกะทู้', name: 'หาดป่าตอง', address: 'ตำบลป่าตอง อำเภอกะทู้ ภูเก็ต', image_url: IMG.island },
+        { time: '19:30', province: 'ภูเก็ต', city: 'อำเภอกะทู้', name: 'ถนนบางลา ป่าตอง', address: 'ตำบลป่าตอง อำเภอกะทู้ ภูเก็ต', image_url: IMG.market },
+      ],
+      // วันที่ 4: โซนเหนือ กมลา - บางเทา - ในทอน (ใกล้สนามบิน)
+      [
+        { time: '09:30', province: 'ภูเก็ต', city: 'อำเภอกะทู้', name: 'หาดกมลา & แหลมสิงห์', address: 'ตำบลกมลา อำเภอกะทู้ ภูเก็ต', image_url: IMG.coast },
+        { time: '12:00', province: 'ภูเก็ต', city: 'อำเภอถลาง', name: 'หาดบางเทา & เชิงทะเล', address: 'ตำบลเชิงทะเล อำเภอถลาง ภูเก็ต', image_url: IMG.beach },
+        { time: '15:00', province: 'ภูเก็ต', city: 'อำเภอถลาง', name: 'หาดในทอน & อุทยานแห่งชาติสิรินาถ', address: 'ตำบลสาคู อำเภอถลาง ภูเก็ต', image_url: IMG.island },
+      ],
+    ],
+  },
+  {
+    name: 'กระบี่ 3 วัน 2 คืน: อ่าวนาง-หมู่เกาะพีพี-สระมรกตคลองท่อม',
+    description: 'วันแรกเที่ยวโซนตัวเมืองและอ่าวนาง วันที่สองออกทะเลพีพีเต็มวัน วันที่สามเก็บน้ำตกร้อนและสระมรกต',
+    cover_url: IMG.cliffSea,
+    days: [
+      // วันที่ 1: ตัวเมืองกระบี่ - อ่าวนาง
+      [
+        { time: '08:30', province: 'กระบี่', city: 'อำเภอเมืองกระบี่', name: 'วัดถ้ำเสือ กระบี่', address: 'ตำบลกระบี่น้อย อำเภอเมืองกระบี่ กระบี่', image_url: IMG.temple },
+        { time: '11:00', province: 'กระบี่', city: 'อำเภอเมืองกระบี่', name: 'ลานปูดำ & เขาขนาบน้ำ', address: 'ถนนอุตรกิจ ตำบลปากน้ำ อำเภอเมืองกระบี่ กระบี่', image_url: IMG.coast },
+        { time: '14:00', province: 'กระบี่', city: 'อำเภอเมืองกระบี่', name: 'หาดนพรัตน์ธารา', address: 'ตำบลอ่าวนาง อำเภอเมืองกระบี่ กระบี่', image_url: IMG.beach },
+        { time: '16:30', province: 'กระบี่', city: 'อำเภอเมืองกระบี่', name: 'หาดอ่าวนาง', address: 'ตำบลอ่าวนาง อำเภอเมืองกระบี่ กระบี่', image_url: IMG.cliffSea },
+        { time: '19:00', province: 'กระบี่', city: 'อำเภอเมืองกระบี่', name: 'ตลาดโต้รุ่งอ่าวนาง', address: 'ตำบลอ่าวนาง อำเภอเมืองกระบี่ กระบี่', image_url: IMG.market },
+      ],
+      // วันที่ 2: ทริปเรือหมู่เกาะพีพี
+      [
+        { time: '09:00', province: 'กระบี่', city: 'อำเภอเมืองกระบี่', name: 'อ่าวมาหยา หมู่เกาะพีพี', address: 'ตำบลอ่าวนาง อำเภอเมืองกระบี่ กระบี่', image_url: IMG.andaman },
+        { time: '11:00', province: 'กระบี่', city: 'อำเภอเมืองกระบี่', name: 'อ่าวปิเละลากูน', address: 'ตำบลอ่าวนาง อำเภอเมืองกระบี่ กระบี่', image_url: IMG.island },
+        { time: '12:30', province: 'กระบี่', city: 'อำเภอเมืองกระบี่', name: 'เกาะพีพีดอน (อ่าวต้นไทร)', address: 'ตำบลอ่าวนาง อำเภอเมืองกระบี่ กระบี่', image_url: IMG.beach },
+        { time: '15:00', province: 'กระบี่', city: 'อำเภอเมืองกระบี่', name: 'เกาะไผ่ (Bamboo Island)', address: 'ตำบลอ่าวนาง อำเภอเมืองกระบี่ กระบี่', image_url: IMG.andaman },
+      ],
+      // วันที่ 3: เส้นทางคลองท่อม - หนองทะเล
+      [
+        { time: '09:00', province: 'กระบี่', city: 'อำเภอคลองท่อม', name: 'น้ำตกร้อนคลองท่อม', address: 'ตำบลคลองท่อมเหนือ อำเภอคลองท่อม กระบี่', image_url: IMG.waterfall },
+        { time: '11:00', province: 'กระบี่', city: 'อำเภอคลองท่อม', name: 'สระมรกต คลองท่อม', address: 'ตำบลคลองท่อมเหนือ อำเภอคลองท่อม กระบี่', image_url: IMG.forest },
+        { time: '13:30', province: 'กระบี่', city: 'อำเภอคลองท่อม', name: 'คาเฟ่กลางสวนปาล์ม คลองท่อม', address: 'ตำบลคลองท่อมใต้ อำเภอคลองท่อม กระบี่', image_url: IMG.cafe },
+        { time: '15:30', province: 'กระบี่', city: 'อำเภอเมืองกระบี่', name: 'คลองหรูด (คลองน้ำใส) หนองทะเล', address: 'ตำบลหนองทะเล อำเภอเมืองกระบี่ กระบี่', image_url: IMG.waterfall },
+      ],
+    ],
+  },
+  {
+    name: 'Road Trip วงกลมเชียงใหม่ - แม่ฮ่องสอน 5 วัน 4 คืน',
+    description: 'เส้นทางวนวงกลมทวนเข็มนาฬิกาที่ขับง่ายที่สุด: อินทนนท์ -> แม่สะเรียง -> ตัวเมืองแม่ฮ่องสอน -> ปางอุ๋ง -> ปาย -> เชียงใหม่',
+    cover_url: IMG.mountain,
+    days: [
+      // วันที่ 1: เชียงใหม่ - จอมทอง - แม่แจ่ม
+      [
+        { time: '08:00', province: 'เชียงใหม่', city: 'อำเภอจอมทอง', name: 'อุทยานแห่งชาติดอยอินทนนท์ (กิ่วแม่ปาน)', address: 'ตำบลบ้านหลวง อำเภอจอมทอง เชียงใหม่', image_url: IMG.peak },
+        { time: '10:30', province: 'เชียงใหม่', city: 'อำเภอจอมทอง', name: 'พระมหาธาตุนภเมทนีดลและพระมหาธาตุนภพลภูมิสิริ', address: 'ตำบลบ้านหลวง อำเภอจอมทอง เชียงใหม่', image_url: IMG.temple },
+        { time: '13:00', province: 'เชียงใหม่', city: 'อำเภอจอมทอง', name: 'น้ำตกวชิรธาร', address: 'ตำบลบ้านหลวง อำเภอจอมทอง เชียงใหม่', image_url: IMG.waterfall },
+        { time: '16:00', province: 'เชียงใหม่', city: 'อำเภอแม่แจ่ม', name: 'นาขั้นบันไดบ้านป่าบงเปียง', address: 'ตำบลช่างเคิ่ง อำเภอแม่แจ่ม เชียงใหม่', image_url: IMG.mountain },
+      ],
+      // วันที่ 2: ฮอด - แม่สะเรียง - ขุนยวม - เมืองแม่ฮ่องสอน
+      [
+        { time: '08:30', province: 'เชียงใหม่', city: 'อำเภอฮอด', name: 'สวนสนบ่อแก้ว ฮอด', address: 'ตำบลบ่อหลวง อำเภอฮอด เชียงใหม่', image_url: IMG.forest },
+        { time: '11:30', province: 'แม่ฮ่องสอน', city: 'อำเภอแม่สะเรียง', name: 'พิพิธภัณฑ์แม่สะเรียง', address: 'ตำบลแม่สะเรียง อำเภอแม่สะเรียง แม่ฮ่องสอน', image_url: IMG.oldTown },
+        { time: '14:30', province: 'แม่ฮ่องสอน', city: 'อำเภอขุนยวม', name: 'ทุ่งบัวตองดอยแม่อูคอ', address: 'ตำบลแม่อูคอ อำเภอขุนยวม แม่ฮ่องสอน', image_url: IMG.mountain },
+        { time: '17:30', province: 'แม่ฮ่องสอน', city: 'อำเภอเมืองแม่ฮ่องสอน', name: 'วัดพระธาตุดอยกองมู', address: 'ตำบลจองคำ อำเภอเมืองแม่ฮ่องสอน แม่ฮ่องสอน', image_url: IMG.temple },
+      ],
+      // วันที่ 3: ปางอุ๋ง - บ้านรักไทย - ปางมะผ้า
+      [
+        { time: '07:30', province: 'แม่ฮ่องสอน', city: 'อำเภอเมืองแม่ฮ่องสอน', name: 'ปางอุ๋ง (โครงการพระราชดำริปางตอง 2)', address: 'ตำบลหมอกจำแป่ อำเภอเมืองแม่ฮ่องสอน แม่ฮ่องสอน', image_url: IMG.forest },
+        { time: '10:30', province: 'แม่ฮ่องสอน', city: 'อำเภอเมืองแม่ฮ่องสอน', name: 'บ้านรักไทย', address: 'ตำบลหมอกจำแป่ อำเภอเมืองแม่ฮ่องสอน แม่ฮ่องสอน', image_url: IMG.mountain },
+        { time: '14:00', province: 'แม่ฮ่องสอน', city: 'อำเภอเมืองแม่ฮ่องสอน', name: 'สะพานซูตองเป้', address: 'ตำบลปางหมู อำเภอเมืองแม่ฮ่องสอน แม่ฮ่องสอน', image_url: IMG.temple },
+        { time: '17:00', province: 'แม่ฮ่องสอน', city: 'อำเภอปางมะผ้า', name: 'จุดชมวิวดอยกิ่วลม ปางมะผ้า', address: 'ตำบลสบป่อง อำเภอปางมะผ้า แม่ฮ่องสอน', image_url: IMG.peak },
+      ],
+      // วันที่ 4: เที่ยวปายเต็มวัน
+      [
+        { time: '09:00', province: 'แม่ฮ่องสอน', city: 'อำเภอปาย', name: 'หมู่บ้านสันติชล & จุดชมวิวหยุนไหล', address: 'ตำบลเวียงใต้ อำเภอปาย แม่ฮ่องสอน', image_url: IMG.mountain },
+        { time: '11:30', province: 'แม่ฮ่องสอน', city: 'อำเภอปาย', name: 'คอฟฟี่ อิน เลิฟ ปาย', address: 'ตำบลทุ่งยาว อำเภอปาย แม่ฮ่องสอน', image_url: IMG.cafe },
+        { time: '16:30', province: 'แม่ฮ่องสอน', city: 'อำเภอปาย', name: 'กองแลน (ปายแคนยอน)', address: 'ตำบลแม่ฮี้ อำเภอปาย แม่ฮ่องสอน', image_url: IMG.peak },
+        { time: '19:00', province: 'แม่ฮ่องสอน', city: 'อำเภอปาย', name: 'ถนนคนเดินปาย', address: 'ตำบลเวียงใต้ อำเภอปาย แม่ฮ่องสอน', image_url: IMG.market },
+      ],
+      // วันที่ 5: ปาย - แม่แตง - กลับเชียงใหม่
+      [
+        { time: '08:30', province: 'แม่ฮ่องสอน', city: 'อำเภอปาย', name: 'สะพานประวัติศาสตร์ท่าปาย', address: 'ตำบลแม่ฮี้ อำเภอปาย แม่ฮ่องสอน', image_url: IMG.oldTown },
+        { time: '11:00', province: 'เชียงใหม่', city: 'อำเภอแม่แตง', name: 'น้ำพุร้อนโป่งเดือด แม่แตง', address: 'ตำบลป่าแป๋ อำเภอแม่แตง เชียงใหม่', image_url: IMG.waterfall },
+        { time: '14:00', province: 'เชียงใหม่', city: 'อำเภอแม่แตง', name: 'แดนเทวดา แม่แตง', address: 'ตำบลสันมหาพน อำเภอแม่แตง เชียงใหม่', image_url: IMG.cafe },
+      ],
+    ],
+  },
+  {
+    name: 'น่านเนิบเนิบ 3 วัน 2 คืน: ในเวียง-ปัว-ดอยภูคา-สะปัน',
+    description: 'ไล่เส้นทางจากตัวเมืองน่านขึ้นเหนือไปอำเภอปัว ข้ามดอยภูคาสู่หมู่บ้านสะปัน และกลับทางถนนลอยฟ้าหมายเลข 3',
+    cover_url: IMG.waterfall,
+    days: [
+      // วันที่ 1: ตัวเมืองน่าน & ภูเพียง
+      [
+        { time: '08:30', province: 'น่าน', city: 'อำเภอเมืองน่าน', name: 'วัดภูมินทร์', address: 'ตำบลในเวียง อำเภอเมืองน่าน น่าน', image_url: IMG.temple },
+        { time: '10:30', province: 'น่าน', city: 'อำเภอเมืองน่าน', name: 'พิพิธภัณฑสถานแห่งชาติน่าน & ซุ้มลีลาวดี', address: 'ตำบลในเวียง อำเภอเมืองน่าน น่าน', image_url: IMG.oldTown },
+        { time: '13:30', province: 'น่าน', city: 'อำเภอภูเพียง', name: 'วัดพระธาตุแช่แห้ง', address: 'ตำบลม่วงตึ๊ด อำเภอภูเพียง น่าน', image_url: IMG.temple },
+        { time: '16:30', province: 'น่าน', city: 'อำเภอเมืองน่าน', name: 'วัดพระธาตุเขาน้อย', address: 'ตำบลดู่ใต้ อำเภอเมืองน่าน น่าน', image_url: IMG.mountain },
+        { time: '19:00', province: 'น่าน', city: 'อำเภอเมืองน่าน', name: 'ถนนคนเดินกาดข่วงเมืองน่าน', address: 'ตำบลในเวียง อำเภอเมืองน่าน น่าน', image_url: IMG.market },
+      ],
+      // วันที่ 2: ปัว - ดอยภูคา - บ่อเกลือ - สะปัน
+      [
+        { time: '09:00', province: 'น่าน', city: 'อำเภอปัว', name: 'วัดภูเก็ต อำเภอปัว', address: 'ตำบลวรนคร อำเภอปัว น่าน', image_url: IMG.temple },
+        { time: '11:00', province: 'น่าน', city: 'อำเภอปัว', name: 'ฟาร์มเห็ดบ้านหัวน้ำ & วังศิลาแลง', address: 'ตำบลศิลาแลง อำเภอปัว น่าน', image_url: IMG.waterfall },
+        { time: '14:00', province: 'น่าน', city: 'อำเภอปัว', name: 'จุดชมวิว 1715 อุทยานแห่งชาติดอยภูคา', address: 'ตำบลภูคา อำเภอปัว น่าน', image_url: IMG.peak },
+        { time: '16:00', province: 'น่าน', city: 'อำเภอบ่อเกลือ', name: 'บ่อเกลือสินเธาว์โบราณ', address: 'ตำบลบ่อเกลือใต้ อำเภอบ่อเกลือ น่าน', image_url: IMG.oldTown },
+        { time: '17:30', province: 'น่าน', city: 'อำเภอบ่อเกลือ', name: 'หมู่บ้านสะปัน', address: 'ตำบลดงพญา อำเภอบ่อเกลือ น่าน', image_url: IMG.mountain },
+      ],
+      // วันที่ 3: สะปัน - ถนนหมายเลข 3 - สันติสุข - เมืองน่าน
+      [
+        { time: '08:30', province: 'น่าน', city: 'อำเภอบ่อเกลือ', name: 'หยุดเวลาคาเฟ่ สะปัน', address: 'ตำบลดงพญา อำเภอบ่อเกลือ น่าน', image_url: IMG.cafe },
+        { time: '10:30', province: 'น่าน', city: 'อำเภอสันติสุข', name: 'โค้งหมายเลข 3 ถนนลอยฟ้า 1081', address: 'ตำบลอวน อำเภอสันติสุข น่าน', image_url: IMG.mountain },
+        { time: '13:30', province: 'น่าน', city: 'อำเภอเมืองน่าน', name: 'ร้านข้าวซอยต้นน้ำ เมืองน่าน', address: 'ตำบลในเวียง อำเภอเมืองน่าน น่าน', image_url: IMG.streetFood },
+        { time: '15:30', province: 'น่าน', city: 'อำเภอเมืองน่าน', name: 'วัดศรีพันต้น', address: 'ตำบลในเวียง อำเภอเมืองน่าน น่าน', image_url: IMG.temple },
+      ],
+    ],
+  },
+  {
+    name: 'เชียงราย 3 วัน 2 คืน: ดอยตุง-สามเหลี่ยมทองคำ-ภูชี้ฟ้า-วัดร่องขุ่น',
+    description: 'เส้นทางเหนือสุดแดนสยาม เลาะริมโขงขึ้นดอยภูชี้ฟ้า และปิดท้ายด้วยแลนด์มาร์กศิลปะในตัวเมืองเชียงราย',
+    cover_url: IMG.whiteTemple,
+    days: [
+      // วันที่ 1: ดอยตุง - แม่สาย - เชียงแสน
+      [
+        { time: '08:30', province: 'เชียงราย', city: 'อำเภอแม่ฟ้าหลวง', name: 'พระตำหนักดอยตุง & สวนแม่ฟ้าหลวง', address: 'ตำบลแม่ฟ้าหลวง อำเภอแม่ฟ้าหลวง เชียงราย', image_url: IMG.forest },
+        { time: '11:30', province: 'เชียงราย', city: 'อำเภอแม่จัน', name: 'ไร่ชาฉุยฟง แม่จัน', address: 'ตำบลป่าซาง อำเภอแม่จัน เชียงราย', image_url: IMG.mountain },
+        { time: '14:30', province: 'เชียงราย', city: 'อำเภอแม่สาย', name: 'อุทยานแห่งชาติถ้ำหลวง-ขุนน้ำนางนอน', address: 'ตำบลโป่งผา อำเภอแม่สาย เชียงราย', image_url: IMG.forest },
+        { time: '17:00', province: 'เชียงราย', city: 'อำเภอเชียงแสน', name: 'สามเหลี่ยมทองคำ เชียงแสน', address: 'ตำบลเวียง อำเภอเชียงแสน เชียงราย', image_url: IMG.oldTown },
+      ],
+      // วันที่ 2: เชียงแสน - เวียงแก่น - ภูชี้ฟ้า
+      [
+        { time: '09:00', province: 'เชียงราย', city: 'อำเภอเชียงแสน', name: 'วัดพระธาตุผาเงา เชียงแสน', address: 'ตำบลเวียง อำเภอเชียงแสน เชียงราย', image_url: IMG.temple },
+        { time: '13:00', province: 'เชียงราย', city: 'อำเภอเวียงแก่น', name: 'ดอยผาตั้ง เวียงแก่น', address: 'ตำบลปอ อำเภอเวียงแก่น เชียงราย', image_url: IMG.peak },
+        { time: '16:30', province: 'เชียงราย', city: 'อำเภอเทิง', name: 'วนอุทยานภูชี้ฟ้า', address: 'ตำบลตับเต่า อำเภอเทิง เชียงราย', image_url: IMG.mountain },
+      ],
+      // วันที่ 3: ทะเลหมอกภูชี้ฟ้า - ตัวเมืองเชียงราย
+      [
+        { time: '06:00', province: 'เชียงราย', city: 'อำเภอเทิง', name: 'จุดชมทะเลหมอกยอดภูชี้ฟ้า', address: 'ตำบลตับเต่า อำเภอเทิง เชียงราย', image_url: IMG.peak },
+        { time: '10:30', province: 'เชียงราย', city: 'อำเภอเมืองเชียงราย', name: 'วัดร่องขุ่น', address: 'ตำบลป่าอ้อดอนชัย อำเภอเมืองเชียงราย เชียงราย', image_url: IMG.whiteTemple },
+        { time: '13:00', province: 'เชียงราย', city: 'อำเภอเมืองเชียงราย', name: 'สิงห์ปาร์ค เชียงราย', address: 'ตำบลแม่กรณ์ อำเภอเมืองเชียงราย เชียงราย', image_url: IMG.forest },
+        { time: '15:30', province: 'เชียงราย', city: 'อำเภอเมืองเชียงราย', name: 'วัดร่องเสือเต้น', address: 'ตำบลริมกก อำเภอเมืองเชียงราย เชียงราย', image_url: IMG.temple },
+        { time: '18:30', province: 'เชียงราย', city: 'อำเภอเมืองเชียงราย', name: 'หอนาฬิกาเชียงราย & เชียงรายไนท์บาซาร์', address: 'ตำบลเวียง อำเภอเมืองเชียงราย เชียงราย', image_url: IMG.market },
+      ],
+    ],
+  },
+  {
+    name: 'พัทยา - เกาะล้าน 2 วัน 1 คืน: ทริปทะเลใกล้กรุงสุดชิล',
+    description: 'วันแรกข้ามเกาะล้านเล่นน้ำใสเต็มวัน วันที่สองเก็บแลนด์มาร์กพัทยาเหนือและจุดชมวิวเขาพระตำหนัก',
+    cover_url: IMG.beach,
+    days: [
+      // วันที่ 1: ท่าเรือแหลมบาลีฮาย - เกาะล้าน
+      [
+        { time: '08:30', province: 'ชลบุรี', city: 'อำเภอบางละมุง', name: 'ท่าเรือแหลมบาลีฮาย พัทยา', address: 'ตำบลหนองปรือ อำเภอบางละมุง ชลบุรี', image_url: IMG.coast },
+        { time: '10:00', province: 'ชลบุรี', city: 'อำเภอบางละมุง', name: 'หาดตาแหวน เกาะล้าน', address: 'ตำบลนาเกลือ อำเภอบางละมุง ชลบุรี', image_url: IMG.island },
+        { time: '13:00', province: 'ชลบุรี', city: 'อำเภอบางละมุง', name: 'หาดเทียน เกาะล้าน', address: 'ตำบลนาเกลือ อำเภอบางละมุง ชลบุรี', image_url: IMG.beach },
+        { time: '16:00', province: 'ชลบุรี', city: 'อำเภอบางละมุง', name: 'จุดชมวิวกังหันลม เกาะล้าน', address: 'ตำบลนาเกลือ อำเภอบางละมุง ชลบุรี', image_url: IMG.coast },
+        { time: '19:30', province: 'ชลบุรี', city: 'อำเภอบางละมุง', name: 'หาดพัทยา & ถนนคนเดินพัทยา', address: 'ตำบลหนองปรือ อำเภอบางละมุง ชลบุรี', image_url: IMG.market },
+      ],
+      // วันที่ 2: นาเกลือ - เขาพระตำหนัก
+      [
+        { time: '09:30', province: 'ชลบุรี', city: 'อำเภอบางละมุง', name: 'ปราสาทสัจธรรม นาเกลือ', address: 'ตำบลนาเกลือ อำเภอบางละมุง ชลบุรี', image_url: IMG.temple },
+        { time: '12:00', province: 'ชลบุรี', city: 'อำเภอบางละมุง', name: 'ตลาดลานโพธิ์นาเกลือ', address: 'ตำบลนาเกลือ อำเภอบางละมุง ชลบุรี', image_url: IMG.streetFood },
+        { time: '14:30', province: 'ชลบุรี', city: 'อำเภอบางละมุง', name: 'คาเฟ่ริมผา ย่านเขาพระตำหนัก', address: 'ตำบลหนองปรือ อำเภอบางละมุง ชลบุรี', image_url: IMG.cafe },
+        { time: '17:00', province: 'ชลบุรี', city: 'อำเภอบางละมุง', name: 'จุดชมวิวเขาพระตำหนัก', address: 'ตำบลหนองปรือ อำเภอบางละมุง ชลบุรี', image_url: IMG.coast },
+      ],
+    ],
+  },
+  {
+    name: 'เขาใหญ่ - ปากช่อง 2 วัน 1 คืน: อุทยานแห่งชาติและคาเฟ่ธนะรัชต์',
+    description: 'วันแรกขึ้นอุทยานแห่งชาติเขาใหญ่ ชมน้ำตกเหวสุวัต วันที่สองเก็บจุดเช็กอินและไร่องุ่นโซนหมูสี-โป่งตาลอง',
+    cover_url: IMG.forest,
+    days: [
+      // วันที่ 1: เส้นทางถนนธนะรัชต์ - อุทยานฯ เขาใหญ่
+      [
+        { time: '09:00', province: 'นครราชสีมา', city: 'อำเภอปากช่อง', name: 'ฟาร์มโชคชัย ปากช่อง', address: 'ตำบลหนองน้ำแดง อำเภอปากช่อง นครราชสีมา', image_url: IMG.forest },
+        { time: '11:30', province: 'นครราชสีมา', city: 'อำเภอปากช่อง', name: 'น้ำตกเหวสุวัต อุทยานแห่งชาติเขาใหญ่', address: 'ตำบลหมูสี อำเภอปากช่อง นครราชสีมา', image_url: IMG.waterfall },
+        { time: '14:30', province: 'นครราชสีมา', city: 'อำเภอปากช่อง', name: 'อ่างเก็บน้ำสายศร เขาใหญ่', address: 'ตำบลหมูสี อำเภอปากช่อง นครราชสีมา', image_url: IMG.forest },
+        { time: '17:30', province: 'นครราชสีมา', city: 'อำเภอปากช่อง', name: 'ร้านอาหารและคาเฟ่ถนนธนะรัชต์', address: 'ตำบลหมูสี อำเภอปากช่อง นครราชสีมา', image_url: IMG.cafe },
+      ],
+      // วันที่ 2: หมูสี - โป่งตาลอง - พญาเย็น
+      [
+        { time: '09:00', province: 'นครราชสีมา', city: 'อำเภอปากช่อง', name: 'บ่อน้ำผุดธรรมชาติบ้านท่าช้าง', address: 'ตำบลหมูสี อำเภอปากช่อง นครราชสีมา', image_url: IMG.waterfall },
+        { time: '11:00', province: 'นครราชสีมา', city: 'อำเภอปากช่อง', name: 'พรีโม เพียซซ่า เขาใหญ่', address: 'ตำบลหมูสี อำเภอปากช่อง นครราชสีมา', image_url: IMG.oldTown },
+        { time: '13:30', province: 'นครราชสีมา', city: 'อำเภอปากช่อง', name: 'ทอสคานา วัลเล่ย์ เขาใหญ่', address: 'ตำบลโป่งตาลอง อำเภอปากช่อง นครราชสีมา', image_url: IMG.mountain },
+        { time: '16:00', province: 'นครราชสีมา', city: 'อำเภอปากช่อง', name: 'ไร่องุ่นพีบี วัลเล่ย์ เขาใหญ่', address: 'ตำบลพญาเย็น อำเภอปากช่อง นครราชสีมา', image_url: IMG.forest },
+      ],
+    ],
+  },
+  {
+    name: 'กาญจนบุรี 3 วัน 2 คืน: สะพานข้ามแม่น้ำแคว-สังขละบุรี-น้ำตกเอราวัณ',
+    description: 'วิ่งตรงตามทางหลวงสาย 323 จากตัวเมืองขึ้นสังขละบุรี และขากลับแวะน้ำตกเอราวัณอย่างลงตัว',
+    cover_url: IMG.temple,
+    days: [
+      // วันที่ 1: ตัวเมืองกาญจนบุรี - ไทรโยค
+      [
+        { time: '08:30', province: 'กาญจนบุรี', city: 'อำเภอเมืองกาญจนบุรี', name: 'สะพานข้ามแม่น้ำแคว', address: 'ตำบลท่ามะขาม อำเภอเมืองกาญจนบุรี กาญจนบุรี', image_url: IMG.oldTown },
+        { time: '11:00', province: 'กาญจนบุรี', city: 'อำเภอไทรโยค', name: 'ช่องเขาขาด (พิพิธภัณฑสถานแห่งความทรงจำ)', address: 'ตำบลท่าเสา อำเภอไทรโยค กาญจนบุรี', image_url: IMG.forest },
+        { time: '13:30', province: 'กาญจนบุรี', city: 'อำเภอไทรโยค', name: 'ถ้ำกระแซ & ทางรถไฟสายมรณะ', address: 'ตำบลลุ่มสุ่ม อำเภอไทรโยค กาญจนบุรี', image_url: IMG.mountain },
+        { time: '15:30', province: 'กาญจนบุรี', city: 'อำเภอไทรโยค', name: 'น้ำตกไทรโยคน้อย', address: 'ตำบลท่าเสา อำเภอไทรโยค กาญจนบุรี', image_url: IMG.waterfall },
+      ],
+      // วันที่ 2: ทองผาภูมิ - สังขละบุรี
+      [
+        { time: '09:30', province: 'กาญจนบุรี', city: 'อำเภอทองผาภูมิ', name: 'อุทยานแห่งชาติทองผาภูมิ (เนินช้างศึก)', address: 'ตำบลปิล๊อก อำเภอทองผาภูมิ กาญจนบุรี', image_url: IMG.peak },
+        { time: '12:30', province: 'กาญจนบุรี', city: 'อำเภอทองผาภูมิ', name: 'จุดชมวิวป้อมปี่', address: 'ตำบลปรังเผล อำเภอทองผาภูมิ กาญจนบุรี', image_url: IMG.mountain },
+        { time: '15:00', province: 'กาญจนบุรี', city: 'อำเภอสังขละบุรี', name: 'วัดวังก์วิเวการาม & เจดีย์พุทธคยา', address: 'ตำบลหนองลู อำเภอสังขละบุรี กาญจนบุรี', image_url: IMG.temple },
+        { time: '17:30', province: 'กาญจนบุรี', city: 'อำเภอสังขละบุรี', name: 'สะพานมอญ (สะพานอุตตมานุสรณ์)', address: 'ตำบลหนองลู อำเภอสังขละบุรี กาญจนบุรี', image_url: IMG.oldTown },
+      ],
+      // วันที่ 3: สังขละบุรี - น้ำตกเอราวัณ ศรีสวัสดิ์
+      [
+        { time: '06:30', province: 'กาญจนบุรี', city: 'อำเภอสังขละบุรี', name: 'ตลาดเช้าฝั่งมอญ สังขละบุรี', address: 'ตำบลหนองลู อำเภอสังขละบุรี กาญจนบุรี', image_url: IMG.market },
+        { time: '09:00', province: 'กาญจนบุรี', city: 'อำเภอสังขละบุรี', name: 'ด่านเจดีย์สามองค์', address: 'ตำบลหนองลู อำเภอสังขละบุรี กาญจนบุรี', image_url: IMG.oldTown },
+        { time: '13:30', province: 'กาญจนบุรี', city: 'อำเภอศรีสวัสดิ์', name: 'อุทยานแห่งชาติเอราวัณ', address: 'ตำบลท่ากระดาน อำเภอศรีสวัสดิ์ กาญจนบุรี', image_url: IMG.waterfall },
+        { time: '16:30', province: 'กาญจนบุรี', city: 'อำเภอศรีสวัสดิ์', name: 'เขื่อนศรีนครินทร์', address: 'ตำบลท่ากระดาน อำเภอศรีสวัสดิ์ กาญจนบุรี', image_url: IMG.mountain },
+      ],
+    ],
+  },
+  {
+    name: 'เลย 4 วัน 3 คืน: พิชิตภูกระดึง - ภูเรือ - ถนนคนเดินเชียงคาน',
+    description: '2 วันแรกพิชิตยอดภูกระดึง ต่อด้วยไหว้พระภูเรือ และพักผ่อนริมแม่น้ำโขงที่เชียงคาน',
+    cover_url: IMG.peak,
+    days: [
+      // วันที่ 1: ขึ้นยอดภูกระดึง
+      [
+        { time: '07:30', province: 'เลย', city: 'อำเภอภูกระดึง', name: 'ศูนย์บริการนักท่องเที่ยวศรีฐาน อุทยานแห่งชาติภูกระดึง', address: 'ตำบลศรีฐาน อำเภอภูกระดึง เลย', image_url: IMG.forest },
+        { time: '10:30', province: 'เลย', city: 'อำเภอภูกระดึง', name: 'ซำแฮก & ซำบอน ภูกระดึง', address: 'ตำบลศรีฐาน อำเภอภูกระดึง เลย', image_url: IMG.peak },
+        { time: '13:30', province: 'เลย', city: 'อำเภอภูกระดึง', name: 'หลังแป อุทยานแห่งชาติภูกระดึง', address: 'ตำบลศรีฐาน อำเภอภูกระดึง เลย', image_url: IMG.mountain },
+        { time: '17:00', province: 'เลย', city: 'อำเภอภูกระดึง', name: 'ผาหมากดูก ภูกระดึง', address: 'ตำบลศรีฐาน อำเภอภูกระดึง เลย', image_url: IMG.peak },
+      ],
+      // วันที่ 2: เที่ยวบนยอดภูกระดึง & เดินลงภู
+      [
+        { time: '05:30', province: 'เลย', city: 'อำเภอภูกระดึง', name: 'ผานกแอ่น ภูกระดึง', address: 'ตำบลศรีฐาน อำเภอภูกระดึง เลย', image_url: IMG.peak },
+        { time: '09:00', province: 'เลย', city: 'อำเภอภูกระดึง', name: 'น้ำตกเพ็ญพบใหม่ & สระอโนดาต', address: 'ตำบลศรีฐาน อำเภอภูกระดึง เลย', image_url: IMG.waterfall },
+        { time: '12:00', province: 'เลย', city: 'อำเภอภูกระดึง', name: 'ผาหล่มสัก ภูกระดึง', address: 'ตำบลศรีฐาน อำเภอภูกระดึง เลย', image_url: IMG.mountain },
+        { time: '16:00', province: 'เลย', city: 'อำเภอภูกระดึง', name: 'ตีนภูศรีฐาน (จุดสิ้นสุดเส้นทางเดินเท้า)', address: 'ตำบลศรีฐาน อำเภอภูกระดึง เลย', image_url: IMG.forest },
+      ],
+      // วันที่ 3: ภูเรือ - สกายวอล์คเชียงคาน
+      [
+        { time: '08:30', province: 'เลย', city: 'อำเภอภูเรือ', name: 'อุทยานแห่งชาติภูเรือ', address: 'ตำบลหนองบัว อำเภอภูเรือ เลย', image_url: IMG.mountain },
+        { time: '10:30', province: 'เลย', city: 'อำเภอภูเรือ', name: 'วัดสมเด็จภูเรือมิ่งเมือง', address: 'ตำบลหนองบัว อำเภอภูเรือ เลย', image_url: IMG.temple },
+        { time: '15:00', province: 'เลย', city: 'อำเภอเชียงคาน', name: 'สกายวอล์คเชียงคาน (พระใหญ่ภูคกงิ้ว)', address: 'ตำบลปากตม อำเภอเชียงคาน เลย', image_url: IMG.peak },
+        { time: '18:30', province: 'เลย', city: 'อำเภอเชียงคาน', name: 'ถนนคนเดินเชียงคาน', address: 'ตำบลเชียงคาน อำเภอเชียงคาน เลย', image_url: IMG.market },
+      ],
+      // วันที่ 4: เชียงคานยามเช้า - แก่งคุดคู้
+      [
+        { time: '06:00', province: 'เลย', city: 'อำเภอเชียงคาน', name: 'จุดชมทะเลหมอกภูทอก เชียงคาน', address: 'ตำบลเชียงคาน อำเภอเชียงคาน เลย', image_url: IMG.mountain },
+        { time: '08:00', province: 'เลย', city: 'อำเภอเชียงคาน', name: 'ซอยศรีเชียงคาน (ตักบาตรข้าวเหนียวริมโขง)', address: 'ตำบลเชียงคาน อำเภอเชียงคาน เลย', image_url: IMG.oldTown },
+        { time: '10:30', province: 'เลย', city: 'อำเภอเชียงคาน', name: 'แก่งคุดคู้ เชียงคาน', address: 'ตำบลเชียงคาน อำเภอเชียงคาน เลย', image_url: IMG.coast },
+        { time: '13:00', province: 'เลย', city: 'อำเภอเชียงคาน', name: 'คาเฟ่ริมแม่น้ำโขง เชียงคาน', address: 'ตำบลเชียงคาน อำเภอเชียงคาน เลย', image_url: IMG.cafe },
+      ],
+    ],
+  },
+  {
+    name: 'สุราษฎร์ธานี 4 วัน 3 คืน: เขื่อนเชี่ยวหลาน - ข้ามเรือสู่เกาะสมุย',
+    description: 'จัดเวลาเดินทางอย่างสมจริง: วันแรกนอนแพเขื่อนรัชชประภา วันที่สองข้ามเฟอร์รี่ไปเกาะสมุย และเที่ยวรอบเกาะ',
+    cover_url: IMG.island,
+    days: [
+      // วันที่ 1: เขื่อนรัชชประภา บ้านตาขุน
+      [
+        { time: '09:30', province: 'สุราษฎร์ธานี', city: 'อำเภอบ้านตาขุน', name: 'ท่าเรือเทศบาลเชี่ยวหลาน', address: 'ตำบลเขาพัง อำเภอบ้านตาขุน สุราษฎร์ธานี', image_url: IMG.mountain },
+        { time: '11:00', province: 'สุราษฎร์ธานี', city: 'อำเภอบ้านตาขุน', name: 'เขาสามเกลอ (กุ้ยหลินเมืองไทย)', address: 'ตำบลเขาพัง อำเภอบ้านตาขุน สุราษฎร์ธานี', image_url: IMG.peak },
+        { time: '13:00', province: 'สุราษฎร์ธานี', city: 'อำเภอบ้านตาขุน', name: 'แพที่พักกลางเขื่อนรัชชประภา', address: 'ตำบลเขาพัง อำเภอบ้านตาขุน สุราษฎร์ธานี', image_url: IMG.forest },
+        { time: '15:30', province: 'สุราษฎร์ธานี', city: 'อำเภอบ้านตาขุน', name: 'ถ้ำปะการัง เขื่อนรัชชประภา', address: 'ตำบลเขาพัง อำเภอบ้านตาขุน สุราษฎร์ธานี', image_url: IMG.waterfall },
+      ],
+      // วันที่ 2: บ้านตาขุน - ท่าเรือดอนสัก - เกาะสมุย
+      [
+        { time: '08:30', province: 'สุราษฎร์ธานี', city: 'อำเภอบ้านตาขุน', name: 'สะพานแขวนเขาพัง & ภูเขารูปหัวใจ', address: 'ตำบลเขาพัง อำเภอบ้านตาขุน สุราษฎร์ธานี', image_url: IMG.mountain },
+        { time: '11:30', province: 'สุราษฎร์ธานี', city: 'อำเภอดอนสัก', name: 'ท่าเรือเฟอร์รี่ดอนสัก', address: 'ตำบลดอนสัก อำเภอดอนสัก สุราษฎร์ธานี', image_url: IMG.coast },
+        { time: '14:30', province: 'สุราษฎร์ธานี', city: 'อำเภอเกาะสมุย', name: 'วัดพระใหญ่ เกาะฟาน เกาะสมุย', address: 'ตำบลบ่อผุด อำเภอเกาะสมุย สุราษฎร์ธานี', image_url: IMG.temple },
+        { time: '18:00', province: 'สุราษฎร์ธานี', city: 'อำเภอเกาะสมุย', name: 'ฟิชเชอร์แมนวิลเลจ บ่อผุด', address: 'ตำบลบ่อผุด อำเภอเกาะสมุย สุราษฎร์ธานี', image_url: IMG.market },
+      ],
+      // วันที่ 3: เที่ยวรอบเกาะสมุย
+      [
+        { time: '09:30', province: 'สุราษฎร์ธานี', city: 'อำเภอเกาะสมุย', name: 'หินตาหินยาย หาดละไม', address: 'ตำบลมะเร็ต อำเภอเกาะสมุย สุราษฎร์ธานี', image_url: IMG.coast },
+        { time: '11:30', province: 'สุราษฎร์ธานี', city: 'อำเภอเกาะสมุย', name: 'วัดคุณาราม (หลวงพ่อแดง)', address: 'ตำบลหน้าเมือง อำเภอเกาะสมุย สุราษฎร์ธานี', image_url: IMG.temple },
+        { time: '13:30', province: 'สุราษฎร์ธานี', city: 'อำเภอเกาะสมุย', name: 'น้ำตกหน้าเมือง 1 เกาะสมุย', address: 'ตำบลหน้าเมือง อำเภอเกาะสมุย สุราษฎร์ธานี', image_url: IMG.waterfall },
+        { time: '16:30', province: 'สุราษฎร์ธานี', city: 'อำเภอเกาะสมุย', name: 'จุดชมวิวลาดเกาะ & หาดเฉวง', address: 'ตำบลบ่อผุด อำเภอเกาะสมุย สุราษฎร์ธานี', image_url: IMG.beach },
+      ],
+      // วันที่ 4: สมุยโซนเหนือ
+      [
+        { time: '09:00', province: 'สุราษฎร์ธานี', city: 'อำเภอเกาะสมุย', name: 'วัดปลายแหลม เกาะสมุย', address: 'ตำบลบ่อผุด อำเภอเกาะสมุย สุราษฎร์ธานี', image_url: IMG.temple },
+        { time: '11:00', province: 'สุราษฎร์ธานี', city: 'อำเภอเกาะสมุย', name: 'หาดแม่น้ำ เกาะสมุย', address: 'ตำบลแม่น้ำ อำเภอเกาะสมุย สุราษฎร์ธานี', image_url: IMG.beach },
+        { time: '13:30', province: 'สุราษฎร์ธานี', city: 'อำเภอเกาะสมุย', name: 'คาเฟ่วิวทะเล ย่านบ่อผุด', address: 'ตำบลบ่อผุด อำเภอเกาะสมุย สุราษฎร์ธานี', image_url: IMG.cafe },
+      ],
+    ],
+  },
+  {
+    name: 'หัวหิน - สามร้อยยอด 2 วัน 1 คืน: ทะเลคลาสสิกและถ้ำพระยานคร',
+    description: 'วันแรกเก็บโซนตัวเมืองหัวหิน วันที่สองลงใต้ไปปราณบุรีและอุทยานแห่งชาติเขาสามร้อยยอด',
+    cover_url: IMG.coast,
+    days: [
+      // วันที่ 1: ชะอำ - ตัวเมืองหัวหิน
+      [
+        { time: '09:00', province: 'เพชรบุรี', city: 'อำเภอชะอำ', name: 'พระราชนิเวศน์มฤคทายวัน', address: 'ตำบลชะอำ อำเภอชะอำ เพชรบุรี', image_url: IMG.oldTown },
+        { time: '11:30', province: 'ประจวบคีรีขันธ์', city: 'อำเภอหัวหิน', name: 'สถานีรถไฟหัวหิน', address: 'ตำบลหัวหิน อำเภอหัวหิน ประจวบคีรีขันธ์', image_url: IMG.oldTown },
+        { time: '14:30', province: 'ประจวบคีรีขันธ์', city: 'อำเภอหัวหิน', name: 'ชายหาดหัวหิน', address: 'ตำบลหัวหิน อำเภอหัวหิน ประจวบคีรีขันธ์', image_url: IMG.beach },
+        { time: '17:00', province: 'ประจวบคีรีขันธ์', city: 'อำเภอหัวหิน', name: 'จุดชมวิวเขาหินเหล็กไฟ', address: 'ตำบลหัวหิน อำเภอหัวหิน ประจวบคีรีขันธ์', image_url: IMG.mountain },
+        { time: '19:00', province: 'ประจวบคีรีขันธ์', city: 'อำเภอหัวหิน', name: 'ตลาดโต้รุ่งหัวหิน', address: 'ถนนเดชานุชิต ตำบลหัวหิน อำเภอหัวหิน ประจวบคีรีขันธ์', image_url: IMG.market },
+      ],
+      // วันที่ 2: ปราณบุรี - สามร้อยยอด - ตลาดซิเคด้า
+      [
+        { time: '08:30', province: 'ประจวบคีรีขันธ์', city: 'อำเภอปราณบุรี', name: 'วนอุทยานปราณบุรี (ป่าชายเลน)', address: 'ตำบลปากน้ำปราณ อำเภอปราณบุรี ประจวบคีรีขันธ์', image_url: IMG.forest },
+        { time: '10:30', province: 'ประจวบคีรีขันธ์', city: 'อำเภอสามร้อยยอด', name: 'ถ้ำพระยานคร อุทยานแห่งชาติเขาสามร้อยยอด', address: 'ตำบลเขาแดง อำเภอสามร้อยยอด ประจวบคีรีขันธ์', image_url: IMG.cliffSea },
+        { time: '14:30', province: 'ประจวบคีรีขันธ์', city: 'อำเภอสามร้อยยอด', name: 'บึงบัวสามร้อยยอด', address: 'ตำบลไร่เก่า อำเภอสามร้อยยอด ประจวบคีรีขันธ์', image_url: IMG.forest },
+        { time: '18:00', province: 'ประจวบคีรีขันธ์', city: 'อำเภอหัวหิน', name: 'ตลาดซิเคด้า (Cicada Market)', address: 'ตำบลหนองแก อำเภอหัวหิน ประจวบคีรีขันธ์', image_url: IMG.market },
+      ],
+    ],
+  },
+  {
+    name: 'One Day Trip อยุธยา: ไหว้พระอุทยานประวัติศาสตร์-กินกุ้งแม่น้ำเผา',
+    description: 'เส้นทางวนรอบเกาะเมืองพระนครศรีอยุธยาภายใน 1 วันเต็ม เดินทางสะดวกจากกรุงเทพฯ',
+    cover_url: IMG.temple,
+    days: [
+      [
+        { time: '08:30', province: 'พระนครศรีอยุธยา', city: 'อำเภอพระนครศรีอยุธยา', name: 'วัดใหญ่ชัยมงคล', address: 'ตำบลคลองสวนพลู อำเภอพระนครศรีอยุธยา พระนครศรีอยุธยา', image_url: IMG.temple },
+        { time: '10:00', province: 'พระนครศรีอยุธยา', city: 'อำเภอพระนครศรีอยุธยา', name: 'วัดพนัญเชิงวรวิหาร', address: 'ตำบลคลองสวนพลู อำเภอพระนครศรีอยุธยา พระนครศรีอยุธยา', image_url: IMG.temple },
+        { time: '11:30', province: 'พระนครศรีอยุธยา', city: 'อำเภอพระนครศรีอยุธยา', name: 'วัดมหาธาตุ อุทยานประวัติศาสตร์พระนครศรีอยุธยา', address: 'ตำบลท่าวาสุกรี อำเภอพระนครศรีอยุธยา พระนครศรีอยุธยา', image_url: IMG.grandPalace },
+        { time: '13:30', province: 'พระนครศรีอยุธยา', city: 'อำเภอพระนครศรีอยุธยา', name: 'ตลาดกลางเพื่อการเกษตร (กุ้งแม่น้ำเผา)', address: 'ตำบลหันตรา อำเภอพระนครศรีอยุธยา พระนครศรีอยุธยา', image_url: IMG.streetFood },
+        { time: '16:00', province: 'พระนครศรีอยุธยา', city: 'อำเภอพระนครศรีอยุธยา', name: 'วัดไชยวัฒนาราม', address: 'ตำบลบ้านป้อม อำเภอพระนครศรีอยุธยา พระนครศรีอยุธยา', image_url: IMG.temple },
+      ],
+    ],
+  },
+  {
+    name: 'เขาค้อ - ภูทับเบิก 3 วัน 2 คืน: ล่าทะเลหมอกเพชรบูรณ์',
+    description: '2 วันแรกเที่ยวโซนเขาค้อ วันที่สองบ่ายขึ้นยอดภูทับเบิก และชมทะเลหมอกยามเช้าก่อนเดินทางกลับ',
+    cover_url: IMG.mountain,
+    days: [
+      // วันที่ 1: โซนแคมป์สน - เขาค้อ
+      [
+        { time: '08:30', province: 'เพชรบูรณ์', city: 'อำเภอเขาค้อ', name: 'วัดพระธาตุผาซ่อนแก้ว', address: 'ตำบลแคมป์สน อำเภอเขาค้อ เพชรบูรณ์', image_url: IMG.temple },
+        { time: '10:30', province: 'เพชรบูรณ์', city: 'อำเภอเขาค้อ', name: 'คาเฟ่ Pino Latte เขาค้อ', address: 'ตำบลแคมป์สน อำเภอเขาค้อ เพชรบูรณ์', image_url: IMG.cafe },
+        { time: '13:30', province: 'เพชรบูรณ์', city: 'อำเภอเขาค้อ', name: 'ทุ่งกังหันลมเขาค้อ', address: 'ตำบลทุ่งสมอ อำเภอเขาค้อ เพชรบูรณ์', image_url: IMG.mountain },
+        { time: '16:30', province: 'เพชรบูรณ์', city: 'อำเภอเขาค้อ', name: 'จุดชมวิวไปรษณีย์เขาค้อ', address: 'ตำบลเขาค้อ อำเภอเขาค้อ เพชรบูรณ์', image_url: IMG.peak },
+      ],
+      // วันที่ 2: เขาค้อ - หล่มเก่า - ภูทับเบิก
+      [
+        { time: '08:30', province: 'เพชรบูรณ์', city: 'อำเภอเขาค้อ', name: 'พระตำหนักเขาค้อ', address: 'ตำบลสะเดาะพง อำเภอเขาค้อ เพชรบูรณ์', image_url: IMG.forest },
+        { time: '10:30', province: 'เพชรบูรณ์', city: 'อำเภอเขาค้อ', name: 'น้ำตกศรีดิษฐ์', address: 'ตำบลหนองแม่นา อำเภอเขาค้อ เพชรบูรณ์', image_url: IMG.waterfall },
+        { time: '12:30', province: 'เพชรบูรณ์', city: 'อำเภอหล่มเก่า', name: 'ร้านขนมจีนเส้นสด หล่มเก่า', address: 'ตำบลหล่มเก่า อำเภอหล่มเก่า เพชรบูรณ์', image_url: IMG.streetFood },
+        { time: '15:30', province: 'เพชรบูรณ์', city: 'อำเภอหล่มเก่า', name: 'จุดชมวิวสูงสุดภูทับเบิก (1,768 เมตร)', address: 'ตำบลวังบาล อำเภอหล่มเก่า เพชรบูรณ์', image_url: IMG.peak },
+      ],
+      // วันที่ 3: ภูทับเบิก - วัดป่าภูทับเบิก - วังชมภู
+      [
+        { time: '06:00', province: 'เพชรบูรณ์', city: 'อำเภอหล่มเก่า', name: 'จุดชมทะเลหมอกภูทับเบิก', address: 'ตำบลวังบาล อำเภอหล่มเก่า เพชรบูรณ์', image_url: IMG.mountain },
+        { time: '08:30', province: 'เพชรบูรณ์', city: 'อำเภอหล่มเก่า', name: 'วัดป่าภูทับเบิก', address: 'ตำบลวังบาล อำเภอหล่มเก่า เพชรบูรณ์', image_url: IMG.temple },
+        { time: '10:30', province: 'เพชรบูรณ์', city: 'อำเภอหล่มเก่า', name: 'ไร่กะหล่ำปลีภูทับเบิก', address: 'ตำบลวังบาล อำเภอหล่มเก่า เพชรบูรณ์', image_url: IMG.forest },
+        { time: '14:00', province: 'เพชรบูรณ์', city: 'อำเภอเมืองเพชรบูรณ์', name: 'ไร่กำนันจุล วังชมภู', address: 'ตำบลวังชมภู อำเภอเมืองเพชรบูรณ์ เพชรบูรณ์', image_url: IMG.forest },
+      ],
+    ],
+  },
+  {
+    name: 'เกาะช้าง - เกาะกูด 4 วัน 3 คืน: ทะเลตะวันออกน้ำใส',
+    description: '2 วันแรกพักผ่อนรอบเกาะช้าง วันที่สามนั่งสปีดโบ๊ทจากท่าเรือบางเบ้าข้ามต่อไปเกาะกูดโดยตรง',
+    cover_url: IMG.andaman,
+    days: [
+      // วันที่ 1: ข้ามเรือสู่เกาะช้าง
+      [
+        { time: '09:00', province: 'ตราด', city: 'อำเภอแหลมงอบ', name: 'ท่าเรือเฟอร์รี่อ่าวธรรมชาติ แหลมงอบ', address: 'ตำบลคลองใหญ่ อำเภอแหลมงอบ ตราด', image_url: IMG.coast },
+        { time: '11:30', province: 'ตราด', city: 'อำเภอเกาะช้าง', name: 'จุดชมวิวไก่แบ้ เกาะช้าง', address: 'ตำบลเกาะช้าง อำเภอเกาะช้าง ตราด', image_url: IMG.island },
+        { time: '14:30', province: 'ตราด', city: 'อำเภอเกาะช้าง', name: 'หาดทรายขาว เกาะช้าง', address: 'ตำบลเกาะช้าง อำเภอเกาะช้าง ตราด', image_url: IMG.beach },
+        { time: '17:30', province: 'ตราด', city: 'อำเภอเกาะช้าง', name: 'หมู่บ้านชาวประมงบางเบ้า เกาะช้าง', address: 'ตำบลเกาะช้างใต้ อำเภอเกาะช้าง ตราด', image_url: IMG.streetFood },
+      ],
+      // วันที่ 2: เที่ยวรอบเกาะช้าง
+      [
+        { time: '09:30', province: 'ตราด', city: 'อำเภอเกาะช้าง', name: 'น้ำตกคลองพลู เกาะช้าง', address: 'ตำบลเกาะช้าง อำเภอเกาะช้าง ตราด', image_url: IMG.waterfall },
+        { time: '12:30', province: 'ตราด', city: 'อำเภอเกาะช้าง', name: 'หาดคลองพร้าว เกาะช้าง', address: 'ตำบลเกาะช้าง อำเภอเกาะช้าง ตราด', image_url: IMG.beach },
+        { time: '15:30', province: 'ตราด', city: 'อำเภอเกาะช้าง', name: 'เส้นทางศึกษาธรรมชาติป่าชายเลนบ้านสลักเพชร', address: 'ตำบลเกาะช้างใต้ อำเภอเกาะช้าง ตราด', image_url: IMG.forest },
+        { time: '18:00', province: 'ตราด', city: 'อำเภอเกาะช้าง', name: 'หาดโลนลี่บีช เกาะช้าง', address: 'ตำบลเกาะช้างใต้ อำเภอเกาะช้าง ตราด', image_url: IMG.coast },
+      ],
+      // วันที่ 3: สปีดโบ๊ทจากเกาะช้างสู่เกาะกูด
+      [
+        { time: '09:30', province: 'ตราด', city: 'อำเภอเกาะช้าง', name: 'ท่าเรือบางเบ้า (สปีดโบ๊ทไปเกาะกูด)', address: 'ตำบลเกาะช้างใต้ อำเภอเกาะช้าง ตราด', image_url: IMG.island },
+        { time: '12:30', province: 'ตราด', city: 'อำเภอเกาะกูด', name: 'หาดคลองเจ้า เกาะกูด', address: 'ตำบลเกาะกูด อำเภอเกาะกูด ตราด', image_url: IMG.beach },
+        { time: '15:00', province: 'ตราด', city: 'อำเภอเกาะกูด', name: 'น้ำตกคลองเจ้า เกาะกูด', address: 'ตำบลเกาะกูด อำเภอเกาะกูด ตราด', image_url: IMG.waterfall },
+        { time: '17:30', province: 'ตราด', city: 'อำเภอเกาะกูด', name: 'สะพานไม้หาดคลองเจ้า', address: 'ตำบลเกาะกูด อำเภอเกาะกูด ตราด', image_url: IMG.andaman },
+      ],
+      // วันที่ 4: เกาะกูด - กลับฝั่งแหลมศอก
+      [
+        { time: '08:30', province: 'ตราด', city: 'อำเภอเกาะกูด', name: 'อ่าวบางเบ้า เกาะกูด', address: 'ตำบลเกาะกูด อำเภอเกาะกูด ตราด', image_url: IMG.beach },
+        { time: '10:30', province: 'ตราด', city: 'อำเภอเกาะกูด', name: 'ต้นมะค่ายักษ์ เกาะกูด', address: 'ตำบลเกาะกูด อำเภอเกาะกูด ตราด', image_url: IMG.forest },
+        { time: '13:30', province: 'ตราด', city: 'อำเภอเมืองตราด', name: 'ท่าเรือแหลมศอก ตราด', address: 'ตำบลอ่าวใหญ่ อำเภอเมืองตราด ตราด', image_url: IMG.coast },
+      ],
+    ],
+  },
+  {
+    name: 'พังงา 3 วัน 2 คืน: เสม็ดนางชี-หมู่เกาะสิมิลัน-เมืองเก่าตะกั่วป่า',
+    description: 'วันแรกชมเสม็ดนางชีและอ่าวพังงา วันที่สองดำน้ำหมู่เกาะสิมิลัน วันที่สามเดินเมืองเก่าตะกั่วป่า',
+    cover_url: IMG.cliffSea,
+    days: [
+      // วันที่ 1: ตะกั่วทุ่ง - อ่าวพังงา - เขาหลัก
+      [
+        { time: '06:30', province: 'พังงา', city: 'อำเภอตะกั่วทุ่ง', name: 'จุดชมวิวเสม็ดนางชี', address: 'ตำบลคลองเคียน อำเภอตะกั่วทุ่ง พังงา', image_url: IMG.cliffSea },
+        { time: '10:00', province: 'พังงา', city: 'อำเภอตะกั่วทุ่ง', name: 'วัดสุวรรณคูหา (วัดถ้ำ)', address: 'ตำบลกระโสม อำเภอตะกั่วทุ่ง พังงา', image_url: IMG.temple },
+        { time: '12:30', province: 'พังงา', city: 'อำเภอเมืองพังงา', name: 'อุทยานแห่งชาติอ่าวพังงา (เขาตะปู)', address: 'ตำบลเกาะปันหยี อำเภอเมืองพังงา พังงา', image_url: IMG.island },
+        { time: '17:00', province: 'พังงา', city: 'อำเภอตะกั่วป่า', name: 'หาดนางทอง เขาหลัก', address: 'ตำบลคึกคัก อำเภอตะกั่วป่า พังงา', image_url: IMG.beach },
+      ],
+      // วันที่ 2: ทริปดำน้ำหมู่เกาะสิมิลัน
+      [
+        { time: '08:00', province: 'พังงา', city: 'อำเภอท้ายเหมือง', name: 'ท่าเรือทับละมุ (จุดลงเรือไปสิมิลัน)', address: 'ตำบลลำแก่น อำเภอท้ายเหมือง พังงา', image_url: IMG.coast },
+        { time: '10:00', province: 'พังงา', city: 'อำเภอคุระบุรี', name: 'เกาะแปด (หินเรือใบ) อุทยานแห่งชาติหมู่เกาะสิมิลัน', address: 'ตำบลเกาะพระทอง อำเภอคุระบุรี พังงา', image_url: IMG.andaman },
+        { time: '12:00', province: 'พังงา', city: 'อำเภอคุระบุรี', name: 'เกาะสี่ (หาดหน้า) หมู่เกาะสิมิลัน', address: 'ตำบลเกาะพระทอง อำเภอคุระบุรี พังงา', image_url: IMG.beach },
+        { time: '14:30', province: 'พังงา', city: 'อำเภอคุระบุรี', name: 'เกาะเก้า (จุดดำน้ำตื้น) หมู่เกาะสิมิลัน', address: 'ตำบลเกาะพระทอง อำเภอคุระบุรี พังงา', image_url: IMG.island },
+      ],
+      // วันที่ 3: เมืองเก่าตะกั่วป่า - ท้ายเหมือง
+      [
+        { time: '09:00', province: 'พังงา', city: 'อำเภอตะกั่วป่า', name: 'ย่านเมืองเก่าตะกั่วป่า', address: 'ตำบลตะกั่วป่า อำเภอตะกั่วป่า พังงา', image_url: IMG.oldTown },
+        { time: '11:00', province: 'พังงา', city: 'อำเภอตะกั่วป่า', name: 'สะพานเหล็กบุญสูง ตะกั่วป่า', address: 'ตำบลบางนายสี อำเภอตะกั่วป่า พังงา', image_url: IMG.oldTown },
+        { time: '14:00', province: 'พังงา', city: 'อำเภอท้ายเหมือง', name: 'อุทยานแห่งชาติเขาลำปี-หาดท้ายเหมือง', address: 'ตำบลท้ายเหมือง อำเภอท้ายเหมือง พังงา', image_url: IMG.beach },
+      ],
+    ],
+  },
+  {
+    name: 'อัมพวา - สมุทรสงคราม 2 วัน 1 คืน: ตลาดร่มหุบ-ดอนหอยหลอด-บางกุ้ง',
+    description: 'วันแรกเที่ยวโซนแม่กลองและล่องเรือดูหิ่งห้อยอัมพวา วันที่สองเก็บโซนบางคนทีและป่าชายเลนคลองโคน',
+    cover_url: IMG.market,
+    days: [
+      // วันที่ 1: แม่กลอง - ดอนหอยหลอด - อัมพวา
+      [
+        { time: '08:30', province: 'สมุทรสงคราม', city: 'อำเภอเมืองสมุทรสงคราม', name: 'ตลาดร่มหุบ สถานีรถไฟแม่กลอง', address: 'ตำบลแม่กลอง อำเภอเมืองสมุทรสงคราม สมุทรสงคราม', image_url: IMG.market },
+        { time: '10:00', province: 'สมุทรสงคราม', city: 'อำเภอเมืองสมุทรสงคราม', name: 'วัดเพชรสมุทรวรวิหาร (วัดบ้านแหลม)', address: 'ตำบลแม่กลอง อำเภอเมืองสมุทรสงคราม สมุทรสงคราม', image_url: IMG.temple },
+        { time: '12:00', province: 'สมุทรสงคราม', city: 'อำเภอเมืองสมุทรสงคราม', name: 'ดอนหอยหลอด', address: 'ตำบลบางจะเกร็ง อำเภอเมืองสมุทรสงคราม สมุทรสงคราม', image_url: IMG.coast },
+        { time: '16:00', province: 'สมุทรสงคราม', city: 'อำเภออัมพวา', name: 'ตลาดน้ำอัมพวา', address: 'ตำบลอัมพวา อำเภออัมพวา สมุทรสงคราม', image_url: IMG.market },
+        { time: '19:00', province: 'สมุทรสงคราม', city: 'อำเภออัมพวา', name: 'ล่องเรือชมหิ่งห้อยคลองอัมพวา', address: 'ตำบลอัมพวา อำเภออัมพวา สมุทรสงคราม', image_url: IMG.forest },
+      ],
+      // วันที่ 2: บางคนที - ท่าคา - คลองโคน
+      [
+        { time: '09:00', province: 'สมุทรสงคราม', city: 'อำเภอบางคนที', name: 'วัดบางกุ้ง (โบสถ์ปรกโพธิ์)', address: 'ตำบลบางกุ้ง อำเภอบางคนที สมุทรสงคราม', image_url: IMG.temple },
+        { time: '11:00', province: 'สมุทรสงคราม', city: 'อำเภออัมพวา', name: 'อุทยานพระบรมราชานุสรณ์ รัชกาลที่ 2', address: 'ตำบลอัมพวา อำเภออัมพวา สมุทรสงคราม', image_url: IMG.oldTown },
+        { time: '13:00', province: 'สมุทรสงคราม', city: 'อำเภออัมพวา', name: 'ตลาดน้ำท่าคา', address: 'ตำบลท่าคา อำเภออัมพวา สมุทรสงคราม', image_url: IMG.market },
+        { time: '15:00', province: 'สมุทรสงคราม', city: 'อำเภอเมืองสมุทรสงคราม', name: 'ศูนย์อนุรักษ์ป่าชายเลนคลองโคน', address: 'ตำบลคลองโคน อำเภอเมืองสมุทรสงคราม สมุทรสงคราม', image_url: IMG.forest },
+      ],
+    ],
+  },
+  {
+    name: 'นครนายก 1 วันเต็ม: ซุ้มไผ่-น้ำตกสาริกา-เขื่อนขุนด่าน-วัดมณีวงศ์',
+    description: 'เส้นทางวนรอบอำเภอบ้านนาและเมืองนครนายก ครบทั้งธรรมชาติ น้ำตก ล่องเรือ และไหว้พระ',
+    cover_url: IMG.waterfall,
+    days: [
+      [
+        { time: '08:30', province: 'นครนายก', city: 'อำเภอบ้านนา', name: 'วัดจุฬาภรณวนาราม (ซุ้มป่าไผ่)', address: 'ตำบลบ้านพริก อำเภอบ้านนา นครนายก', image_url: IMG.forest },
+        { time: '10:30', province: 'นครนายก', city: 'อำเภอเมืองนครนายก', name: 'น้ำตกสาริกา', address: 'ตำบลสาริกา อำเภอเมืองนครนายก นครนายก', image_url: IMG.waterfall },
+        { time: '12:30', province: 'นครนายก', city: 'อำเภอเมืองนครนายก', name: 'ร้านอาหารริมน้ำย่านสาริกา-นางรอง', address: 'ตำบลหินตั้ง อำเภอเมืองนครนายก นครนายก', image_url: IMG.streetFood },
+        { time: '14:30', province: 'นครนายก', city: 'อำเภอเมืองนครนายก', name: 'เขื่อนขุนด่านปราการชล (ล่องเรือชมน้ำตกช่องลม)', address: 'ตำบลหินตั้ง อำเภอเมืองนครนายก นครนายก', image_url: IMG.mountain },
+        { time: '17:00', province: 'นครนายก', city: 'อำเภอเมืองนครนายก', name: 'วัดมณีวงศ์ (วังรัตนมณีมหานครบาดาลนาคราช)', address: 'ตำบลดงละคร อำเภอเมืองนครนายก นครนายก', image_url: IMG.temple },
+      ],
+    ],
+  },
+  {
+    name: 'อุบลราชธานี 3 วัน 2 คืน: วัดเรืองแสง-ผาแต้ม-สามพันโบก',
+    description: 'เลาะริมแม่น้ำโขงจากสิรินธร ขึ้นโขงเจียม ผาแต้ม และต่อไปสามพันโบก โพธิ์ไทร แบบไม่ย้อนทาง',
+    cover_url: IMG.peak,
+    days: [
+      // วันที่ 1: ตัวเมืองอุบลฯ - สิรินธร - โขงเจียม
+      [
+        { time: '09:00', province: 'อุบลราชธานี', city: 'อำเภอเมืองอุบลราชธานี', name: 'วัดทุ่งศรีเมือง & ทุ่งศรีเมืองอุบลราชธานี', address: 'ตำบลในเมือง อำเภอเมืองอุบลราชธานี อุบลราชธานี', image_url: IMG.temple },
+        { time: '12:30', province: 'อุบลราชธานี', city: 'อำเภอพิบูลมังสาหาร', name: 'แก่งสะพือ พิบูลมังสาหาร', address: 'ตำบลพิบูล อำเภอพิบูลมังสาหาร อุบลราชธานี', image_url: IMG.waterfall },
+        { time: '17:30', province: 'อุบลราชธานี', city: 'อำเภอสิรินธร', name: 'วัดสิรินธรวรารามภูพร้าว (วัดเรืองแสง)', address: 'ตำบลช่องเม็ก อำเภอสิรินธร อุบลราชธานี', image_url: IMG.temple },
+        { time: '19:30', province: 'อุบลราชธานี', city: 'อำเภอโขงเจียม', name: 'จุดชมวิวแม่น้ำสองสี โขงเจียม', address: 'ตำบลโขงเจียม อำเภอโขงเจียม อุบลราชธานี', image_url: IMG.coast },
+      ],
+      // วันที่ 2: ผาแต้ม - น้ำตกแสงจันทร์ - สามพันโบก
+      [
+        { time: '06:00', province: 'อุบลราชธานี', city: 'อำเภอโขงเจียม', name: 'อุทยานแห่งชาติผาแต้ม (จุดชมแสงแรก)', address: 'ตำบลห้วยไผ่ อำเภอโขงเจียม อุบลราชธานี', image_url: IMG.peak },
+        { time: '08:30', province: 'อุบลราชธานี', city: 'อำเภอโขงเจียม', name: 'เสาเฉลียง ผาแต้ม', address: 'ตำบลห้วยไผ่ อำเภอโขงเจียม อุบลราชธานี', image_url: IMG.mountain },
+        { time: '11:30', province: 'อุบลราชธานี', city: 'อำเภอศรีเมืองใหม่', name: 'น้ำตกแสงจันทร์ (น้ำตกลงรู)', address: 'ตำบลนาโพธิ์กลาง อำเภอศรีเมืองใหม่ อุบลราชธานี', image_url: IMG.waterfall },
+        { time: '16:00', province: 'อุบลราชธานี', city: 'อำเภอโพธิ์ไทร', name: 'สามพันโบก (แกรนด์แคนยอนเมืองไทย)', address: 'ตำบลเหล่างาม อำเภอโพธิ์ไทร อุบลราชธานี', image_url: IMG.mountain },
+      ],
+      // วันที่ 3: เขมราฐ - ตัวเมืองอุบลฯ
+      [
+        { time: '08:30', province: 'อุบลราชธานี', city: 'อำเภอเขมราฐ', name: 'ริมโขงเขมราฐ & ตลาดเช้าเขมราฐ', address: 'ตำบลเขมราฐ อำเภอเขมราฐ อุบลราชธานี', image_url: IMG.oldTown },
+        { time: '13:00', province: 'อุบลราชธานี', city: 'อำเภอเมืองอุบลราชธานี', name: 'วัดพระธาตุหนองบัว', address: 'ตำบลในเมือง อำเภอเมืองอุบลราชธานี อุบลราชธานี', image_url: IMG.temple },
+        { time: '15:30', province: 'อุบลราชธานี', city: 'อำเภอเมืองอุบลราชธานี', name: 'ร้านก๋วยจั๊บญวนเมืองอุบลฯ', address: 'ตำบลในเมือง อำเภอเมืองอุบลราชธานี อุบลราชธานี', image_url: IMG.streetFood },
+      ],
+    ],
+  },
+  {
+    name: 'ขอนแก่น - ภูผาม่าน 2 วัน 1 คืน: พระธาตุแก่นนคร-ชมค้างคาวภูผาม่าน',
+    description: 'วันแรกเที่ยวแลนด์มาร์กในตัวเมืองขอนแก่น วันที่สองเดินทางไปสัมผัสธรรมชาติและดูฝูงค้างคาวที่ภูผาม่าน',
+    cover_url: IMG.forest,
+    days: [
+      // วันที่ 1: ตัวเมืองขอนแก่น
+      [
+        { time: '09:00', province: 'ขอนแก่น', city: 'อำเภอเมืองขอนแก่น', name: 'วัดหนองแวง (พระมหาธาตุแก่นนคร)', address: 'ตำบลในเมือง อำเภอเมืองขอนแก่น ขอนแก่น', image_url: IMG.temple },
+        { time: '11:00', province: 'ขอนแก่น', city: 'อำเภอเมืองขอนแก่น', name: 'บึงแก่นนคร', address: 'ตำบลในเมือง อำเภอเมืองขอนแก่น ขอนแก่น', image_url: IMG.coast },
+        { time: '14:00', province: 'ขอนแก่น', city: 'อำเภอเมืองขอนแก่น', name: 'พิพิธภัณฑสถานแห่งชาติ ขอนแก่น', address: 'ตำบลในเมือง อำเภอเมืองขอนแก่น ขอนแก่น', image_url: IMG.oldTown },
+        { time: '18:30', province: 'ขอนแก่น', city: 'อำเภอเมืองขอนแก่น', name: 'ตลาดต้นตาล ขอนแก่น', address: 'ตำบลในเมือง อำเภอเมืองขอนแก่น ขอนแก่น', image_url: IMG.market },
+      ],
+      // วันที่ 2: อำเภอภูผาม่าน
+      [
+        { time: '09:30', province: 'ขอนแก่น', city: 'อำเภอภูผาม่าน', name: 'อุทยานแห่งชาติภูผาม่าน', address: 'ตำบลนาฝาย อำเภอภูผาม่าน ขอนแก่น', image_url: IMG.mountain },
+        { time: '11:30', province: 'ขอนแก่น', city: 'อำเภอภูผาม่าน', name: 'บลูลากูน ภูผาม่าน', address: 'ตำบลนาฝาย อำเภอภูผาม่าน ขอนแก่น', image_url: IMG.waterfall },
+        { time: '14:00', province: 'ขอนแก่น', city: 'อำเภอภูผาม่าน', name: 'ผาม่านฝัน คาเฟ่', address: 'ตำบลภูผาม่าน อำเภอภูผาม่าน ขอนแก่น', image_url: IMG.cafe },
+        { time: '17:30', province: 'ขอนแก่น', city: 'อำเภอภูผาม่าน', name: 'ถ้ำค้างคาวภูผาม่าน', address: 'ตำบลภูผาม่าน อำเภอภูผาม่าน ขอนแก่น', image_url: IMG.peak },
+      ],
+    ],
+  },
+  {
+    name: 'ระยอง 2 วัน 1 คืน: ทุ่งโปรงทองปากน้ำประแส-เขาแหลมหญ้า-เกาะเสม็ด',
+    description: 'วันแรกเก็บโซนอำเภอแกลงและป่าเสม็ดพันปี วันที่สองชมวิวเขาแหลมหญ้าและข้ามเรือไปเกาะเสม็ด',
+    cover_url: IMG.beach,
+    days: [
+      // วันที่ 1: อำเภอแกลง
+      [
+        { time: '08:30', province: 'ระยอง', city: 'อำเภอแกลง', name: 'ทุ่งโปรงทอง ปากน้ำประแส', address: 'ตำบลปากน้ำกระแส อำเภอแกลง ระยอง', image_url: IMG.forest },
+        { time: '10:30', province: 'ระยอง', city: 'อำเภอแกลง', name: 'อนุสรณ์เรือรบหลวงประแส', address: 'ตำบลปากน้ำกระแส อำเภอแกลง ระยอง', image_url: IMG.coast },
+        { time: '12:30', province: 'ระยอง', city: 'อำเภอแกลง', name: 'แหลมแม่พิมพ์ (ร้านอาหารทะเลริมหาด)', address: 'ตำบลกร่ำ อำเภอแกลง ระยอง', image_url: IMG.streetFood },
+        { time: '15:00', province: 'ระยอง', city: 'อำเภอแกลง', name: 'สวนพฤกษศาสตร์ระยอง (ป่าเสม็ดพันปี)', address: 'ตำบลชากพง อำเภอแกลง ระยอง', image_url: IMG.forest },
+      ],
+      // วันที่ 2: บ้านเพ - เขาแหลมหญ้า - เกาะเสม็ด
+      [
+        { time: '08:30', province: 'ระยอง', city: 'อำเภอเมืองระยอง', name: 'อุทยานแห่งชาติเขาแหลมหญ้า-หมู่เกาะเสม็ด', address: 'ตำบลเพ อำเภอเมืองระยอง ระยอง', image_url: IMG.coast },
+        { time: '11:00', province: 'ระยอง', city: 'อำเภอเมืองระยอง', name: 'หาดทรายแก้ว เกาะเสม็ด', address: 'ตำบลเพ อำเภอเมืองระยอง ระยอง', image_url: IMG.beach },
+        { time: '15:00', province: 'ระยอง', city: 'อำเภอเมืองระยอง', name: 'อ่าวพร้าว เกาะเสม็ด', address: 'ตำบลเพ อำเภอเมืองระยอง ระยอง', image_url: IMG.island },
+        { time: '17:30', province: 'ระยอง', city: 'อำเภอเมืองระยอง', name: 'ตลาดร้อยเสา บ้านเพ', address: 'ตำบลเพ อำเภอเมืองระยอง ระยอง', image_url: IMG.market },
+      ],
+    ],
+  },
+  {
+    name: 'เพชรบุรี 3 วัน 2 คืน: เขาวัง-ชะอำ-อุทยานแห่งชาติแก่งกระจาน',
+    description: 'วันแรกชมเมืองประวัติศาสตร์เพชรบุรี วันที่สองเลียบทะเลชะอำขึ้นแก่งกระจาน วันที่สามขึ้นพะเนินทุ่ง',
+    cover_url: IMG.temple,
+    days: [
+      // วันที่ 1: ตัวเมืองเพชรบุรี - หาดเจ้าสำราญ
+      [
+        { time: '08:30', province: 'เพชรบุรี', city: 'อำเภอเมืองเพชรบุรี', name: 'อุทยานประวัติศาสตร์พระนครคีรี (เขาวัง)', address: 'ตำบลคลองกระแชง อำเภอเมืองเพชรบุรี เพชรบุรี', image_url: IMG.temple },
+        { time: '10:30', province: 'เพชรบุรี', city: 'อำเภอเมืองเพชรบุรี', name: 'ถ้ำเขาหลวง เพชรบุรี', address: 'ตำบลธงชัย อำเภอเมืองเพชรบุรี เพชรบุรี', image_url: IMG.temple },
+        { time: '12:30', province: 'เพชรบุรี', city: 'อำเภอเมืองเพชรบุรี', name: 'ข้าวแช่เมืองเพชร ย่านตลาดริมน้ำ', address: 'ตำบลท่าราบ อำเภอเมืองเพชรบุรี เพชรบุรี', image_url: IMG.streetFood },
+        { time: '15:30', province: 'เพชรบุรี', city: 'อำเภอเมืองเพชรบุรี', name: 'หาดเจ้าสำราญ', address: 'ตำบลหาดเจ้าสำราญ อำเภอเมืองเพชรบุรี เพชรบุรี', image_url: IMG.beach },
+      ],
+      // วันที่ 2: ชะอำ - ท่ายาง - แก่งกระจาน
+      [
+        { time: '08:30', province: 'เพชรบุรี', city: 'อำเภอชะอำ', name: 'ชายหาดชะอำ', address: 'ตำบลชะอำ อำเภอชะอำ เพชรบุรี', image_url: IMG.beach },
+        { time: '11:30', province: 'เพชรบุรี', city: 'อำเภอท่ายาง', name: 'โครงการชั่งหัวมัน ตามพระราชดำริ', address: 'ตำบลเขากระปุก อำเภอท่ายาง เพชรบุรี', image_url: IMG.forest },
+        { time: '15:00', province: 'เพชรบุรี', city: 'อำเภอแก่งกระจาน', name: 'สะพานแขวนเขื่อนแก่งกระจาน', address: 'ตำบลแก่งกระจาน อำเภอแก่งกระจาน เพชรบุรี', image_url: IMG.mountain },
+      ],
+      // วันที่ 3: พะเนินทุ่ง - บ้านกร่าง
+      [
+        { time: '06:00', province: 'เพชรบุรี', city: 'อำเภอแก่งกระจาน', name: 'จุดชมทะเลหมอกเขาพะเนินทุ่ง', address: 'ตำบลห้วยแม่เพรียง อำเภอแก่งกระจาน เพชรบุรี', image_url: IMG.peak },
+        { time: '09:30', province: 'เพชรบุรี', city: 'อำเภอแก่งกระจาน', name: 'แคมป์บ้านกร่าง อุทยานแห่งชาติแก่งกระจาน', address: 'ตำบลห้วยแม่เพรียง อำเภอแก่งกระจาน เพชรบุรี', image_url: IMG.forest },
+        { time: '14:00', province: 'เพชรบุรี', city: 'อำเภอเมืองเพชรบุรี', name: 'วัดมหาธาตุวรวิหาร เพชรบุรี', address: 'ตำบลคลองกระแชง อำเภอเมืองเพชรบุรี เพชรบุรี', image_url: IMG.temple },
+      ],
+    ],
+  },
+  {
+    name: 'สุโขทัย 2 วัน 1 คืน: อุทยานประวัติศาสตร์สุโขทัย-ศรีสัชนาลัย',
+    description: 'วันแรกปั่นจักรยานชมเมืองเก่าสุโขทัย วันที่สองขึ้นเหนือไปอุทยานประวัติศาสตร์ศรีสัชนาลัยและบ้านนาต้นจั่น',
+    cover_url: IMG.grandPalace,
+    days: [
+      // วันที่ 1: อุทยานประวัติศาสตร์สุโขทัย
+      [
+        { time: '08:30', province: 'สุโขทัย', city: 'อำเภอเมืองสุโขทัย', name: 'วัดมหาธาตุ อุทยานประวัติศาสตร์สุโขทัย', address: 'ตำบลเมืองเก่า อำเภอเมืองสุโขทัย สุโขทัย', image_url: IMG.grandPalace },
+        { time: '10:30', province: 'สุโขทัย', city: 'อำเภอเมืองสุโขทัย', name: 'วัดศรีชุม (พระอจนะ)', address: 'ตำบลเมืองเก่า อำเภอเมืองสุโขทัย สุโขทัย', image_url: IMG.temple },
+        { time: '12:30', province: 'สุโขทัย', city: 'อำเภอเมืองสุโขทัย', name: 'ก๋วยเตี๋ยวสุโขทัยไม้กลางกรุง', address: 'ตำบลเมืองเก่า อำเภอเมืองสุโขทัย สุโขทัย', image_url: IMG.streetFood },
+        { time: '15:30', province: 'สุโขทัย', city: 'อำเภอเมืองสุโขทัย', name: 'วัดสะพานหิน', address: 'ตำบลเมืองเก่า อำเภอเมืองสุโขทัย สุโขทัย', image_url: IMG.mountain },
+        { time: '17:30', province: 'สุโขทัย', city: 'อำเภอเมืองสุโขทัย', name: 'อ่างเก็บน้ำสรีดภงส์', address: 'ตำบลเมืองเก่า อำเภอเมืองสุโขทัย สุโขทัย', image_url: IMG.forest },
+      ],
+      // วันที่ 2: ศรีสัชนาลัย
+      [
+        { time: '09:00', province: 'สุโขทัย', city: 'อำเภอศรีสัชนาลัย', name: 'อุทยานประวัติศาสตร์ศรีสัชนาลัย (วัดช้างล้อม)', address: 'ตำบลศรีสัชนาลัย อำเภอศรีสัชนาลัย สุโขทัย', image_url: IMG.temple },
+        { time: '11:00', province: 'สุโขทัย', city: 'อำเภอศรีสัชนาลัย', name: 'วัดพระศรีรัตนมหาธาตุราชวรวิหาร เชลียง', address: 'ตำบลศรีสัชนาลัย อำเภอศรีสัชนาลัย สุโขทัย', image_url: IMG.grandPalace },
+        { time: '13:30', province: 'สุโขทัย', city: 'อำเภอศรีสัชนาลัย', name: 'โฮมสเตย์บ้านนาต้นจั่น ศรีสัชนาลัย', address: 'ตำบลบ้านตึก อำเภอศรีสัชนาลัย สุโขทัย', image_url: IMG.oldTown },
+      ],
+    ],
+  },
+  {
+    name: 'นครศรีธรรมราช 3 วัน 2 คืน: วัดพระมหาธาตุ-คีรีวง-สิชล-ขนอม',
+    description: 'วันแรกไหว้พระบรมธาตุและพักคีรีวง วันที่สองและสามเลียบชายฝั่งทะเลอ่าวไทยจากสิชลไปขนอม',
+    cover_url: IMG.waterfall,
+    days: [
+      // วันที่ 1: ตัวเมืองนครฯ - หมู่บ้านคีรีวง
+      [
+        { time: '08:30', province: 'นครศรีธรรมราช', city: 'อำเภอเมืองนครศรีธรรมราช', name: 'วัดพระมหาธาตุวรมหาวิหาร', address: 'ตำบลในเมือง อำเภอเมืองนครศรีธรรมราช นครศรีธรรมราช', image_url: IMG.temple },
+        { time: '11:00', province: 'นครศรีธรรมราช', city: 'อำเภอเมืองนครศรีธรรมราช', name: 'ร้านขนมจีนเมืองคอน ถนนพานยม', address: 'ตำบลในเมือง อำเภอเมืองนครศรีธรรมราช นครศรีธรรมราช', image_url: IMG.streetFood },
+        { time: '14:00', province: 'นครศรีธรรมราช', city: 'อำเภอลานสกา', name: 'หมู่บ้านคีรีวง ลานสกา', address: 'ตำบลกำโลน อำเภอลานสกา นครศรีธรรมราช', image_url: IMG.waterfall },
+        { time: '16:30', province: 'นครศรีธรรมราช', city: 'อำเภอลานสกา', name: 'สะพานบ้านคีรีวง & คาเฟ่ริมลำธาร', address: 'ตำบลกำโลน อำเภอลานสกา นครศรีธรรมราช', image_url: IMG.cafe },
+      ],
+      // วันที่ 2: สิชล - ถนนเลียบทะเลเขาพลายดำ - ขนอม
+      [
+        { time: '08:30', province: 'นครศรีธรรมราช', city: 'อำเภอสิชล', name: 'วัดเจดีย์ (ไอ้ไข่) สิชล', address: 'ตำบลฉลอง อำเภอสิชล นครศรีธรรมราช', image_url: IMG.temple },
+        { time: '11:30', province: 'นครศรีธรรมราช', city: 'อำเภอสิชล', name: 'ถนนเลียบชายทะเลเขาพลายดำ-อ่าวท้องหยี', address: 'ตำบลทุ่งใส อำเภอสิชล นครศรีธรรมราช', image_url: IMG.coast },
+        { time: '14:30', province: 'นครศรีธรรมราช', city: 'อำเภอขนอม', name: 'จุดชมวิวเนินเทวดา ขนอม', address: 'ตำบลท้องเนียน อำเภอขนอม นครศรีธรรมราช', image_url: IMG.cliffSea },
+        { time: '16:30', province: 'นครศรีธรรมราช', city: 'อำเภอขนอม', name: 'หาดหน้าด่าน ขนอม', address: 'ตำบลขนอม อำเภอขนอม นครศรีธรรมราช', image_url: IMG.beach },
+      ],
+      // วันที่ 3: ล่องเรือชมโลมาสีชมพู ขนอม - สนามบิน
+      [
+        { time: '08:30', province: 'นครศรีธรรมราช', city: 'อำเภอขนอม', name: 'อ่าวขนอม (ล่องเรือชมโลมาสีชมพู)', address: 'ตำบลท้องเนียน อำเภอขนอม นครศรีธรรมราช', image_url: IMG.island },
+        { time: '11:00', province: 'นครศรีธรรมราช', city: 'อำเภอขนอม', name: 'สะพานไม้อ่าวเตล็ด ขนอม', address: 'ตำบลท้องเนียน อำเภอขนอม นครศรีธรรมราช', image_url: IMG.coast },
+        { time: '14:30', province: 'นครศรีธรรมราช', city: 'อำเภอเมืองนครศรีธรรมราช', name: 'บ้านหนังตะลุงสุชาติ ทรัพย์สิน', address: 'ตำบลในเมือง อำเภอเมืองนครศรีธรรมราช นครศรีธรรมราช', image_url: IMG.oldTown },
+      ],
+    ],
+  },
+  {
+    name: 'ตรัง - สตูล 4 วัน 3 คืน: ถ้ำมรกตเกาะมุก-เกาะหลีเป๊ะ',
+    description: 'ไล่เส้นทางทะเลอันดามันตอนล่างจากตรังลงสตูลแบบไม่ย้อนกลับ เก็บทั้งถ้ำมรกตและเกาะหลีเป๊ะ',
+    cover_url: IMG.andaman,
+    days: [
+      // วันที่ 1: ตัวเมืองตรัง - กันตัง - หาดปากเมง
+      [
+        { time: '08:00', province: 'ตรัง', city: 'อำเภอเมืองตรัง', name: 'ร้านติ่มซำหมูย่างเมืองตรัง', address: 'ตำบลทับเที่ยง อำเภอเมืองตรัง ตรัง', image_url: IMG.streetFood },
+        { time: '10:30', province: 'ตรัง', city: 'อำเภอกันตัง', name: 'สถานีรถไฟกันตัง', address: 'ตำบลกันตัง อำเภอกันตัง ตรัง', image_url: IMG.oldTown },
+        { time: '13:30', province: 'ตรัง', city: 'อำเภอสิเกา', name: 'หาดปากเมง สิเกา', address: 'ตำบลไม้ฝาด อำเภอสิเกา ตรัง', image_url: IMG.beach },
+        { time: '17:00', province: 'ตรัง', city: 'อำเภอสิเกา', name: 'ท่าเรือปากเมง (จุดชมพระอาทิตย์ตก)', address: 'ตำบลไม้ฝาด อำเภอสิเกา ตรัง', image_url: IMG.coast },
+      ],
+      // วันที่ 2: ทริปทะเลตรัง -> เดินทางต่อไปท่าเรือปากบารา สตูล
+      [
+        { time: '09:30', province: 'ตรัง', city: 'อำเภอกันตัง', name: 'ถ้ำมรกต เกาะมุก', address: 'ตำบลเกาะลิบง อำเภอกันตัง ตรัง', image_url: IMG.andaman },
+        { time: '12:00', province: 'ตรัง', city: 'อำเภอกันตัง', name: 'เกาะกระดาน', address: 'ตำบลเกาะลิบง อำเภอกันตัง ตรัง', image_url: IMG.beach },
+        { time: '14:30', province: 'ตรัง', city: 'อำเภอกันตัง', name: 'เกาะเชือก (จุดดำน้ำปะการัง)', address: 'ตำบลเกาะลิบง อำเภอกันตัง ตรัง', image_url: IMG.island },
+        { time: '18:00', province: 'สตูล', city: 'อำเภอละงู', name: 'หาดปากบารา ละงู', address: 'ตำบลปากน้ำ อำเภอละงู สตูล', image_url: IMG.coast },
+      ],
+      // วันที่ 3: ข้ามสปีดโบ๊ทสู่เกาะหลีเป๊ะ
+      [
+        { time: '09:30', province: 'สตูล', city: 'อำเภอละงู', name: 'ท่าเรือปากบารา (สปีดโบ๊ทไปเกาะหลีเป๊ะ)', address: 'ตำบลปากน้ำ อำเภอละงู สตูล', image_url: IMG.coast },
+        { time: '11:00', province: 'สตูล', city: 'อำเภอเมืองสตูล', name: 'เกาะไข่ อุทยานแห่งชาติตะรุเตา', address: 'ตำบลเกาะสาหร่าย อำเภอเมืองสตูล สตูล', image_url: IMG.cliffSea },
+        { time: '13:00', province: 'สตูล', city: 'อำเภอเมืองสตูล', name: 'หาดพัทยา เกาะหลีเป๊ะ', address: 'ตำบลเกาะสาหร่าย อำเภอเมืองสตูล สตูล', image_url: IMG.beach },
+        { time: '17:30', province: 'สตูล', city: 'อำเภอเมืองสตูล', name: 'หาดซันเซ็ท เกาะหลีเป๊ะ', address: 'ตำบลเกาะสาหร่าย อำเภอเมืองสตูล สตูล', image_url: IMG.island },
+        { time: '19:30', province: 'สตูล', city: 'อำเภอเมืองสตูล', name: 'ถนนคนเดินเกาะหลีเป๊ะ', address: 'ตำบลเกาะสาหร่าย อำเภอเมืองสตูล สตูล', image_url: IMG.market },
+      ],
+      // วันที่ 4: หาดซันไรส์ - เกาะอาดัง - กลับฝั่งปากบารา
+      [
+        { time: '07:30', province: 'สตูล', city: 'อำเภอเมืองสตูล', name: 'หาดซันไรส์ เกาะหลีเป๊ะ', address: 'ตำบลเกาะสาหร่าย อำเภอเมืองสตูล สตูล', image_url: IMG.andaman },
+        { time: '09:30', province: 'สตูล', city: 'อำเภอเมืองสตูล', name: 'เกาะอาดัง (จุดชมวิวผาชะโด)', address: 'ตำบลเกาะสาหร่าย อำเภอเมืองสตูล สตูล', image_url: IMG.peak },
+        { time: '13:30', province: 'สตูล', city: 'อำเภอละงู', name: 'ท่าเรือปากบารา (เดินทางกลับ)', address: 'ตำบลปากน้ำ อำเภอละงู สตูล', image_url: IMG.coast },
+      ],
+    ],
+  },
+  {
+    name: 'สงขลา - หาดใหญ่ 3 วัน 2 คืน: ย่านเมืองเก่าสงขลา-เกาะยอ-ตะลุยกินหาดใหญ่',
+    description: 'วันแรกเดินสตรีทอาร์ตเมืองเก่าสงขลา วันที่สองข้ามเกาะยอเข้าหาดใหญ่ วันที่สามตะลุยกินของอร่อยหาดใหญ่',
+    cover_url: IMG.oldTown,
+    days: [
+      // วันที่ 1: อำเภอเมืองสงขลา
+      [
+        { time: '09:00', province: 'สงขลา', city: 'อำเภอเมืองสงขลา', name: 'ย่านเมืองเก่าสงขลา (ถนนนครนอก-นครใน)', address: 'ตำบลบ่อยาง อำเภอเมืองสงขลา สงขลา', image_url: IMG.oldTown },
+        { time: '11:00', province: 'สงขลา', city: 'อำเภอเมืองสงขลา', name: 'โรงสีแดง หับ โห้ หิ้น', address: 'ถนนนครนอก ตำบลบ่อยาง อำเภอเมืองสงขลา สงขลา', image_url: IMG.oldTown },
+        { time: '15:30', province: 'สงขลา', city: 'อำเภอเมืองสงขลา', name: 'หาดสมิหลา (รูปปั้นนางเงือกทอง)', address: 'ตำบลบ่อยาง อำเภอเมืองสงขลา สงขลา', image_url: IMG.beach },
+        { time: '17:30', province: 'สงขลา', city: 'อำเภอเมืองสงขลา', name: 'จุดชมวิวเขาตังกวน', address: 'ตำบลบ่อยาง อำเภอเมืองสงขลา สงขลา', image_url: IMG.mountain },
+      ],
+      // วันที่ 2: เกาะยอ - สวนสาธารณะหาดใหญ่
+      [
+        { time: '09:30', province: 'สงขลา', city: 'อำเภอเมืองสงขลา', name: 'สถาบันทักษิณคดีศึกษา เกาะยอ', address: 'ตำบลเกาะยอ อำเภอเมืองสงขลา สงขลา', image_url: IMG.oldTown },
+        { time: '12:00', province: 'สงขลา', city: 'อำเภอเมืองสงขลา', name: 'ร้านอาหารซีฟู้ดริมทะเลสาบสงขลา เกาะยอ', address: 'ตำบลเกาะยอ อำเภอเมืองสงขลา สงขลา', image_url: IMG.streetFood },
+        { time: '15:30', province: 'สงขลา', city: 'อำเภอหาดใหญ่', name: 'สวนสาธารณะเทศบาลนครหาดใหญ่', address: 'ตำบลคอหงส์ อำเภอหาดใหญ่ สงขลา', image_url: IMG.forest },
+        { time: '19:00', province: 'สงขลา', city: 'อำเภอหาดใหญ่', name: 'ตลาดนัดอาเซียน ไนท์บาซาร์ หาดใหญ่', address: 'ตำบลหาดใหญ่ อำเภอหาดใหญ่ สงขลา', image_url: IMG.market },
+      ],
+      // วันที่ 3: ตัวเมืองหาดใหญ่
+      [
+        { time: '08:00', province: 'สงขลา', city: 'อำเภอหาดใหญ่', name: 'ร้านติ่มซำโชคดีแต่เตี้ยม หาดใหญ่', address: 'ตำบลหาดใหญ่ อำเภอหาดใหญ่ สงขลา', image_url: IMG.streetFood },
+        { time: '10:30', province: 'สงขลา', city: 'อำเภอหาดใหญ่', name: 'ตลาดกิมหยง หาดใหญ่', address: 'ตำบลหาดใหญ่ อำเภอหาดใหญ่ สงขลา', image_url: IMG.market },
+        { time: '15:30', province: 'สงขลา', city: 'อำเภอหาดใหญ่', name: 'มัสยิดกลางประจำจังหวัดสงขลา', address: 'ตำบลคลองแห อำเภอหาดใหญ่ สงขลา', image_url: IMG.temple },
+      ],
+    ],
+  },
+  {
+    name: 'ระนอง 2 วัน 1 คืน: แช่น้ำแร่รักษะวาริน-ชมภูเขาหญ้า-น้ำตกหงาว',
+    description: 'ทริปเมืองรองสุดสโลว์ไลฟ์ เก็บครบไฮไลต์ในตัวเมืองระนองและเส้นทางสายใต้สู่น้ำตกหงาวและแหลมสน',
+    cover_url: IMG.forest,
+    days: [
+      // วันที่ 1: ตัวเมืองระนอง
+      [
+        { time: '09:00', province: 'ระนอง', city: 'อำเภอเมืองระนอง', name: 'พระราชวังรัตนรังสรรค์ (จำลอง)', address: 'ตำบลเขานิเวศน์ อำเภอเมืองระนอง ระนอง', image_url: IMG.oldTown },
+        { time: '10:30', province: 'ระนอง', city: 'อำเภอเมืองระนอง', name: 'บ่อน้ำร้อนรักษะวาริน', address: 'ตำบลเขานิเวศน์ อำเภอเมืองระนอง ระนอง', image_url: IMG.waterfall },
+        { time: '13:00', province: 'ระนอง', city: 'อำเภอเมืองระนอง', name: 'บ้านร้อยปีเทียนสือ เมืองระนอง', address: 'ตำบลเขานิเวศน์ อำเภอเมืองระนอง ระนอง', image_url: IMG.oldTown },
+        { time: '16:30', province: 'ระนอง', city: 'อำเภอเมืองระนอง', name: 'ภูเขาหญ้า (เขาหัวล้าน)', address: 'ตำบลหงาว อำเภอเมืองระนอง ระนอง', image_url: IMG.mountain },
+      ],
+      // วันที่ 2: หงาว - กะเปอร์
+      [
+        { time: '09:00', province: 'ระนอง', city: 'อำเภอเมืองระนอง', name: 'น้ำตกหงาว อุทยานแห่งชาติน้ำตกหงาว', address: 'ตำบลหงาว อำเภอเมืองระนอง ระนอง', image_url: IMG.waterfall },
+        { time: '11:30', province: 'ระนอง', city: 'อำเภอเมืองระนอง', name: 'ก้องวัลเล่ย์ คาเฟ่และโรงคั่วกาแฟระนอง', address: 'ตำบลราชกรูด อำเภอเมืองระนอง ระนอง', image_url: IMG.cafe },
+        { time: '14:30', province: 'ระนอง', city: 'อำเภอกะเปอร์', name: 'อุทยานแห่งชาติแหลมสน กะเปอร์', address: 'ตำบลม่วงกลวง อำเภอกะเปอร์ ระนอง', image_url: IMG.beach },
+      ],
+    ],
+  },
+  {
+    name: 'เบตง ยะลา 3 วัน 2 คืน: สกายวอล์คอัยเยอร์เวง-อุโมงค์ปิยะมิตร-เมืองเบตง',
+    description: 'พิชิตใต้สุดแดนสยาม ชมทะเลหมอกสกายวอล์ค เที่ยวอุโมงค์ประวัติศาสตร์ และชิมของอร่อยเมืองเบตง',
+    cover_url: IMG.mountain,
+    days: [
+      // วันที่ 1: ธารโต - ตัวเมืองเบตง
+      [
+        { time: '09:30', province: 'ยะลา', city: 'อำเภอธารโต', name: 'สะพานข้ามเขื่อนบางลาง ธารโต', address: 'ตำบลแม่หวาด อำเภอธารโต ยะลา', image_url: IMG.mountain },
+        { time: '13:30', province: 'ยะลา', city: 'อำเภอเบตง', name: 'ป้ายใต้สุดสยาม เบตง', address: 'ตำบลเบตง อำเภอเบตง ยะลา', image_url: IMG.oldTown },
+        { time: '16:00', province: 'ยะลา', city: 'อำเภอเบตง', name: 'สตรีทอาร์ตเบตง & หอนาฬิกาเบตง', address: 'ตำบลเบตง อำเภอเบตง ยะลา', image_url: IMG.oldTown },
+        { time: '18:30', province: 'ยะลา', city: 'อำเภอเบตง', name: 'ร้านไก่สับเบตงและเฉาก๊วยโบราณ กม.4', address: 'ตำบลเบตง อำเภอเบตง ยะลา', image_url: IMG.streetFood },
+      ],
+      // วันที่ 2: สกายวอล์คอัยเยอร์เวง - อุโมงค์ปิยะมิตร - บ่อน้ำร้อนเบตง
+      [
+        { time: '06:00', province: 'ยะลา', city: 'อำเภอเบตง', name: 'สกายวอล์คทะเลหมอกอัยเยอร์เวง', address: 'ตำบลอัยเยอร์เวง อำเภอเบตง ยะลา', image_url: IMG.peak },
+        { time: '09:30', province: 'ยะลา', city: 'อำเภอเบตง', name: 'อุโมงค์ปิยะมิตร', address: 'ตำบลตะเนาะแมเราะ อำเภอเบตง ยะลา', image_url: IMG.forest },
+        { time: '11:30', province: 'ยะลา', city: 'อำเภอเบตง', name: 'สวนหมื่นบุปผา (สวนไม้ดอกเมืองหนาวเบตง)', address: 'ตำบลตะเนาะแมเราะ อำเภอเบตง ยะลา', image_url: IMG.forest },
+        { time: '14:30', province: 'ยะลา', city: 'อำเภอเบตง', name: 'บ่อน้ำร้อนเบตง', address: 'ตำบลตะเนาะแมเราะ อำเภอเบตง ยะลา', image_url: IMG.waterfall },
+        { time: '17:00', province: 'ยะลา', city: 'อำเภอเบตง', name: 'วัดพุทธาธิวาส เบตง', address: 'ตำบลเบตง อำเภอเบตง ยะลา', image_url: IMG.temple },
+      ],
+      // วันที่ 3: ตลาดเช้าเบตง - อุโมงค์เบตงมงคลฤทธิ์
+      [
+        { time: '07:30', province: 'ยะลา', city: 'อำเภอเบตง', name: 'ตลาดเช้าเบตง (ติ่มซำและบะหมี่เบตง)', address: 'ตำบลเบตง อำเภอเบตง ยะลา', image_url: IMG.market },
+        { time: '09:30', province: 'ยะลา', city: 'อำเภอเบตง', name: 'อุโมงค์เบตงมงคลฤทธิ์', address: 'ตำบลเบตง อำเภอเบตง ยะลา', image_url: IMG.oldTown },
+        { time: '11:30', province: 'ยะลา', city: 'อำเภอเบตง', name: 'จุดชมวิว กม.29 เบตง', address: 'ตำบลอัยเยอร์เวง อำเภอเบตง ยะลา', image_url: IMG.mountain },
+      ],
+    ],
+  },
+  {
+    name: 'สายบุญลุ่มเจ้าพระยา 2 วัน 1 คืน: อยุธยา - อ่างทอง - สิงห์บุรี',
+    description: 'เส้นทางไหว้พระขอพรองค์พระใหญ่เรียงลำดับจากใต้ขึ้นเหนือตามทางหลวงสายเอเชีย',
+    cover_url: IMG.temple,
+    days: [
+      // วันที่ 1: อยุธยา - อ่างทอง
+      [
+        { time: '08:30', province: 'พระนครศรีอยุธยา', city: 'อำเภอพระนครศรีอยุธยา', name: 'วัดท่าการ้อง พระนครศรีอยุธยา', address: 'ตำบลบ้านป้อม อำเภอพระนครศรีอยุธยา พระนครศรีอยุธยา', image_url: IMG.temple },
+        { time: '10:30', province: 'อ่างทอง', city: 'อำเภอวิเศษชัยชาญ', name: 'วัดม่วง (หลวงพ่อใหญ่) อ่างทอง', address: 'ตำบลหัวตะพาน อำเภอวิเศษชัยชาญ อ่างทอง', image_url: IMG.temple },
+        { time: '13:30', province: 'อ่างทอง', city: 'อำเภอโพธิ์ทอง', name: 'วัดขุนอินทประมูล อ่างทอง', address: 'ตำบลอินทประมูล อำเภอโพธิ์ทอง อ่างทอง', image_url: IMG.temple },
+        { time: '15:30', province: 'อ่างทอง', city: 'อำเภอไชโย', name: 'วัดไชโยวรวิหาร (วัดเกษไชโย)', address: 'ตำบลไชโย อำเภอไชโย อ่างทอง', image_url: IMG.temple },
+      ],
+      // วันที่ 2: สิงห์บุรี
+      [
+        { time: '08:30', province: 'สิงห์บุรี', city: 'อำเภอท่าช้าง', name: 'วัดพิกุลทอง สิงห์บุรี', address: 'ตำบลพิกุลทอง อำเภอท่าช้าง สิงห์บุรี', image_url: IMG.temple },
+        { time: '10:30', province: 'สิงห์บุรี', city: 'อำเภอเมืองสิงห์บุรี', name: 'วัดพระนอนจักรสีห์วรวิหาร', address: 'ตำบลจักรสีห์ อำเภอเมืองสิงห์บุรี สิงห์บุรี', image_url: IMG.temple },
+        { time: '13:00', province: 'สิงห์บุรี', city: 'อำเภอค่ายบางระจัน', name: 'ตลาดบ้านบางระจัน ค่ายบางระจัน', address: 'ตำบลบางระจัน อำเภอค่ายบางระจัน สิงห์บุรี', image_url: IMG.market },
+        { time: '15:30', province: 'สิงห์บุรี', city: 'อำเภอพรหมบุรี', name: 'วัดอัมพวัน สิงห์บุรี', address: 'ตำบลพรหมบุรี อำเภอพรหมบุรี สิงห์บุรี', image_url: IMG.temple },
+      ],
+    ],
+  },
+  {
+    name: 'จันทบุรี 2 วัน 1 คืน: เนินนางพญา-ชุมชนริมน้ำจันทบูร-น้ำตกพลิ้ว',
+    description: 'วันแรกขับรถเลียบถนนเฉลิมบูรพาชลทิตเข้าเมืองจันท์ วันที่สองเที่ยวน้ำตกพลิ้วและกินปูทะเลขลุง',
+    cover_url: IMG.coast,
+    days: [
+      // วันที่ 1: นายายอาม - ท่าใหม่ - ตัวเมืองจันทบุรี
+      [
+        { time: '09:00', province: 'จันทบุรี', city: 'อำเภอนายายอาม', name: 'จุดชมวิวเนินนางพญา ถนนเฉลิมบูรพาชลทิต', address: 'ตำบลสนามไชย อำเภอนายายอาม จันทบุรี', image_url: IMG.coast },
+        { time: '11:00', province: 'จันทบุรี', city: 'อำเภอท่าใหม่', name: 'ศูนย์ศึกษาการพัฒนาอ่าวคุ้งกระเบน', address: 'ตำบลคลองขุด อำเภอท่าใหม่ จันทบุรี', image_url: IMG.forest },
+        { time: '14:00', province: 'จันทบุรี', city: 'อำเภอเมืองจันทบุรี', name: 'ชุมชนริมน้ำจันทบูร', address: 'ตำบลวัดใหม่ อำเภอเมืองจันทบุรี จันทบุรี', image_url: IMG.oldTown },
+        { time: '16:00', province: 'จันทบุรี', city: 'อำเภอเมืองจันทบุรี', name: 'อาสนวิหารพระนางมารีอาปฏิสนธินิรมล', address: 'ตำบลจันทนิมิต อำเภอเมืองจันทบุรี จันทบุรี', image_url: IMG.oldTown },
+        { time: '18:30', province: 'จันทบุรี', city: 'อำเภอเมืองจันทบุรี', name: 'ตลาดน้ำพุ จันทบุรี', address: 'ตำบลตลาด อำเภอเมืองจันทบุรี จันทบุรี', image_url: IMG.market },
+      ],
+      // วันที่ 2: แหลมสิงห์ - ขลุง
+      [
+        { time: '09:00', province: 'จันทบุรี', city: 'อำเภอแหลมสิงห์', name: 'อุทยานแห่งชาติน้ำตกพลิ้ว', address: 'ตำบลพลิ้ว อำเภอแหลมสิงห์ จันทบุรี', image_url: IMG.waterfall },
+        { time: '11:30', province: 'จันทบุรี', city: 'อำเภอแหลมสิงห์', name: 'ตึกแดง & คุกขี้ไก่ แหลมสิงห์', address: 'ตำบลปากน้ำแหลมสิงห์ อำเภอแหลมสิงห์ จันทบุรี', image_url: IMG.oldTown },
+        { time: '13:30', province: 'จันทบุรี', city: 'อำเภอขลุง', name: 'โฮมสเตย์ล่องแพเปียกและทานปูทะเล ขลุง', address: 'ตำบลบางชัน อำเภอขลุง จันทบุรี', image_url: IMG.streetFood },
+      ],
+    ],
+  },
+  {
+    name: 'ราชบุรี - สวนผึ้ง 2 วัน 1 คืน: เขางู-ตลาดโอ๊ะป่อย-ธารน้ำร้อนบ่อคลึง',
+    description: 'วันแรกแวะเขางูและถ้ำเขาบินมุ่งหน้าสู่สวนผึ้ง วันที่สองตักบาตรตลาดโอ๊ะป่อยและแวะโพธารามขากลับ',
+    cover_url: IMG.waterfall,
+    days: [
+      // วันที่ 1: เมืองราชบุรี - จอมบึง - สวนผึ้ง
+      [
+        { time: '08:30', province: 'ราชบุรี', city: 'อำเภอเมืองราชบุรี', name: 'อุทยานหินเขางู ราชบุรี', address: 'ตำบลเกาะพลับพลา อำเภอเมืองราชบุรี ราชบุรี', image_url: IMG.mountain },
+        { time: '10:30', province: 'ราชบุรี', city: 'อำเภอจอมบึง', name: 'ถ้ำเขาบิน จอมบึง', address: 'ตำบลหินกอง อำเภอจอมบึง ราชบุรี', image_url: IMG.peak },
+        { time: '13:30', province: 'ราชบุรี', city: 'อำเภอสวนผึ้ง', name: 'เดอะ ซีนเนอรี่ วินเทจ ฟาร์ม สวนผึ้ง', address: 'ตำบลสวนผึ้ง อำเภอสวนผึ้ง ราชบุรี', image_url: IMG.forest },
+        { time: '16:00', province: 'ราชบุรี', city: 'อำเภอสวนผึ้ง', name: 'บ้านหอมเทียน สวนผึ้ง', address: 'ตำบลสวนผึ้ง อำเภอสวนผึ้ง ราชบุรี', image_url: IMG.cafe },
+      ],
+      // วันที่ 2: สวนผึ้ง - โพธาราม
+      [
+        { time: '07:30', province: 'ราชบุรี', city: 'อำเภอสวนผึ้ง', name: 'ตลาดโอ๊ะป่อย สวนผึ้ง', address: 'ตำบลตะนาวศรี อำเภอสวนผึ้ง ราชบุรี', image_url: IMG.market },
+        { time: '09:30', province: 'ราชบุรี', city: 'อำเภอสวนผึ้ง', name: 'ธารน้ำร้อนบ่อคลึง สวนผึ้ง', address: 'ตำบลสวนผึ้ง อำเภอสวนผึ้ง ราชบุรี', image_url: IMG.waterfall },
+        { time: '11:30', province: 'ราชบุรี', city: 'อำเภอสวนผึ้ง', name: 'น้ำตกเก้าชั้น (เก้าโจน) สวนผึ้ง', address: 'ตำบลสวนผึ้ง อำเภอสวนผึ้ง ราชบุรี', image_url: IMG.waterfall },
+        { time: '15:00', province: 'ราชบุรี', city: 'อำเภอโพธาราม', name: 'วัดขนอนหนังใหญ่ โพธาราม', address: 'ตำบลสร้อยฟ้า อำเภอโพธาราม ราชบุรี', image_url: IMG.temple },
+      ],
+    ],
+  },
+  {
+    name: 'ลำปาง - ลำพูน 3 วัน 2 คืน: นั่งรถม้า-แจ้ซ้อน-พระธาตุหริภุญชัย',
+    description: 'เส้นทางเมืองรองล้านนา ไล่จากลำปางขึ้นอุทยานฯ แจ้ซ้อน และข้ามดอยขุนตาลสู่ลำพูน',
+    cover_url: IMG.chiangMai,
+    days: [
+      // วันที่ 1: เกาะคา - ห้างฉัตร - ตัวเมืองลำปาง
+      [
+        { time: '09:00', province: 'ลำปาง', city: 'อำเภอเกาะคา', name: 'วัดพระธาตุลำปางหลวง', address: 'ตำบลลำปางหลวง อำเภอเกาะคา ลำปาง', image_url: IMG.temple },
+        { time: '11:30', province: 'ลำปาง', city: 'อำเภอห้างฉัตร', name: 'ศูนย์อนุรักษ์ช้างไทย ลำปาง', address: 'ตำบลเวียงตาล อำเภอห้างฉัตร ลำปาง', image_url: IMG.forest },
+        { time: '15:30', province: 'ลำปาง', city: 'อำเภอเมืองลำปาง', name: 'สะพานรัษฎาภิเศก & นั่งรถม้าชมเมืองลำปาง', address: 'ตำบลหัวเวียง อำเภอเมืองลำปาง ลำปาง', image_url: IMG.oldTown },
+        { time: '18:30', province: 'ลำปาง', city: 'อำเภอเมืองลำปาง', name: 'ถนนคนเดินกาดกองต้า ลำปาง', address: 'ตำบลสวนดอก อำเภอเมืองลำปาง ลำปาง', image_url: IMG.market },
+      ],
+      // วันที่ 2: แจ้ซ้อน - แจ้ห่ม - เดินทางสู่ลำพูน
+      [
+        { time: '08:30', province: 'ลำปาง', city: 'อำเภอเมืองปาน', name: 'อุทยานแห่งชาติแจ้ซ้อน (น้ำพุร้อนแจ้ซ้อน)', address: 'ตำบลแจ้ซ้อน อำเภอเมืองปาน ลำปาง', image_url: IMG.waterfall },
+        { time: '11:30', province: 'ลำปาง', city: 'อำเภอแจ้ห่ม', name: 'วัดเฉลิมพระเกียรติพระจอมเกล้าราชานุสรณ์', address: 'ตำบลวิเชตนคร อำเภอแจ้ห่ม ลำปาง', image_url: IMG.peak },
+        { time: '16:30', province: 'ลำพูน', city: 'อำเภอเมืองลำพูน', name: 'กู่ช้าง กู่ม้า ลำพูน', address: 'ตำบลในเมือง อำเภอเมืองลำพูน ลำพูน', image_url: IMG.oldTown },
+      ],
+      // วันที่ 3: ตัวเมืองลำพูน - แม่ทา
+      [
+        { time: '08:30', province: 'ลำพูน', city: 'อำเภอเมืองลำพูน', name: 'วัดพระธาตุหริภุญชัยวรมหาวิหาร', address: 'ตำบลในเมือง อำเภอเมืองลำพูน ลำพูน', image_url: IMG.temple },
+        { time: '10:30', province: 'ลำพูน', city: 'อำเภอเมืองลำพูน', name: 'วัดจามเทวี ลำพูน', address: 'ตำบลในเมือง อำเภอเมืองลำพูน ลำพูน', image_url: IMG.temple },
+        { time: '12:30', province: 'ลำพูน', city: 'อำเภอเมืองลำพูน', name: 'ร้านก๋วยเตี๋ยวหมูตุ๋นลำไย ลำพูน', address: 'ตำบลในเมือง อำเภอเมืองลำพูน ลำพูน', image_url: IMG.streetFood },
+        { time: '15:00', province: 'ลำพูน', city: 'อำเภอแม่ทา', name: 'สะพานขาวทาชมภู แม่ทา', address: 'ตำบลทาปลาดุก อำเภอแม่ทา ลำพูน', image_url: IMG.oldTown },
+      ],
+    ],
+  },
+  {
+    name: 'อุดรธานี - หนองคาย 3 วัน 2 คืน: ทะเลบัวแดง-คำชะโนด-สกายวอล์คผาตากเสื้อ',
+    description: 'วันแรกเก็บโซนอุดรฯ วันที่สองขึ้นนายูง-สังคมเลาะริมโขงเข้าหนองคาย วันที่สามชมศาลาแก้วกู่ก่อนกลับ',
+    cover_url: IMG.forest,
+    days: [
+      // วันที่ 1: กุมภวาปี - บ้านดุง - หนองหาน - เมืองอุดรฯ
+      [
+        { time: '06:30', province: 'อุดรธานี', city: 'อำเภอกุมภวาปี', name: 'ทะเลบัวแดง หนองหาน กุมภวาปี', address: 'ตำบลเชียงแหว อำเภอกุมภวาปี อุดรธานี', image_url: IMG.forest },
+        { time: '10:00', province: 'อุดรธานี', city: 'อำเภอบ้านดุง', name: 'วังนาคินทร์ คำชะโนด', address: 'ตำบลบ้านม่วง อำเภอบ้านดุง อุดรธานี', image_url: IMG.temple },
+        { time: '13:30', province: 'อุดรธานี', city: 'อำเภอหนองหาน', name: 'พิพิธภัณฑสถานแห่งชาติ บ้านเชียง', address: 'ตำบลบ้านเชียง อำเภอหนองหาน อุดรธานี', image_url: IMG.oldTown },
+        { time: '18:30', province: 'อุดรธานี', city: 'อำเภอเมืองอุดรธานี', name: 'ยูดี ทาวน์ อุดรธานี', address: 'ตำบลหมากแข้ง อำเภอเมืองอุดรธานี อุดรธานี', image_url: IMG.market },
+      ],
+      // วันที่ 2: นายูง - สังคม - ตัวเมืองหนองคาย
+      [
+        { time: '09:00', province: 'อุดรธานี', city: 'อำเภอนายูง', name: 'วัดป่าภูก้อน นายูง', address: 'ตำบลบ้านก้อง อำเภอนายูง อุดรธานี', image_url: IMG.temple },
+        { time: '11:30', province: 'หนองคาย', city: 'อำเภอสังคม', name: 'สกายวอล์ควัดผาตากเสื้อ สังคม', address: 'ตำบลผาตั้ง อำเภอสังคม หนองคาย', image_url: IMG.peak },
+        { time: '15:30', province: 'หนองคาย', city: 'อำเภอเมืองหนองคาย', name: 'วัดโพธิ์ชัย (หลวงพ่อพระใส) หนองคาย', address: 'ตำบลในเมือง อำเภอเมืองหนองคาย หนองคาย', image_url: IMG.temple },
+        { time: '18:00', province: 'หนองคาย', city: 'อำเภอเมืองหนองคาย', name: 'ตลาดท่าเสด็จ & ถนนคนเดินริมโขงหนองคาย', address: 'ตำบลในเมือง อำเภอเมืองหนองคาย หนองคาย', image_url: IMG.market },
+      ],
+      // วันที่ 3: หนองคาย - สวนสาธารณะหนองประจักษ์ อุดรฯ
+      [
+        { time: '09:00', province: 'หนองคาย', city: 'อำเภอเมืองหนองคาย', name: 'ศาลาแก้วกู่ หนองคาย', address: 'ตำบลหาดคำ อำเภอเมืองหนองคาย หนองคาย', image_url: IMG.oldTown },
+        { time: '11:00', province: 'หนองคาย', city: 'อำเภอเมืองหนองคาย', name: 'ร้านอาหารเช้าเวียดนามริมโขง หนองคาย', address: 'ตำบลในเมือง อำเภอเมืองหนองคาย หนองคาย', image_url: IMG.streetFood },
+        { time: '15:00', province: 'อุดรธานี', city: 'อำเภอเมืองอุดรธานี', name: 'สวนสาธารณะหนองประจักษ์ศิลปาคม', address: 'ตำบลหมากแข้ง อำเภอเมืองอุดรธานี อุดรธานี', image_url: IMG.coast },
+      ],
+    ],
+  },
+  {
+    name: 'นครปฐม - สุพรรณบุรี 1 วันเต็ม: พระปฐมเจดีย์-ดอนหวาย-ตลาดสามชุก',
+    description: 'ทริปครอบครัวใกล้กรุง ไล่เส้นทางจากนครปฐมขึ้นเหนือสู่ตลาดร้อยปีสามชุก สุพรรณบุรี',
+    cover_url: IMG.market,
+    days: [
+      [
+        { time: '08:30', province: 'นครปฐม', city: 'อำเภอเมืองนครปฐม', name: 'วัดพระปฐมเจดีย์ราชวรมหาวิหาร', address: 'ตำบลพระปฐมเจดีย์ อำเภอเมืองนครปฐม นครปฐม', image_url: IMG.temple },
+        { time: '10:30', province: 'นครปฐม', city: 'อำเภอสามพราน', name: 'ตลาดน้ำดอนหวาย', address: 'ตำบลบางกระทึก อำเภอสามพราน นครปฐม', image_url: IMG.market },
+        { time: '13:30', province: 'สุพรรณบุรี', city: 'อำเภอศรีประจันต์', name: 'หมู่บ้านอนุรักษ์ควายไทย ศรีประจันต์', address: 'ตำบลวังน้ำซับ อำเภอศรีประจันต์ สุพรรณบุรี', image_url: IMG.forest },
+        { time: '15:30', province: 'สุพรรณบุรี', city: 'อำเภอสามชุก', name: 'ตลาดสามชุก ตลาดร้อยปี', address: 'ตำบลสามชุก อำเภอสามชุก สุพรรณบุรี', image_url: IMG.oldTown },
+      ],
+    ],
+  },
+  {
+    name: 'ปัตตานี - นราธิวาส 3 วัน 2 คืน: มัสยิดกลาง-สกายวอล์ค-ป่าฮาลาบาลา',
+    description: 'เส้นทางวัฒนธรรมมลายูและธรรมชาติชายแดนใต้ ไล่จากปัตตานีลงสายบุรี นราธิวาส และตากใบ-แว้ง',
+    cover_url: IMG.temple,
+    days: [
+      // วันที่ 1: อำเภอเมืองปัตตานี
+      [
+        { time: '09:00', province: 'ปัตตานี', city: 'อำเภอเมืองปัตตานี', name: 'มัสยิดกลางจังหวัดปัตตานี', address: 'ตำบลอาเนาะรู อำเภอเมืองปัตตานี ปัตตานี', image_url: IMG.temple },
+        { time: '11:00', province: 'ปัตตานี', city: 'อำเภอเมืองปัตตานี', name: 'ศาลเจ้าแม่ลิ้มกอเหนี่ยว ปัตตานี', address: 'ตำบลอาเนาะรู อำเภอเมืองปัตตานี ปัตตานี', image_url: IMG.oldTown },
+        { time: '14:00', province: 'ปัตตานี', city: 'อำเภอเมืองปัตตานี', name: 'มัสยิดกรือเซะ', address: 'ตำบลตันหยงลุโละ อำเภอเมืองปัตตานี ปัตตานี', image_url: IMG.oldTown },
+        { time: '16:30', province: 'ปัตตานี', city: 'อำเภอเมืองปัตตานี', name: 'สกายวอล์คปัตตานี (สวนสมเด็จเจ้าฟ้ากัลยาณิวัฒนาฯ)', address: 'ตำบลรูสะมิแล อำเภอเมืองปัตตานี ปัตตานี', image_url: IMG.coast },
+      ],
+      // วันที่ 2: สายบุรี - ยี่งอ - เมืองนราธิวาส
+      [
+        { time: '09:00', province: 'ปัตตานี', city: 'อำเภอสายบุรี', name: 'หาดวาสุกรี สายบุรี', address: 'ตำบลตะลุบัน อำเภอสายบุรี ปัตตานี', image_url: IMG.beach },
+        { time: '11:30', province: 'นราธิวาส', city: 'อำเภอยี่งอ', name: 'พิพิธภัณฑ์มรดกวัฒนธรรมอิสลาม', address: 'ตำบลละหาร อำเภอยี่งอ นราธิวาส', image_url: IMG.oldTown },
+        { time: '15:30', province: 'นราธิวาส', city: 'อำเภอเมืองนราธิวาส', name: 'หาดนราทัศน์ เมืองนราธิวาส', address: 'ตำบลบางนาค อำเภอเมืองนราธิวาส นราธิวาส', image_url: IMG.beach },
+        { time: '18:30', province: 'นราธิวาส', city: 'อำเภอเมืองนราธิวาส', name: 'ตลาดโต้รุ่งนราธิวาส', address: 'ตำบลบางนาค อำเภอเมืองนราธิวาส นราธิวาส', image_url: IMG.market },
+      ],
+      // วันที่ 3: ตากใบ - แว้ง - สุไหงโก-ลก
+      [
+        { time: '09:00', province: 'นราธิวาส', city: 'อำเภอตากใบ', name: 'วัดชลธาราสิงเห (วัดพิทักษ์แผ่นดินไทย)', address: 'ตำบลเจ๊ะเห อำเภอตากใบ นราธิวาส', image_url: IMG.temple },
+        { time: '11:30', province: 'นราธิวาส', city: 'อำเภอแว้ง', name: 'เขตรักษาพันธุ์สัตว์ป่าฮาลา-บาลา', address: 'ตำบลโละจูด อำเภอแว้ง นราธิวาส', image_url: IMG.forest },
+        { time: '15:00', province: 'นราธิวาส', city: 'อำเภอสุไหงโก-ลก', name: 'ด่านพรมแดนสุไหงโก-ลก', address: 'ตำบลสุไหงโก-ลก อำเภอสุไหงโก-ลก นราธิวาส', image_url: IMG.oldTown },
+      ],
+    ],
+  },
+  {
+    name: 'บุรีรัมย์ - สุรินทร์ 3 วัน 2 คืน: ปราสาทพนมรุ้ง-ช้างอารีนา-หมู่บ้านช้าง',
+    description: 'เส้นทางอีสานใต้ เก็บครบปราสาทหินพนมรุ้ง ปราสาทเมืองต่ำ สนามช้างอารีนา และหมู่บ้านช้างสุรินทร์',
+    cover_url: IMG.grandPalace,
+    days: [
+      // วันที่ 1: เฉลิมพระเกียรติ - ประโคนชัย - นางรอง - เมืองบุรีรัมย์
+      [
+        { time: '08:30', province: 'บุรีรัมย์', city: 'อำเภอเฉลิมพระเกียรติ', name: 'อุทยานประวัติศาสตร์พนมรุ้ง', address: 'ตำบลตาเป๊ก อำเภอเฉลิมพระเกียรติ บุรีรัมย์', image_url: IMG.grandPalace },
+        { time: '10:30', province: 'บุรีรัมย์', city: 'อำเภอประโคนชัย', name: 'ปราสาทเมืองต่ำ ประโคนชัย', address: 'ตำบลจรเข้มาก อำเภอประโคนชัย บุรีรัมย์', image_url: IMG.temple },
+        { time: '12:30', province: 'บุรีรัมย์', city: 'อำเภอนางรอง', name: 'ร้านขาหมูอันเจริญ นางรอง', address: 'ตำบลนางรอง อำเภอนางรอง บุรีรัมย์', image_url: IMG.streetFood },
+        { time: '16:00', province: 'บุรีรัมย์', city: 'อำเภอเมืองบุรีรัมย์', name: 'สนามช้างอารีนา & ปราสาทสายฟ้า', address: 'ตำบลอิสาณ อำเภอเมืองบุรีรัมย์ บุรีรัมย์', image_url: IMG.oldTown },
+      ],
+      // วันที่ 2: ท่าตูม - เมืองสุรินทร์
+      [
+        { time: '09:00', province: 'สุรินทร์', city: 'อำเภอท่าตูม', name: 'ศูนย์คชศึกษา หมู่บ้านช้างบ้านตากลาง', address: 'ตำบลกระโพ อำเภอท่าตูม สุรินทร์', image_url: IMG.forest },
+        { time: '13:00', province: 'สุรินทร์', city: 'อำเภอเมืองสุรินทร์', name: 'หมู่บ้านทอผ้าไหมยกทองบ้านท่าสว่าง', address: 'ตำบลท่าสว่าง อำเภอเมืองสุรินทร์ สุรินทร์', image_url: IMG.oldTown },
+        { time: '16:00', province: 'สุรินทร์', city: 'อำเภอเมืองสุรินทร์', name: 'วนอุทยานพนมสวาย สุรินทร์', address: 'ตำบลนาบัว อำเภอเมืองสุรินทร์ สุรินทร์', image_url: IMG.mountain },
+      ],
+      // วันที่ 3: ศีขรภูมิ - ตัวเมืองสุรินทร์
+      [
+        { time: '09:00', province: 'สุรินทร์', city: 'อำเภอศีขรภูมิ', name: 'ปราสาทศีขรภูมิ สุรินทร์', address: 'ตำบลระแงง อำเภอศีขรภูมิ สุรินทร์', image_url: IMG.grandPalace },
+        { time: '11:30', province: 'สุรินทร์', city: 'อำเภอเมืองสุรินทร์', name: 'อนุสาวรีย์พระยาสุรินทรภักดีศรีณรงค์จางวาง', address: 'ตำบลในเมือง อำเภอเมืองสุรินทร์ สุรินทร์', image_url: IMG.oldTown },
+        { time: '13:30', province: 'สุรินทร์', city: 'อำเภอเมืองสุรินทร์', name: 'ตลาดสดเทศบาลเมืองสุรินทร์', address: 'ตำบลในเมือง อำเภอเมืองสุรินทร์ สุรินทร์', image_url: IMG.market },
+      ],
+    ],
+  },
+  {
+    name: 'นครพนม - มุกดาหาร 3 วัน 2 คืน: พญาศรีสัตตนาคราช-พระธาตุพนม-ภูมโนรมย์',
+    description: 'เลาะเลียบแม่น้ำโขงจากตัวเมืองนครพนมลงใต้ผ่านธาตุพนมสู่จังหวัดมุกดาหาร',
+    cover_url: IMG.temple,
+    days: [
+      // วันที่ 1: ตัวเมืองนครพนม - ท่าอุเทน
+      [
+        { time: '08:30', province: 'นครพนม', city: 'อำเภอเมืองนครพนม', name: 'ลานพญาศรีสัตตนาคราช ริมโขงนครพนม', address: 'ตำบลในเมือง อำเภอเมืองนครพนม นครพนม', image_url: IMG.temple },
+        { time: '10:30', province: 'นครพนม', city: 'อำเภอเมืองนครพนม', name: 'พิพิธภัณฑ์จวนผู้ว่าราชการจังหวัดนครพนม', address: 'ตำบลในเมือง อำเภอเมืองนครพนม นครพนม', image_url: IMG.oldTown },
+        { time: '13:30', province: 'นครพนม', city: 'อำเภอท่าอุเทน', name: 'วัดพระธาตุท่าอุเทน', address: 'ตำบลท่าอุเทน อำเภอท่าอุเทน นครพนม', image_url: IMG.temple },
+        { time: '18:00', province: 'นครพนม', city: 'อำเภอเมืองนครพนม', name: 'ถนนคนเดินนครพนม', address: 'ตำบลในเมือง อำเภอเมืองนครพนม นครพนม', image_url: IMG.market },
+      ],
+      // วันที่ 2: เรณูนคร - ธาตุพนม - หว้านใหญ่ - เมืองมุกดาหาร
+      [
+        { time: '09:00', province: 'นครพนม', city: 'อำเภอเรณูนคร', name: 'วัดพระธาตุเรณู เรณูนคร', address: 'ตำบลเรณู อำเภอเรณูนคร นครพนม', image_url: IMG.temple },
+        { time: '11:00', province: 'นครพนม', city: 'อำเภอธาตุพนม', name: 'วัดพระธาตุพนมวรมหาวิหาร', address: 'ตำบลธาตุพนม อำเภอธาตุพนม นครพนม', image_url: IMG.temple },
+        { time: '14:30', province: 'มุกดาหาร', city: 'อำเภอหว้านใหญ่', name: 'แก่งกะเบา หว้านใหญ่', address: 'ตำบลป่งขาม อำเภอหว้านใหญ่ มุกดาหาร', image_url: IMG.coast },
+        { time: '17:00', province: 'มุกดาหาร', city: 'อำเภอเมืองมุกดาหาร', name: 'หอแก้วมุกดาหาร', address: 'ตำบลศรีบุญเรือง อำเภอเมืองมุกดาหาร มุกดาหาร', image_url: IMG.oldTown },
+      ],
+      // วันที่ 3: ตัวเมืองมุกดาหาร
+      [
+        { time: '08:30', province: 'มุกดาหาร', city: 'อำเภอเมืองมุกดาหาร', name: 'วัดรอยพระพุทธบาทภูมโนรมย์', address: 'ตำบลนาสีนวน อำเภอเมืองมุกดาหาร มุกดาหาร', image_url: IMG.mountain },
+        { time: '11:00', province: 'มุกดาหาร', city: 'อำเภอเมืองมุกดาหาร', name: 'ตลาดอินโดจีน มุกดาหาร', address: 'ตำบลศรีบุญเรือง อำเภอเมืองมุกดาหาร มุกดาหาร', image_url: IMG.market },
+        { time: '14:00', province: 'มุกดาหาร', city: 'อำเภอเมืองมุกดาหาร', name: 'อุทยานแห่งชาติภูผาเทิบ', address: 'ตำบลนาสีนวน อำเภอเมืองมุกดาหาร มุกดาหาร', image_url: IMG.peak },
+      ],
+    ],
+  },
+  {
+    name: 'Road Trip เลียบอ่าวไทยตะวันออก 3 วัน 2 คืน: ระยอง-จันทบุรี-ตราด',
+    description: 'เส้นทางขับรถเลียบชายฝั่งทะเลตะวันออกเรียงจังหวัดจากระยอง ผ่านจันทบุรี จนถึงสุดแผ่นดินตะวันออกที่ตราด',
+    cover_url: IMG.beach,
+    days: [
+      // วันที่ 1: ระยอง
+      [
+        { time: '09:30', province: 'ระยอง', city: 'อำเภอเมืองระยอง', name: 'สถานแสดงพันธุ์สัตว์น้ำระยอง บ้านเพ', address: 'ตำบลเพ อำเภอเมืองระยอง ระยอง', image_url: IMG.coast },
+        { time: '12:00', province: 'ระยอง', city: 'อำเภอบ้านค่าย', name: 'สวนสุภัทราแลนด์ (บุฟเฟต์ผลไม้)', address: 'ตำบลหนองละลอก อำเภอบ้านค่าย ระยอง', image_url: IMG.forest },
+        { time: '15:30', province: 'ระยอง', city: 'อำเภอแกลง', name: 'อนุสาวรีย์สุนทรภู่ อำเภอแกลง', address: 'ตำบลกร่ำ อำเภอแกลง ระยอง', image_url: IMG.oldTown },
+      ],
+      // วันที่ 2: จันทบุรี
+      [
+        { time: '09:00', province: 'จันทบุรี', city: 'อำเภอท่าใหม่', name: 'วัดปากน้ำแขมหนู (โบสถ์สีน้ำเงิน)', address: 'ตำบลตะกาดเง้า อำเภอท่าใหม่ จันทบุรี', image_url: IMG.temple },
+        { time: '11:30', province: 'จันทบุรี', city: 'อำเภอท่าใหม่', name: 'หาดเจ้าหลาว ท่าใหม่', address: 'ตำบลคลองขุด อำเภอท่าใหม่ จันทบุรี', image_url: IMG.beach },
+        { time: '15:00', province: 'จันทบุรี', city: 'อำเภอเมืองจันทบุรี', name: 'ศาลสมเด็จพระเจ้าตากสินมหาราช จันทบุรี', address: 'ตำบลวัดใหม่ อำเภอเมืองจันทบุรี จันทบุรี', image_url: IMG.temple },
+      ],
+      // วันที่ 3: ตราด
+      [
+        { time: '09:30', province: 'ตราด', city: 'อำเภอแหลมงอบ', name: 'อนุสรณ์สถานยุทธนาวีเกาะช้าง แหลมงอบ', address: 'ตำบลแหลมงอบ อำเภอแหลมงอบ ตราด', image_url: IMG.oldTown },
+        { time: '11:00', province: 'ตราด', city: 'อำเภอแหลมงอบ', name: 'ประภาคารแหลมงอบ (สุดแผ่นดินตะวันออก)', address: 'ตำบลแหลมงอบ อำเภอแหลมงอบ ตราด', image_url: IMG.coast },
+        { time: '13:00', province: 'ตราด', city: 'อำเภอเมืองตราด', name: 'วัดบุปผาราม (วัดปลายคลอง) ตราด', address: 'ตำบลวังกระแจะ อำเภอเมืองตราด ตราด', image_url: IMG.temple },
+      ],
+    ],
+  },
+  {
+    name: 'พัทลุง 2 วัน 1 คืน: ล่องเรือทะเลน้อย-สะพานเอกชัย-เขาอกทะลุ',
+    description: 'วันแรกเก็บโซนควนขนุนและทะเลน้อย วันที่สองเที่ยวตัวเมืองพัทลุงและน้ำตกไพรวัลย์',
+    cover_url: IMG.forest,
+    days: [
+      // วันที่ 1: อำเภอควนขนุน
+      [
+        { time: '06:30', province: 'พัทลุง', city: 'อำเภอควนขนุน', name: 'อุทยานนกน้ำทะเลน้อย (ล่องเรือชมบัวแดงและควายน้ำ)', address: 'ตำบลพนางตุง อำเภอควนขนุน พัทลุง', image_url: IMG.forest },
+        { time: '09:30', province: 'พัทลุง', city: 'อำเภอควนขนุน', name: 'สะพานเฉลิมพระเกียรติ 80 พรรษา (สะพานเอกชัย)', address: 'ตำบลพนางตุง อำเภอควนขนุน พัทลุง', image_url: IMG.coast },
+        { time: '11:30', province: 'พัทลุง', city: 'อำเภอควนขนุน', name: 'หลาดใต้โหนด ควนขนุน', address: 'ตำบลดอนทราย อำเภอควนขนุน พัทลุง', image_url: IMG.market },
+        { time: '15:00', province: 'พัทลุง', city: 'อำเภอควนขนุน', name: 'นาโปแก ควนขนุน', address: 'ตำบลมะกอกเหนือ อำเภอควนขนุน พัทลุง', image_url: IMG.cafe },
+      ],
+      // วันที่ 2: ควนขนุน - เมืองพัทลุง - กงหรา
+      [
+        { time: '08:30', province: 'พัทลุง', city: 'อำเภอควนขนุน', name: 'วัดเขาอ้อ ควนขนุน', address: 'ตำบลมะกอกเหนือ อำเภอควนขนุน พัทลุง', image_url: IMG.temple },
+        { time: '10:30', province: 'พัทลุง', city: 'อำเภอเมืองพัทลุง', name: 'ภูเขาอกทะลุ เมืองพัทลุง', address: 'ตำบลคูหาสวรรค์ อำเภอเมืองพัทลุง พัทลุง', image_url: IMG.peak },
+        { time: '13:30', province: 'พัทลุง', city: 'อำเภอกงหรา', name: 'น้ำตกไพรวัลย์ กงหรา', address: 'ตำบลคลองเฉลิม อำเภอกงหรา พัทลุง', image_url: IMG.waterfall },
+        { time: '16:00', province: 'พัทลุง', city: 'อำเภอกงหรา', name: 'จุดชมวิวควนนกเต้น กงหรา', address: 'ตำบลคลองทรายขาว อำเภอกงหรา พัทลุง', image_url: IMG.mountain },
+      ],
+    ],
+  },
+
+  // =========================================================================
+  // 10 แผน PRIVATE (index 40 .. 49)
+  // =========================================================================
+  {
+    name: 'ฮันนีมูนเกาะกูด 4 วัน 3 คืน พักพูลวิลล่าริมอ่าว',
+    description: 'แพลนพักผ่อนส่วนตัวบนเกาะกูด เน้นชายหาดเงียบสงบ พายคายัคใส และดำน้ำตื้นหมู่เกาะรัง',
+    cover_url: IMG.andaman,
+    days: [
+      // วันที่ 1: เดินทางถึงเกาะกูด - อ่าวคลองเจ้า
+      [
+        { time: '10:00', province: 'ตราด', city: 'อำเภอเมืองตราด', name: 'ท่าเรือแหลมศอก (สปีดโบ๊ทไปเกาะกูด)', address: 'ตำบลอ่าวใหญ่ อำเภอเมืองตราด ตราด', image_url: IMG.coast },
+        { time: '12:30', province: 'ตราด', city: 'อำเภอเกาะกูด', name: 'อ่าวคลองเจ้า เกาะกูด', address: 'ตำบลเกาะกูด อำเภอเกาะกูด ตราด', image_url: IMG.beach },
+        { time: '15:00', province: 'ตราด', city: 'อำเภอเกาะกูด', name: 'คาเฟ่ริมคลองเจ้า เกาะกูด', address: 'ตำบลเกาะกูด อำเภอเกาะกูด ตราด', image_url: IMG.cafe },
+        { time: '18:30', province: 'ตราด', city: 'อำเภอเกาะกูด', name: 'ดินเนอร์ริมชายหาดอ่าวคลองเจ้า', address: 'ตำบลเกาะกูด อำเภอเกาะกูด ตราด', image_url: IMG.island },
+      ],
+      // วันที่ 2: เที่ยวอ่าวฝั่งตะวันตกของเกาะกูด
+      [
+        { time: '09:30', province: 'ตราด', city: 'อำเภอเกาะกูด', name: 'อ่าวน้อย เกาะกูด', address: 'ตำบลเกาะกูด อำเภอเกาะกูด ตราด', image_url: IMG.beach },
+        { time: '11:30', province: 'ตราด', city: 'อำเภอเกาะกูด', name: 'น้ำตกห้วงน้ำเขียว เกาะกูด', address: 'ตำบลเกาะกูด อำเภอเกาะกูด ตราด', image_url: IMG.waterfall },
+        { time: '14:30', province: 'ตราด', city: 'อำเภอเกาะกูด', name: 'หาดบางเบ้า เกาะกูด', address: 'ตำบลเกาะกูด อำเภอเกาะกูด ตราด', image_url: IMG.island },
+        { time: '17:30', province: 'ตราด', city: 'อำเภอเกาะกูด', name: 'สะพานไม้อ่าวบางเบ้า', address: 'ตำบลเกาะกูด อำเภอเกาะกูด ตราด', image_url: IMG.coast },
+      ],
+      // วันที่ 3: ดำน้ำตื้นอุทยานฯ หมู่เกาะรัง
+      [
+        { time: '09:00', province: 'ตราด', city: 'อำเภอเกาะช้าง', name: 'จุดดำน้ำตื้นหมู่เกาะรัง อุทยานแห่งชาติหมู่เกาะช้าง', address: 'ตำบลเกาะช้างใต้ อำเภอเกาะช้าง ตราด', image_url: IMG.andaman },
+        { time: '12:00', province: 'ตราด', city: 'อำเภอเกาะช้าง', name: 'หาดศาลเจ้า เกาะรัง', address: 'ตำบลเกาะช้างใต้ อำเภอเกาะช้าง ตราด', image_url: IMG.beach },
+        { time: '16:00', province: 'ตราด', city: 'อำเภอเกาะกูด', name: 'อ่าวตะเภา เกาะกูด', address: 'ตำบลเกาะกูด อำเภอเกาะกูด ตราด', image_url: IMG.island },
+      ],
+      // วันที่ 4: พายคายัคใส - เดินทางกลับ
+      [
+        { time: '08:00', province: 'ตราด', city: 'อำเภอเกาะกูด', name: 'คลองเจ้า (พายคายัคใสยามเช้า)', address: 'ตำบลเกาะกูด อำเภอเกาะกูด ตราด', image_url: IMG.waterfall },
+        { time: '10:30', province: 'ตราด', city: 'อำเภอเกาะกูด', name: 'อ่าวพร้าว เกาะกูด', address: 'ตำบลเกาะกูด อำเภอเกาะกูด ตราด', image_url: IMG.beach },
+        { time: '13:30', province: 'ตราด', city: 'อำเภอเกาะกูด', name: 'ท่าเรืออ่าวสลัด เกาะกูด', address: 'ตำบลเกาะกูด อำเภอเกาะกูด ตราด', image_url: IMG.coast },
+      ],
+    ],
+  },
+  {
+    name: 'ทริปครอบครัวเชียงใหม่ 4 วัน 3 คืน เที่ยวสบายผู้ใหญ่และเด็ก',
+    description: 'เน้นสถานที่เดินง่าย ใกล้อำเภอเมือง หางดง และดอยสะเก็ด ไม่ขึ้นเขาสูงชัน',
+    cover_url: IMG.chiangMai,
+    days: [
+      // วันที่ 1: ตัวเมือง - หางดง
+      [
+        { time: '09:30', province: 'เชียงใหม่', city: 'อำเภอเมืองเชียงใหม่', name: 'วัดโลกโมฬี เชียงใหม่', address: 'ตำบลศรีภูมิ อำเภอเมืองเชียงใหม่ เชียงใหม่', image_url: IMG.temple },
+        { time: '12:00', province: 'เชียงใหม่', city: 'อำเภอเมืองเชียงใหม่', name: 'ร้านอาหารเหนือเฮือนม่วนใจ๋', address: 'ตำบลช้างเผือก อำเภอเมืองเชียงใหม่ เชียงใหม่', image_url: IMG.streetFood },
+        { time: '16:00', province: 'เชียงใหม่', city: 'อำเภอหางดง', name: 'เชียงใหม่ไนท์ซาฟารี', address: 'ตำบลแม่เหียะ อำเภอหางดง เชียงใหม่', image_url: IMG.forest },
+      ],
+      // วันที่ 2: ห้วยแก้ว - นิมมาน - กาดหลวง
+      [
+        { time: '09:00', province: 'เชียงใหม่', city: 'อำเภอเมืองเชียงใหม่', name: 'สวนสัตว์เชียงใหม่', address: 'ตำบลสุเทพ อำเภอเมืองเชียงใหม่ เชียงใหม่', image_url: IMG.forest },
+        { time: '11:30', province: 'เชียงใหม่', city: 'อำเภอเมืองเชียงใหม่', name: 'อ่างแก้ว มหาวิทยาลัยเชียงใหม่', address: 'ตำบลสุเทพ อำเภอเมืองเชียงใหม่ เชียงใหม่', image_url: IMG.mountain },
+        { time: '14:30', province: 'เชียงใหม่', city: 'อำเภอเมืองเชียงใหม่', name: 'คาเฟ่สำหรับครอบครัวย่านนิมมาน', address: 'ตำบลสุเทพ อำเภอเมืองเชียงใหม่ เชียงใหม่', image_url: IMG.cafe },
+        { time: '17:00', province: 'เชียงใหม่', city: 'อำเภอเมืองเชียงใหม่', name: 'กาดหลวง (ตลาดวโรรส)', address: 'ตำบลช้างม่อย อำเภอเมืองเชียงใหม่ เชียงใหม่', image_url: IMG.market },
+      ],
+      // วันที่ 3: อุทยานหลวงราชพฤกษ์ - วัดพระธาตุดอยคำ - บ้านข้างวัด
+      [
+        { time: '09:00', province: 'เชียงใหม่', city: 'อำเภอเมืองเชียงใหม่', name: 'อุทยานหลวงราชพฤกษ์', address: 'ตำบลแม่เหียะ อำเภอเมืองเชียงใหม่ เชียงใหม่', image_url: IMG.forest },
+        { time: '11:30', province: 'เชียงใหม่', city: 'อำเภอเมืองเชียงใหม่', name: 'วัดพระธาตุดอยคำ', address: 'ตำบลแม่เหียะ อำเภอเมืองเชียงใหม่ เชียงใหม่', image_url: IMG.temple },
+        { time: '13:30', province: 'เชียงใหม่', city: 'อำเภอเมืองเชียงใหม่', name: 'ข้าวซอยลุงประกิจ กาดก้อม', address: 'ตำบลหายยา อำเภอเมืองเชียงใหม่ เชียงใหม่', image_url: IMG.streetFood },
+        { time: '15:30', province: 'เชียงใหม่', city: 'อำเภอเมืองเชียงใหม่', name: 'โครงการบ้านข้างวัด', address: 'ตำบลสุเทพ อำเภอเมืองเชียงใหม่ เชียงใหม่', image_url: IMG.cafe },
+      ],
+      // วันที่ 4: ดอยสะเก็ด - จริงใจมาร์เก็ต
+      [
+        { time: '09:30', province: 'เชียงใหม่', city: 'อำเภอดอยสะเก็ด', name: 'สวนพฤกษศาสตร์ทวีชล ดอยสะเก็ด', address: 'ตำบลเชิงดอย อำเภอดอยสะเก็ด เชียงใหม่', image_url: IMG.forest },
+        { time: '12:00', province: 'เชียงใหม่', city: 'อำเภอเมืองเชียงใหม่', name: 'โครงการจริงใจมาร์เก็ต (Jing Jai Market)', address: 'ตำบลป่าตัน อำเภอเมืองเชียงใหม่ เชียงใหม่', image_url: IMG.market },
+      ],
+    ],
+  },
+  {
+    name: 'Workation ภูเก็ต 5 วัน 4 คืน: ทำงานคาเฟ่ดี-เดินเล่นริมหาดตอนเย็น',
+    description: 'แพลน Work from Anywhere ย้ายโซนทำงานวันละย่าน ตั้งแต่เมืองเก่า ราไวย์ เชิงทะเล กะตะ จนถึงไม้ขาว',
+    cover_url: IMG.cafe,
+    days: [
+      // วันที่ 1: โซนตัวเมืองภูเก็ต
+      [
+        { time: '09:30', province: 'ภูเก็ต', city: 'อำเภอเมืองภูเก็ต', name: 'คาเฟ่สเปเชียลตี้ถนนดีบุก เมืองเก่าภูเก็ต', address: 'ถนนดีบุก ตำบลตลาดใหญ่ อำเภอเมืองภูเก็ต ภูเก็ต', image_url: IMG.cafe },
+        { time: '12:30', province: 'ภูเก็ต', city: 'อำเภอเมืองภูเก็ต', name: 'ร้านโกเบนซ์ข้าวต้มแห้งภูเก็ต', address: 'ถนนกระบี่ ตำบลตลาดเหนือ อำเภอเมืองภูเก็ต ภูเก็ต', image_url: IMG.streetFood },
+        { time: '17:00', province: 'ภูเก็ต', city: 'อำเภอเมืองภูเก็ต', name: 'สวนสาธารณะสะพานหิน', address: 'ตำบลตลาดใหญ่ อำเภอเมืองภูเก็ต ภูเก็ต', image_url: IMG.coast },
+      ],
+      // วันที่ 2: โซนราไวย์
+      [
+        { time: '09:30', province: 'ภูเก็ต', city: 'อำเภอเมืองภูเก็ต', name: 'คาเฟ่โคเวิร์กกิ้งย่านราไวย์', address: 'ตำบลราไวย์ อำเภอเมืองภูเก็ต ภูเก็ต', image_url: IMG.cafe },
+        { time: '12:30', province: 'ภูเก็ต', city: 'อำเภอเมืองภูเก็ต', name: 'หาดราไวย์', address: 'ตำบลราไวย์ อำเภอเมืองภูเก็ต ภูเก็ต', image_url: IMG.beach },
+        { time: '17:15', province: 'ภูเก็ต', city: 'อำเภอเมืองภูเก็ต', name: 'จุดชมวิวกังหันลม ราไวย์', address: 'ตำบลราไวย์ อำเภอเมืองภูเก็ต ภูเก็ต', image_url: IMG.coast },
+      ],
+      // วันที่ 3: โซนเชิงทะเล - บางเทา
+      [
+        { time: '09:30', province: 'ภูเก็ต', city: 'อำเภอถลาง', name: 'โบ๊ทอเวนิว & ปอร์โต เดอ ภูเก็ต เชิงทะเล', address: 'ตำบลเชิงทะเล อำเภอถลาง ภูเก็ต', image_url: IMG.cafe },
+        { time: '12:30', province: 'ภูเก็ต', city: 'อำเภอถลาง', name: 'หาดสุรินทร์ เชิงทะเล', address: 'ตำบลเชิงทะเล อำเภอถลาง ภูเก็ต', image_url: IMG.beach },
+        { time: '17:00', province: 'ภูเก็ต', city: 'อำเภอถลาง', name: 'หาดบางเทา', address: 'ตำบลเชิงทะเล อำเภอถลาง ภูเก็ต', image_url: IMG.island },
+      ],
+      // วันที่ 4: โซนกะตะ - วัดพระใหญ่
+      [
+        { time: '09:30', province: 'ภูเก็ต', city: 'อำเภอเมืองภูเก็ต', name: 'คาเฟ่บนเนินเขากะตะ', address: 'ตำบลกะรน อำเภอเมืองภูเก็ต ภูเก็ต', image_url: IMG.cafe },
+        { time: '12:30', province: 'ภูเก็ต', city: 'อำเภอเมืองภูเก็ต', name: 'หาดกะรน', address: 'ตำบลกะรน อำเภอเมืองภูเก็ต ภูเก็ต', image_url: IMG.beach },
+        { time: '16:30', province: 'ภูเก็ต', city: 'อำเภอเมืองภูเก็ต', name: 'วัดพระใหญ่ (พระพุทธมิ่งมงคลเอกนาคคีรี)', address: 'ตำบลกะรน อำเภอเมืองภูเก็ต ภูเก็ต', image_url: IMG.temple },
+      ],
+      // วันที่ 5: โซนถลาง - ไม้ขาว (ใกล้สนามบิน)
+      [
+        { time: '09:30', province: 'ภูเก็ต', city: 'อำเภอถลาง', name: 'หาดไม้ขาว (จุดชมเครื่องบินลงจอด)', address: 'ตำบลไม้ขาว อำเภอถลาง ภูเก็ต', image_url: IMG.beach },
+        { time: '12:00', province: 'ภูเก็ต', city: 'อำเภอถลาง', name: 'วัดพระทอง (วัดพระผุด) ถลาง', address: 'ตำบลเทพกระษัตรี อำเภอถลาง ภูเก็ต', image_url: IMG.temple },
+      ],
+    ],
+  },
+  {
+    name: 'คาเฟ่ฮอปปิ้งกรุงเทพฯ 1 วันเต็ม: อารีย์ - ตลาดน้อย - เจริญกรุง',
+    description: 'นั่ง BTS ต่อเรือด่วนเจ้าพระยาจากเหนือลงใต้ เก็บครบย่านคาเฟ่ถ่ายรูปสวยในกรุงเทพฯ',
+    cover_url: IMG.cafe,
+    days: [
+      [
+        { time: '09:00', province: 'กรุงเทพมหานคร', city: 'เขตพญาไท', name: 'คาเฟ่ย่านซอยอารีย์ (พหลโยธิน 7)', address: 'ซอยพหลโยธิน 7 แขวงสามเสนใน เขตพญาไท กรุงเทพฯ', image_url: IMG.cafe },
+        { time: '11:30', province: 'กรุงเทพมหานคร', city: 'เขตปทุมวัน', name: 'สยามดิสคัฟเวอรี่ & สยามสแควร์', address: 'ถนนพระรามที่ 1 แขวงปทุมวัน เขตปทุมวัน กรุงเทพฯ', image_url: IMG.oldTown },
+        { time: '14:00', province: 'กรุงเทพมหานคร', city: 'เขตสัมพันธวงศ์', name: 'ชุมชนตลาดน้อย & โซวเฮงไถ่', address: 'ซอยวานิช 2 แขวงตลาดน้อย เขตสัมพันธวงศ์ กรุงเทพฯ', image_url: IMG.cafe },
+        { time: '16:00', province: 'กรุงเทพมหานคร', city: 'เขตบางรัก', name: 'อาคารไปรษณีย์กลาง บางรัก & เจริญกรุง 32', address: 'ถนนเจริญกรุง แขวงบางรัก เขตบางรัก กรุงเทพฯ', image_url: IMG.oldTown },
+        { time: '18:30', province: 'กรุงเทพมหานคร', city: 'เขตบางคอแหลม', name: 'เอเชียทีค เดอะ ริเวอร์ฟร้อนท์', address: '2194 ถนนเจริญกรุง แขวงวัดพระยาไกร เขตบางคอแหลม กรุงเทพฯ', image_url: IMG.market },
+      ],
+    ],
+  },
+  {
+    name: 'ขับรถเที่ยวน่านคนเดียว 3 วัน 2 คืน: ท่าวังผา-ปัว-บ่อเกลือ',
+    description: 'เส้นทางสาย 101 ขึ้นเหนือไปท่าวังผา ปัว และบ่อเกลือ เน้นจุดแวะพักชิลๆ และวัดไทลื้อ',
+    cover_url: IMG.mountain,
+    days: [
+      // วันที่ 1: ตัวเมืองน่าน - ท่าวังผา - ปัว
+      [
+        { time: '09:00', province: 'น่าน', city: 'อำเภอเมืองน่าน', name: 'วัดมิ่งเมือง & เสาหลักเมืองน่าน', address: 'ตำบลในเวียง อำเภอเมืองน่าน น่าน', image_url: IMG.temple },
+        { time: '11:30', province: 'น่าน', city: 'อำเภอท่าวังผา', name: 'หอศิลป์ริมน่าน ท่าวังผา', address: 'ตำบลป่าคา อำเภอท่าวังผา น่าน', image_url: IMG.oldTown },
+        { time: '14:30', province: 'น่าน', city: 'อำเภอปัว', name: 'ร้านกาแฟไทลื้อ & ลำดวนผ้าทอ ปัว', address: 'ตำบลศิลาแลง อำเภอปัว น่าน', image_url: IMG.cafe },
+        { time: '17:00', province: 'น่าน', city: 'อำเภอปัว', name: 'อุทยานแห่งชาติดอยภูคา', address: 'ตำบลภูคา อำเภอปัว น่าน', image_url: IMG.mountain },
+      ],
+      // วันที่ 2: บ่อเกลือ - สะปัน - ถนน 1256
+      [
+        { time: '09:00', province: 'น่าน', city: 'อำเภอบ่อเกลือ', name: 'บ่อเกลือสินเธาว์บ้านบ่อหลวง', address: 'ตำบลบ่อเกลือใต้ อำเภอบ่อเกลือ น่าน', image_url: IMG.oldTown },
+        { time: '11:00', province: 'น่าน', city: 'อำเภอบ่อเกลือ', name: 'น้ำตกสะปัน บ่อเกลือ', address: 'ตำบลดงพญา อำเภอบ่อเกลือ น่าน', image_url: IMG.waterfall },
+        { time: '14:30', province: 'น่าน', city: 'อำเภอปัว', name: 'ถนนลอยฟ้า 1256 (ดอยภูคา-ปัว)', address: 'ตำบลภูคา อำเภอปัว น่าน', image_url: IMG.peak },
+      ],
+      // วันที่ 3: ท่าวังผา - ตัวเมืองน่าน
+      [
+        { time: '08:30', province: 'น่าน', city: 'อำเภอท่าวังผา', name: 'วัดศรีมงคล (ก๋ง) ท่าวังผา', address: 'ตำบลยม อำเภอท่าวังผา น่าน', image_url: IMG.temple },
+        { time: '10:30', province: 'น่าน', city: 'อำเภอท่าวังผา', name: 'วัดหนองบัว ท่าวังผา', address: 'ตำบลป่าคา อำเภอท่าวังผา น่าน', image_url: IMG.temple },
+        { time: '13:00', province: 'น่าน', city: 'อำเภอเมืองน่าน', name: 'กาดตั้งจิตนุสรณ์ เมืองน่าน', address: 'ตำบลในเวียง อำเภอเมืองน่าน น่าน', image_url: IMG.market },
+      ],
+    ],
+  },
+  {
+    name: 'Outing บริษัท พัทยา - สัตหีบ 2 วัน 1 คืน: จอมเทียน-ฐานทัพเรือสัตหีบ',
+    description: 'วันแรกกิจกรรมที่สวนนงนุชและหาดจอมเทียน วันที่สองทัศนศึกษาเรือหลวงจักรีนฤเบศรและหาดเตยงาม',
+    cover_url: IMG.beach,
+    days: [
+      // วันที่ 1: สวนนงนุช - จอมเทียน
+      [
+        { time: '09:30', province: 'ชลบุรี', city: 'อำเภอสัตหีบ', name: 'สวนนงนุช พัทยา', address: 'ตำบลนาจอมเทียน อำเภอสัตหีบ ชลบุรี', image_url: IMG.forest },
+        { time: '12:30', province: 'ชลบุรี', city: 'อำเภอบางละมุง', name: 'ร้านอาหารซีฟู้ดริมหาดจอมเทียน', address: 'ตำบลหนองปรือ อำเภอบางละมุง ชลบุรี', image_url: IMG.streetFood },
+        { time: '15:00', province: 'ชลบุรี', city: 'อำเภอบางละมุง', name: 'หาดจอมเทียน', address: 'ตำบลหนองปรือ อำเภอบางละมุง ชลบุรี', image_url: IMG.beach },
+        { time: '19:00', province: 'ชลบุรี', city: 'อำเภอบางละมุง', name: 'ตลาดนัดกลางคืนเทพประสิทธิ์ พัทยา', address: 'ตำบลหนองปรือ อำเภอบางละมุง ชลบุรี', image_url: IMG.market },
+      ],
+      // วันที่ 2: สัตหีบ
+      [
+        { time: '09:00', province: 'ชลบุรี', city: 'อำเภอสัตหีบ', name: 'เรือหลวงจักรีนฤเบศร ท่าเรือจุกเสม็ด', address: 'ตำบลแสมสาร อำเภอสัตหีบ ชลบุรี', image_url: IMG.coast },
+        { time: '11:00', province: 'ชลบุรี', city: 'อำเภอสัตหีบ', name: 'หาดเตยงาม อ่าวนาวิกโยธิน สัตหีบ', address: 'ตำบลสัตหีบ อำเภอสัตหีบ ชลบุรี', image_url: IMG.beach },
+        { time: '14:00', province: 'ชลบุรี', city: 'อำเภอสัตหีบ', name: 'ศูนย์อนุรักษ์พันธุ์เต่าทะเล กองทัพเรือ', address: 'ตำบลสัตหีบ อำเภอสัตหีบ ชลบุรี', image_url: IMG.island },
+      ],
+    ],
+  },
+  {
+    name: 'กางเต็นท์เขาใหญ่ 2 วัน 1 คืน: ลานกางเต็นท์ลำตะคอง-ผาตรอมใจ-เหวนรก',
+    description: 'ทริปแคมป์ปิ้งบนอุทยานแห่งชาติเขาใหญ่ กางเต็นท์ลำตะคอง ส่องสัตว์หนองผักชี และลงทางฝั่งปราจีนบุรีแวะน้ำตกเหวนรก',
+    cover_url: IMG.forest,
+    days: [
+      // วันที่ 1: ขึ้นเขาใหญ่ - ผาตรอมใจ - ลำตะคอง
+      [
+        { time: '09:30', province: 'นครราชสีมา', city: 'อำเภอปากช่อง', name: 'ศูนย์บริการนักท่องเที่ยวอุทยานแห่งชาติเขาใหญ่', address: 'ตำบลหมูสี อำเภอปากช่อง นครราชสีมา', image_url: IMG.forest },
+        { time: '11:30', province: 'นครนายก', city: 'อำเภอเมืองนครนายก', name: 'จุดชมวิวผาตรอมใจ ยอดเขาเขียว', address: 'ตำบลหินตั้ง อำเภอเมืองนครนายก นครนายก', image_url: IMG.peak },
+        { time: '14:30', province: 'นครราชสีมา', city: 'อำเภอปากช่อง', name: 'ลานกางเต็นท์ลำตะคอง เขาใหญ่', address: 'ตำบลหมูสี อำเภอปากช่อง นครราชสีมา', image_url: IMG.forest },
+        { time: '17:00', province: 'นครราชสีมา', city: 'อำเภอปากช่อง', name: 'หอดูสัตว์หนองผักชี เขาใหญ่', address: 'ตำบลหมูสี อำเภอปากช่อง นครราชสีมา', image_url: IMG.mountain },
+      ],
+      // วันที่ 2: น้ำตกเหวนรก - จุดชมวิว กม.30
+      [
+        { time: '08:30', province: 'นครนายก', city: 'อำเภอปากพลี', name: 'น้ำตกเหวนรก อุทยานแห่งชาติเขาใหญ่', address: 'ตำบลนาหินลาด อำเภอปากพลี นครนายก', image_url: IMG.waterfall },
+        { time: '11:00', province: 'นครราชสีมา', city: 'อำเภอปากช่อง', name: 'จุดชมวิว กม.30 ถนนธนะรัชต์', address: 'ตำบลหมูสี อำเภอปากช่อง นครราชสีมา', image_url: IMG.mountain },
+        { time: '13:30', province: 'นครราชสีมา', city: 'อำเภอปากช่อง', name: 'ตลาดผลไม้กลางดง ปากช่อง', address: 'ตำบลกลางดง อำเภอปากช่อง นครราชสีมา', image_url: IMG.market },
+      ],
+    ],
+  },
+  {
+    name: 'ไหว้พระแก้ปีชง 1 วันเต็ม: กรุงเทพฯ - นนทบุรี (เล่งเน่ยยี่ 1 & 2)',
+    description: 'เส้นทางเชื่อมต่อด้วยรถไฟฟ้า MRT สายสีน้ำเงินต่อสายสีม่วง จากเยาวราชตรงสู่วัดเล่งเน่ยยี่ 2 บางบัวทอง',
+    cover_url: IMG.temple,
+    days: [
+      [
+        { time: '08:30', province: 'กรุงเทพมหานคร', city: 'เขตป้อมปราบศัตรูพ่าย', name: 'วัดมังกรกมลาวาส (วัดเล่งเน่ยยี่)', address: '423 ถนนเจริญกรุง แขวงป้อมปราบ เขตป้อมปราบศัตรูพ่าย กรุงเทพฯ', image_url: IMG.temple },
+        { time: '10:30', province: 'กรุงเทพมหานคร', city: 'เขตพระนคร', name: 'ศาลเจ้าพ่อเสือ พระนคร', address: '468 ถนนตะนาว แขวงศาลเจ้าพ่อเสือ เขตพระนคร กรุงเทพฯ', image_url: IMG.temple },
+        { time: '12:30', province: 'กรุงเทพมหานคร', city: 'เขตธนบุรี', name: 'วัดกัลยาณมิตรวรมหาวิหาร', address: '371 ซอยอรุณอมรินทร์ 6 แขวงวัดกัลยาณ์ เขตธนบุรี กรุงเทพฯ', image_url: IMG.temple },
+        { time: '15:00', province: 'นนทบุรี', city: 'อำเภอบางบัวทอง', name: 'วัดบรมราชากาญจนาภิเษกอนุสรณ์ (วัดเล่งเน่ยยี่ 2)', address: 'ตำบลโสนลอย อำเภอบางบัวทอง นนทบุรี', image_url: IMG.temple },
+        { time: '17:30', province: 'นนทบุรี', city: 'อำเภอปากเกร็ด', name: 'เกาะเกร็ด ปากเกร็ด', address: 'ตำบลเกาะเกร็ด อำเภอปากเกร็ด นนทบุรี', image_url: IMG.market },
+      ],
+    ],
+  },
+  {
+    name: 'พิษณุโลก - สุโขทัย 3 วัน 2 คืน: พระพุทธชินราช-อุทยานประวัติศาสตร์-เขาหลวง',
+    description: 'วันแรกไหว้พระพุทธชินราชและเที่ยวน้ำตกแก่งซอง วันที่สองและสามมุ่งหน้าสู่สุโขทัย',
+    cover_url: IMG.grandPalace,
+    days: [
+      // วันที่ 1: เมืองพิษณุโลก - วังทอง
+      [
+        { time: '08:30', province: 'พิษณุโลก', city: 'อำเภอเมืองพิษณุโลก', name: 'วัดพระศรีรัตนมหาธาตุวรมหาวิหาร (วัดใหญ่)', address: 'ตำบลในเมือง อำเภอเมืองพิษณุโลก พิษณุโลก', image_url: IMG.temple },
+        { time: '10:30', province: 'พิษณุโลก', city: 'อำเภอเมืองพิษณุโลก', name: 'วัดนางพญา & วัดราชบูรณะ พิษณุโลก', address: 'ตำบลในเมือง อำเภอเมืองพิษณุโลก พิษณุโลก', image_url: IMG.temple },
+        { time: '12:30', province: 'พิษณุโลก', city: 'อำเภอเมืองพิษณุโลก', name: 'ร้านก๋วยเตี๋ยวห้อยขาริมน่าน พิษณุโลก', address: 'ตำบลในเมือง อำเภอเมืองพิษณุโลก พิษณุโลก', image_url: IMG.streetFood },
+        { time: '15:00', province: 'พิษณุโลก', city: 'อำเภอวังทอง', name: 'น้ำตกแก่งซอง วังทอง', address: 'ตำบลแก่งโสภา อำเภอวังทอง พิษณุโลก', image_url: IMG.waterfall },
+      ],
+      // วันที่ 2: พระราชวังจันทน์ - เมืองเก่าสุโขทัย
+      [
+        { time: '09:00', province: 'พิษณุโลก', city: 'อำเภอเมืองพิษณุโลก', name: 'พระราชวังจันทน์ พิษณุโลก', address: 'ตำบลในเมือง อำเภอเมืองพิษณุโลก พิษณุโลก', image_url: IMG.oldTown },
+        { time: '12:00', province: 'สุโขทัย', city: 'อำเภอเมืองสุโขทัย', name: 'พิพิธภัณฑสถานแห่งชาติ รามคำแหง', address: 'ตำบลเมืองเก่า อำเภอเมืองสุโขทัย สุโขทัย', image_url: IMG.oldTown },
+        { time: '15:00', province: 'สุโขทัย', city: 'อำเภอเมืองสุโขทัย', name: 'วัดตระพังทอง & ตลาดริมน้ำเมืองเก่า', address: 'ตำบลเมืองเก่า อำเภอเมืองสุโขทัย สุโขทัย', image_url: IMG.market },
+        { time: '17:30', province: 'สุโขทัย', city: 'อำเภอเมืองสุโขทัย', name: 'วัดช้างล้อม อุทยานประวัติศาสตร์สุโขทัย', address: 'ตำบลเมืองเก่า อำเภอเมืองสุโขทัย สุโขทัย', image_url: IMG.grandPalace },
+      ],
+      // วันที่ 3: คีรีมาศ - ทุ่งทะเลหลวง
+      [
+        { time: '08:30', province: 'สุโขทัย', city: 'อำเภอคีรีมาศ', name: 'อุทยานแห่งชาติรามคำแหง (เขาหลวงสุโขทัย)', address: 'ตำบลคีรีมาศ อำเภอคีรีมาศ สุโขทัย', image_url: IMG.peak },
+        { time: '13:30', province: 'สุโขทัย', city: 'อำเภอเมืองสุโขทัย', name: 'ทุ่งทะเลหลวง (แผ่นดินศักดิ์สิทธิ์รูปหัวใจ)', address: 'ตำบลบ้านกล้วย อำเภอเมืองสุโขทัย สุโขทัย', image_url: IMG.coast },
+      ],
+    ],
+  },
+  {
+    name: 'ชุมพร - ระนอง 3 วัน 2 คืน: ประตูสู่ภาคใต้และเส้นทางกาแฟโรบัสต้า',
+    description: 'วันแรกเที่ยวชายฝั่งอ่าวไทยที่ชุมพร วันที่สองข้ามคอคอดกระสู่ฝั่งอันดามันที่ระนอง',
+    cover_url: IMG.coast,
+    days: [
+      // วันที่ 1: ปะทิว - เมืองชุมพร - ท่าแซะ
+      [
+        { time: '08:30', province: 'ชุมพร', city: 'อำเภอเมืองชุมพร', name: 'จุดชมวิวเขามัทรี ปากน้ำชุมพร', address: 'ตำบลปากน้ำ อำเภอเมืองชุมพร ชุมพร', image_url: IMG.coast },
+        { time: '10:30', province: 'ชุมพร', city: 'อำเภอปะทิว', name: 'หาดทุ่งวัวแล่น ปะทิว', address: 'ตำบลสะพลี อำเภอปะทิว ชุมพร', image_url: IMG.beach },
+        { time: '14:00', province: 'ชุมพร', city: 'อำเภอท่าแซะ', name: 'สวนกาแฟโรบัสต้าและโรงคั่วกาแฟท่าแซะ', address: 'ตำบลรับร่อ อำเภอท่าแซะ ชุมพร', image_url: IMG.cafe },
+        { time: '17:00', province: 'ชุมพร', city: 'อำเภอเมืองชุมพร', name: 'ศาลกรมหลวงชุมพรเขตอุดมศักดิ์ หาดทรายรี', address: 'ตำบลหาดทรายรี อำเภอเมืองชุมพร ชุมพร', image_url: IMG.temple },
+      ],
+      // วันที่ 2: สวี - คอคอดกระ - น้ำตกปุญญบาล - เมืองระนอง
+      [
+        { time: '09:00', province: 'ชุมพร', city: 'อำเภอสวี', name: 'วัดพระบรมธาตุสวี', address: 'ตำบลสวี อำเภอสวี ชุมพร', image_url: IMG.temple },
+        { time: '12:00', province: 'ระนอง', city: 'อำเภอกระบุรี', name: 'คอคอดกระ (กิ่วกระ) กระบุรี', address: 'ตำบลมะมุ อำเภอกระบุรี ระนอง', image_url: IMG.mountain },
+        { time: '14:30', province: 'ระนอง', city: 'อำเภอเมืองระนอง', name: 'น้ำตกปุญญบาล เมืองระนอง', address: 'ตำบลบางนอน อำเภอเมืองระนอง ระนอง', image_url: IMG.waterfall },
+        { time: '16:30', province: 'ระนอง', city: 'อำเภอเมืองระนอง', name: 'ลานน้ำแร่รักษะวาริน', address: 'ตำบลเขานิเวศน์ อำเภอเมืองระนอง ระนอง', image_url: IMG.waterfall },
+      ],
+      // วันที่ 3: ระนอง - จุดชมวิวเขาฝาชี
+      [
+        { time: '08:30', province: 'ระนอง', city: 'อำเภอเมืองระนอง', name: 'ร้านโรตีนิสรา เมืองระนอง', address: 'ตำบลเขานิเวศน์ อำเภอเมืองระนอง ระนอง', image_url: IMG.streetFood },
+        { time: '10:30', province: 'ระนอง', city: 'อำเภอละอุ่น', name: 'จุดชมวิวเขาฝาชี ละอุ่น', address: 'ตำบลบางแก้ว อำเภอละอุ่น ระนอง', image_url: IMG.peak },
+      ],
+    ],
+  },
 ];
 
-// เวลาเยี่ยมชมมาตรฐานสำหรับแต่ละลำดับกิจกรรมใน 1 วัน (รองรับ @db.Time(0))
-const VISIT_TIME_SLOTS = [
-  new Date('1970-01-01T08:30:00.000Z'),
-  new Date('10:30'.includes(':') ? '1970-01-01T10:30:00.000Z' : ''),
-  new Date('1970-01-01T13:00:00.000Z'),
-  new Date('1970-01-01T15:30:00.000Z'),
-  new Date('1970-01-01T18:30:00.000Z'),
-];
+function toVisitTime(hhmm: string): Date {
+  return new Date(`1970-01-01T${hhmm}:00.000Z`);
+}
 
 async function main() {
   console.log('🌱 เริ่มต้นการ Seed ข้อมูล...');
 
   // 0. ตรวจสอบหรือสร้าง User ตัวอย่างสำหรับเป็น owner_id ของ Schedule
-  // ⚠️ หมายเหตุ: หาก Model User ของคุณมีฟิลด์บังคับอื่นๆ (เช่น email, password, username) สามารถปรับแก้ด้านล่างนี้ได้เลย
   let users = await prisma.user.findMany({ take: 5 });
   if (users.length === 0) {
     console.log('👤 ไม่พบข้อมูล User ในระบบ กำลังสร้าง User ตัวอย่าง...');
@@ -270,10 +1377,10 @@ async function main() {
     }
   }
 
-  // 1. สร้างข้อมูลจังหวัดครบทั้ง 77 จังหวัด + อำเภอ + สถานที่ท่องเที่ยว
-  console.log('🗺️  กำลังสร้างข้อมูลจังหวัดครบ 77 จังหวัด, อำเภอ และสถานที่...');
-  const locationsByProvinceName: Record<string, number[]> = {};
-  const allLocationIds: number[] = [];
+  // 1. สร้างข้อมูลจังหวัดครบทั้ง 77 จังหวัด + อำเภอทั้งหมด
+  console.log('🗺️  กำลังสร้างข้อมูลจังหวัดครบ 77 จังหวัด และอำเภอทั้งหมด...');
+  const provinceIdByName = new Map<string, number>();
+  const cityIdByProvinceAndName = new Map<string, number>();
 
   for (const provinceName of ALL_77_PROVINCES) {
     const province = await prisma.province.create({
@@ -281,150 +1388,167 @@ async function main() {
         province_name: provinceName,
       },
     });
+    provinceIdByName.set(provinceName, province.province_id);
 
-    locationsByProvinceName[provinceName] = [];
-    const featuredList = FEATURED_LOCATIONS_BY_PROVINCE[provinceName];
+    const districts = THAILAND_DISTRICTS[provinceName] ?? [];
+    if (districts.length > 0) {
+      await prisma.city.createMany({
+        data: districts.map((city_name) => ({
+          city_name,
+          province_id: province.province_id,
+        })),
+      });
+    }
 
-    await prisma.city.createMany({
-      data: THAILAND_DISTRICTS[provinceName].map((city_name) => ({
-        city_name,
-        province_id: province.province_id,
-      })),
+    const createdCities = await prisma.city.findMany({
+      where: { province_id: province.province_id },
+      select: { city_id: true, city_name: true },
     });
-    const cityMap = new Map(
-      (
-        await prisma.city.findMany({
-          where: { province_id: province.province_id },
-          select: { city_id: true, city_name: true },
-        })
-      ).map((city) => [city.city_name, city.city_id]),
-    );
 
-    if (featuredList && featuredList.length > 0) {
-      for (const loc of featuredList) {
-        let cityId = cityMap.get(loc.city);
-        if (!cityId) {
-          const city = await prisma.city.create({
-            data: {
-              city_name: loc.city,
-              province_id: province.province_id,
-            },
-          });
-          cityId = city.city_id;
-          cityMap.set(loc.city, cityId);
-        }
+    for (const city of createdCities) {
+      cityIdByProvinceAndName.set(`${provinceName}::${city.city_name}`, city.city_id);
+    }
+  }
 
-        const createdLocation = await prisma.location.create({
-          data: {
-            name: loc.name,
-            address: loc.address,
-            city_id: cityId,
-            image_url: loc.image_url,
-          },
-        });
+  // Helper: ดึงหรือสร้าง City และ Location แบบไม่ซ้ำกัน
+  const locationIdCache = new Map<string, number>();
+  const provincesWithLocations = new Set<string>();
 
-        locationsByProvinceName[provinceName].push(createdLocation.location_id);
-        allLocationIds.push(createdLocation.location_id);
-      }
-    } else {
-      // สำหรับจังหวัดที่ไม่ได้ระบุไฮไลต์เฉพาะ จะสร้างอำเภอเมืองและสถานที่ประจำจังหวัดให้อัตโนมัติ
-      const defaultCityName =
-        provinceName === 'กรุงเทพมหานคร' ? 'เขตพระนคร' : `อำเภอเมือง${provinceName}`;
+  async function getOrCreateLocation(stop: Omit<RouteStop, 'time'>): Promise<number> {
+    const locKey = `${stop.province}::${stop.city}::${stop.name}`;
+    const cached = locationIdCache.get(locKey);
+    if (cached !== undefined) {
+      return cached;
+    }
 
-      const defaultCityId = cityMap.get(defaultCityName);
-      if (defaultCityId === undefined) throw new Error(`Missing district ${defaultCityName}`);
+    const provinceId = provinceIdByName.get(stop.province);
+    if (provinceId === undefined) {
+      throw new Error(`ไม่พบข้อมูลจังหวัด: ${stop.province}`);
+    }
 
-      const defaultLocations = [
-        {
-          name: `ศาลหลักเมือง${provinceName}`,
-          address: `ตำบลในเมือง ${defaultCityName} จังหวัด${provinceName}`,
-          image_url: 'https://images.unsplash.com/photo-1528181304800-259b08848526',
+    const cityKey = `${stop.province}::${stop.city}`;
+    let cityId = cityIdByProvinceAndName.get(cityKey);
+    if (cityId === undefined) {
+      const createdCity = await prisma.city.create({
+        data: {
+          city_name: stop.city,
+          province_id: provinceId,
         },
-        {
-          name: `ตลาดต้องชมและถนนคนเดิน${provinceName}`,
-          address: `ตำบลในเมือง ${defaultCityName} จังหวัด${provinceName}`,
-          image_url: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365',
-        },
-      ];
+      });
+      cityId = createdCity.city_id;
+      cityIdByProvinceAndName.set(cityKey, cityId);
+    }
 
-      for (const loc of defaultLocations) {
-        const createdLocation = await prisma.location.create({
-          data: {
-            name: loc.name,
-            address: loc.address,
-            city_id: defaultCityId,
-            image_url: loc.image_url,
-          },
-        });
+    const createdLocation = await prisma.location.create({
+      data: {
+        name: stop.name,
+        address: stop.address,
+        city_id: cityId,
+        image_url: stop.image_url,
+      },
+    });
 
-        locationsByProvinceName[provinceName].push(createdLocation.location_id);
-        allLocationIds.push(createdLocation.location_id);
+    locationIdCache.set(locKey, createdLocation.location_id);
+    provincesWithLocations.add(stop.province);
+    return createdLocation.location_id;
+  }
+
+  // 2. สร้างสถานที่จากทั้ง 50 แผนการเดินทางก่อน เพื่อให้ข้อมูล Location ครบถ้วนตรงตามเส้นทางจริง
+  console.log('📍 กำลังสร้างข้อมูลสถานที่ท่องเที่ยวตามเส้นทางจริง...');
+  for (const template of SCHEDULE_TEMPLATES) {
+    for (const dayStops of template.days) {
+      for (const stop of dayStops) {
+        await getOrCreateLocation(stop);
       }
     }
   }
 
-  console.log(`✅ สร้างครบ ${ALL_77_PROVINCES.length} จังหวัด และสถานที่ทั้งหมด ${allLocationIds.length} แห่ง`);
+  // เติมสถานที่พื้นฐานให้จังหวัดที่ยังไม่มีสถานที่ใน 50 แผน เพื่อให้ครบทั้ง 77 จังหวัด
+  for (const provinceName of ALL_77_PROVINCES) {
+    if (!provincesWithLocations.has(provinceName)) {
+      const defaultCityName =
+        provinceName === 'กรุงเทพมหานคร' ? 'เขตพระนคร' : `อำเภอเมือง${provinceName}`;
 
-  // 2. สร้างแผนการเดินทาง 50 แผน (35 Public + 15 Private) พร้อม ScheduleItem
-  console.log('📅 กำลังสร้างแผนการเดินทาง 50 แผน (Public 35 แผน / Private 15 แผน)...');
+      await getOrCreateLocation({
+        province: provinceName,
+        city: defaultCityName,
+        name: `ศาลหลักเมือง${provinceName}`,
+        address: `ตำบลในเมือง ${defaultCityName} จังหวัด${provinceName}`,
+        image_url: IMG.temple,
+      });
+
+      await getOrCreateLocation({
+        province: provinceName,
+        city: defaultCityName,
+        name: `ตลาดต้องชมและถนนคนเดิน${provinceName}`,
+        address: `ตำบลในเมือง ${defaultCityName} จังหวัด${provinceName}`,
+        image_url: IMG.market,
+      });
+    }
+  }
+
+  console.log(
+    `✅ สร้างครบ ${ALL_77_PROVINCES.length} จังหวัด และสถานที่ทั้งหมด ${locationIdCache.size} แห่ง`
+  );
+
+  // 3. สร้างแผนการเดินทางทั้งหมด 50 แผน (40 แผน Public + 10 แผน Private)
+  console.log('📅 กำลังสร้างแผนการเดินทาง 50 แผน (Public 40 แผน / Private 10 แผน)...');
   const categories = Object.values(Category);
+  const PUBLIC_COUNT = 40;
 
   for (let i = 0; i < SCHEDULE_TEMPLATES.length; i++) {
     const template = SCHEDULE_TEMPLATES[i];
-    const isPublic = i < 35; // 35 แผนแรกเป็น Public, 15 แผนหลังเป็น Private
+    const isPublic = i < PUBLIC_COUNT; // 0..39 = Public (40 แผน), 40..49 = Private (10 แผน)
     const owner = users[i % users.length];
-    const planCategories = i % 2 === 0
-      ? [categories[i % categories.length]]
-      : [categories[i % categories.length], categories[(i + 3) % categories.length]];
-
-    // รวบรวม location_id ที่เกี่ยวข้องกับจังหวัดในแผนนี้
-    let candidateLocations: number[] = [];
-    for (const prov of template.provinces) {
-      if (locationsByProvinceName[prov]) {
-        candidateLocations.push(...locationsByProvinceName[prov]);
-      }
-    }
-    if (candidateLocations.length === 0) {
-      candidateLocations = allLocationIds;
-    }
+    const planCategories =
+      i % 2 === 0
+        ? [categories[i % categories.length]]
+        : [categories[i % categories.length], categories[(i + 2) % categories.length]];
 
     const schedule = await prisma.schedule.create({
       data: {
         schedule_name: template.name,
         description: template.description,
-        total_day: template.total_day,
+        total_day: template.days.length,
         cover_url: template.cover_url,
         categories: planCategories,
+        is_public: false,
         owner_id: owner.user_id,
       },
     });
 
-    // สร้าง ScheduleItem ในแต่ละวัน (วันละ 3-4 กิจกรรม)
-    let locPointer = i;
-    for (let day = 1; day <= template.total_day; day++) {
-      const itemsPerDay = Math.min(4, Math.max(3, candidateLocations.length));
+    // สร้าง ScheduleItem เรียงตามลำดับเส้นทางจริงในแต่ละวัน
+    const scheduleItemsData: Array<{
+      day_no: number;
+      sequence_no: number;
+      visit_time: Date;
+      location_id: number;
+    }> = [];
 
-      for (let seq = 1; seq <= itemsPerDay; seq++) {
-        const locationId = candidateLocations[locPointer % candidateLocations.length];
-        locPointer++;
+    for (let dayIdx = 0; dayIdx < template.days.length; dayIdx++) {
+      const dayStops = template.days[dayIdx];
+      for (let seqIdx = 0; seqIdx < dayStops.length; seqIdx++) {
+        const stop = dayStops[seqIdx];
+        const locationId = await getOrCreateLocation(stop);
 
-        await prisma.scheduleItem.create({
-          data: {
-            schedule_id: schedule.schedule_id,
-            day_no: day,
-            sequence_no: seq,
-            visit_time: VISIT_TIME_SLOTS[(seq - 1) % VISIT_TIME_SLOTS.length],
-            location_id: locationId,
-          },
+        scheduleItemsData.push({
+          day_no: dayIdx + 1,
+          sequence_no: seqIdx + 1,
+          visit_time: toVisitTime(stop.time),
+          location_id: locationId,
         });
       }
     }
 
+    await prisma.scheduleItem.createMany({
+      data: scheduleItemsData.map((item) => ({
+        schedule_id: schedule.schedule_id,
+        ...item,
+      })),
+    });
+
+    // หากเป็น 40 แผน Public ให้สร้างสำเนาที่ Publish แล้ว (is_public: true)
     if (isPublic) {
-      const items = await prisma.scheduleItem.findMany({
-        where: { schedule_id: schedule.schedule_id },
-        select: { day_no: true, sequence_no: true, visit_time: true, location_id: true },
-      });
       await prisma.schedule.create({
         data: {
           schedule_name: schedule.schedule_name,
@@ -435,13 +1559,17 @@ async function main() {
           is_public: true,
           owner_id: schedule.owner_id,
           published_from_id: schedule.schedule_id,
-          items: { create: items },
+          items: {
+            create: scheduleItemsData,
+          },
         },
       });
     }
   }
 
-  console.log('🎉 Seed ข้อมูลเสร็จสมบูรณ์! (77 จังหวัด, 50 แผนการเดินทาง: 35 Public / 15 Private)');
+  console.log(
+    `🎉 Seed ข้อมูลเสร็จสมบูรณ์! (77 จังหวัด, ${SCHEDULE_TEMPLATES.length} แผนการเดินทาง: ${PUBLIC_COUNT} Public / ${SCHEDULE_TEMPLATES.length - PUBLIC_COUNT} Private)`
+  );
 }
 
 main()
