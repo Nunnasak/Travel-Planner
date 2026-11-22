@@ -413,3 +413,35 @@
   color: #6b7c7c;
   font-size: 13px;
 }
+
+.cover-editor {
+  display: grid;
+  gap: 8px;
+}
+
+.cover-link-row {
+  display: flex;
+  gap: 6px;
+}
+
+.cover-link-row .btn-outline {
+  flex: none;
+  height: 38px;
+  border-radius: 10px;
+}
+
+.cover-cancel {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #6b7c7c;
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.place-photo {
+  display: grid;
+  gap: 8px;
+}

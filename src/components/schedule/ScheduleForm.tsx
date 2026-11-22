@@ -2,6 +2,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent, type ReactNode } from "react";
+import ImageDropzone from "@/components/ui/image-dropzone";
+import { UPLOAD_PATH } from "@/core/schema/image.schema";
 import { MAX_DAYS } from "@/core/schema/schedule.schema";
 import { pickFieldErrors, sendJson } from "@/lib/api-client";
 import { CATEGORY_KEYS, categoryInfo, tintClass } from "@/lib/categories";
@@ -31,6 +33,7 @@ const EMPTY: ScheduleFormValues = {
 
 function previewable(url: string) {
   const value = url.trim();
+  if (value.startsWith(UPLOAD_PATH)) return value;
   if (!URL.canParse(value)) return null;
   const { protocol } = new URL(value);
   return protocol === "https:" || protocol === "http:" ? value : null;
@@ -199,18 +202,31 @@ export default function ScheduleForm() {
           {errors.categories && <p className="field-error">{errors.categories}</p>}
         </Section>
 
-        <Section step={4} title="Cover photo" hint="Optional. Paste a link to a photo.">
+        <Section step={4} title="Cover photo" hint="Optional. Upload a photo or paste a link.">
           <div className="field">
-            <input
-              id="cover_url"
-              name="cover_url"
-              type="url"
-              aria-label="Cover image URL"
-              placeholder="https://…"
-              value={values.cover_url}
-              onChange={(e) => set("cover_url", e.target.value)}
-              aria-invalid={errors.cover_url ? true : undefined}
-            />
+            {values.cover_url.startsWith(UPLOAD_PATH) ? (
+              <div className="uploaded-row">
+                <span>Using your uploaded photo</span>
+                <button type="button" className="btn-outline small" onClick={() => set("cover_url", "")}>
+                  Remove
+                </button>
+              </div>
+            ) : (
+              <>
+                <ImageDropzone onUploaded={(url) => set("cover_url", url)} />
+                <p className="or-divider">or paste a link</p>
+                <input
+                  id="cover_url"
+                  name="cover_url"
+                  type="url"
+                  aria-label="Cover image URL"
+                  placeholder="https://…"
+                  value={values.cover_url}
+                  onChange={(e) => set("cover_url", e.target.value)}
+                  aria-invalid={errors.cover_url ? true : undefined}
+                />
+              </>
+            )}
             {errors.cover_url && <p className="field-error">{errors.cover_url}</p>}
             {!errors.cover_url && coverUrl && coverUrl === brokenCover && (
               <p className="field-error">Couldn&apos;t load this image. Check the link.</p>

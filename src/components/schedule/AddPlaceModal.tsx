@@ -2,7 +2,9 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { pickFieldErrors, sendJson } from "@/lib/api-client";
+import ImageDropzone from "@/components/ui/image-dropzone";
 import SelectMenu from "@/components/ui/select-menu";
+import { UPLOAD_PATH } from "@/core/schema/image.schema";
 
 type Place = {
   location_id: number;
@@ -286,17 +288,35 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
                   </div>
                 </div>
                 <div className="field">
-                  <label htmlFor="place-image">Image URL (optional)</label>
-                  <input
-                    id="place-image"
-                    type="url"
-                    placeholder="https://..."
-                    value={imageUrl}
-                    onChange={(e) => {
-                      setImageUrl(e.target.value);
-                      clear("image_url");
-                    }}
-                  />
+                  <label htmlFor="place-image">Photo (optional)</label>
+                  {imageUrl.startsWith(UPLOAD_PATH) ? (
+                    <div className="uploaded-row">
+                      <span>Using your uploaded photo</span>
+                      <button type="button" className="btn-outline small" onClick={() => setImageUrl("")}>
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="place-photo">
+                      <ImageDropzone
+                        compact
+                        onUploaded={(url) => {
+                          setImageUrl(url);
+                          clear("image_url");
+                        }}
+                      />
+                      <input
+                        id="place-image"
+                        type="url"
+                        placeholder="or paste a link (https://…)"
+                        value={imageUrl}
+                        onChange={(e) => {
+                          setImageUrl(e.target.value);
+                          clear("image_url");
+                        }}
+                      />
+                    </div>
+                  )}
                   {errors.image_url && <p className="field-error">{errors.image_url}</p>}
                 </div>
               </>

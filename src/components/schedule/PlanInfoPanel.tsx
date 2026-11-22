@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import CategoryTags from "@/components/ui/category-tags";
 import CoverImage from "@/components/ui/cover-image";
+import ImageDropzone from "@/components/ui/image-dropzone";
 import { MAX_DAYS } from "@/core/schema/schedule.schema";
 import { CATEGORY_KEYS, categoryInfo, coverTintClass } from "@/lib/categories";
 import type { ScheduleDetail } from "@/lib/schedule";
@@ -53,6 +54,11 @@ export default function PlanInfoPanel({ plan, onSave }: Props) {
     if (!(await onSave({ total_day: next }))) setDays(plan.total_day);
   }
 
+  function cancelCover() {
+    setCoverDraft(plan.cover_url ?? "");
+    setCoverOpen(false);
+  }
+
   async function saveCover(value: string | null) {
     const next = value?.trim() || null;
     setCoverOpen(false);
@@ -82,23 +88,29 @@ export default function PlanInfoPanel({ plan, onSave }: Props) {
         )}
       </div>
       {editable && coverOpen && (
-        <input
-          className="inline-field"
-          type="url"
-          autoFocus
-          placeholder="Paste an image URL (https://…)"
-          aria-label="Cover image URL"
-          value={coverDraft}
-          onChange={(e) => setCoverDraft(e.target.value)}
-          onBlur={() => saveCover(coverDraft)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") e.currentTarget.blur();
-            if (e.key === "Escape") {
-              setCoverDraft(plan.cover_url ?? "");
-              setCoverOpen(false);
-            }
-          }}
-        />
+        <div className="cover-editor">
+          <ImageDropzone compact onUploaded={(url) => saveCover(url)} />
+          <div className="cover-link-row">
+            <input
+              className="inline-field"
+              type="url"
+              placeholder="or paste a link (https://…)"
+              aria-label="Cover image URL"
+              value={coverDraft}
+              onChange={(e) => setCoverDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") saveCover(coverDraft);
+                if (e.key === "Escape") cancelCover();
+              }}
+            />
+            <button type="button" className="btn-outline small" onClick={() => saveCover(coverDraft)}>
+              Use link
+            </button>
+          </div>
+          <button type="button" className="cover-cancel" onClick={cancelCover}>
+            Cancel
+          </button>
+        </div>
       )}
 
       <h2>Description</h2>

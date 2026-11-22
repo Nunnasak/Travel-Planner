@@ -248,3 +248,109 @@
   font-weight: 600;
   font-size: 13px;
 }
+
+.dropzone-wrap {
+  display: grid;
+  gap: 6px;
+}
+
+.dropzone {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  border: 1.5px dashed #b9e3dc;
+  border-radius: 14px;
+  background: #f6fcfb;
+  color: #0b5d5b;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.dropzone:hover,
+.dropzone.is-dragging,
+.dropzone:focus-within {
+  border-color: #19b5a5;
+  background: #d3f3ee;
+}
+
+.dropzone[aria-disabled="true"] {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.dropzone > svg {
+  flex: none;
+  width: 28px;
+  height: 28px;
+}
+
+.dropzone-text {
+  display: grid;
+  gap: 2px;
+}
+
+.dropzone-text strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.dropzone-text span {
+  color: #6b7c7c;
+  font-size: 12.5px;
+}
+
+.dropzone.is-compact {
+  padding: 10px 12px;
+  gap: 10px;
+}
+
+.dropzone.is-compact > svg {
+  width: 20px;
+  height: 20px;
+}
+
+.dropzone-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.dropzone-done {
+  margin: 0;
+  color: #0b8478;
+  font-size: 12.5px;
+}
+
+.or-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #8a8d8a;
+  font-size: 12px;
+}
+
+.or-divider::before,
+.or-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #eadfcb;
+}
+
+.uploaded-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #b9e3dc;
+  border-radius: 12px;
+  background: #f6fcfb;
+  color: #0b5d5b;
+  font-size: 14px;
+  font-weight: 500;
+}

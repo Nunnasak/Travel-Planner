@@ -43,3 +43,11 @@ export function pickFieldErrors<K extends string>(
   }
   return picked;
 }
+
+export async function uploadImage(file: File): Promise<ApiResult> {
+  const body = new FormData();
+  body.append("file", file);
+  const response = await fetch("/api/uploads", { method: "POST", body, credentials: "same-origin" });
+  const data = await response.json().catch(() => ({}));
+  return { ok: response.ok, status: response.status, data };
+}
