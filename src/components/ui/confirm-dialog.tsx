@@ -1,5 +1,6 @@
 "use client";
 import { useId, type KeyboardEvent } from "react";
+import { createPortal } from "react-dom";
 
 type Props = {
   title: string;
@@ -20,7 +21,7 @@ export default function ConfirmDialog({ title, message, confirmLabel, busy, onCo
     }
   }
 
-  return (
+  return createPortal(
     <div
       className="modal-backdrop confirm-backdrop"
       onMouseDown={(event) => event.target === event.currentTarget && onCancel()}
@@ -44,6 +45,7 @@ export default function ConfirmDialog({ title, message, confirmLabel, busy, onCo
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

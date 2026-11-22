@@ -10,12 +10,16 @@ type Props<T extends string> = {
   label: string;
   disabled?: boolean;
   variant?: "outline" | "plain";
+  block?: boolean;
+  id?: string;
+  invalid?: boolean;
 };
 
 type Position = { top?: number; bottom?: number; left: number; minWidth: number };
 
 const MENU_GAP = 6;
 const MENU_MAX_HEIGHT = 260;
+const TYPEAHEAD_RESET_MS = 600;
 
 export default function SelectMenu<T extends string>({
   value,
@@ -24,8 +28,12 @@ export default function SelectMenu<T extends string>({
   label,
   disabled,
   variant = "outline",
+  block,
+  id: buttonId,
+  invalid,
 }: Props<T>) {
   const id = useId();
+  const typed = useRef({ text: "", at: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const [open, setOpen] = useState(false);
@@ -54,6 +62,10 @@ export default function SelectMenu<T extends string>({
       listRef.current?.focus({ preventScroll: true });
     }
   }, [open, position]);
+
+  useEffect(() => {
+    if (open) document.getElementById(`${id}-option-${active}`)?.scrollIntoView({ block: "nearest" });
+  }, [open, active, id]);
 
   useEffect(() => {
     if (!open) return;
@@ -118,6 +130,12 @@ export default function SelectMenu<T extends string>({
       pick(active);
     } else if (event.key === "Tab") {
       setOpen(false);
+    } else if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+      const now = Date.now();
+      const text = (now - typed.current.at > TYPEAHEAD_RESET_MS ? "" : typed.current.text) + event.key.toLowerCase();
+      typed.current = { text, at: now };
+      const match = options.findIndex((option) => option.label.toLowerCase().startsWith(text));
+      if (match >= 0) setActive(match);
     }
   }
 
@@ -125,8 +143,10 @@ export default function SelectMenu<T extends string>({
     <>
       <button
         ref={buttonRef}
+        id={buttonId}
         type="button"
-        className={`menu-button menu-button-${variant}`}
+        className={`menu-button menu-button-${variant} ${block ? "menu-button-block" : ""} ${value === "" ? "is-placeholder" : ""}`}
+        aria-invalid={invalid || undefined}
         aria-label={`${label}: ${current?.label ?? ""}`}
         aria-haspopup="listbox"
         aria-expanded={open}

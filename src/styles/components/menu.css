@@ -123,3 +123,22 @@
   height: 16px;
   color: #0b8478;
 }
+
+.menu-button-block {
+  width: 100%;
+  height: 40px;
+  font-weight: 500;
+}
+
+.menu-button-block > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.menu-button.is-placeholder > span {
+  color: #8a8d8a;
+}
+
+.menu-button[aria-invalid="true"] {
+  border-color: var(--error);
+}
