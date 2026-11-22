@@ -114,6 +114,9 @@ model Location {
   address     String
   city_id     Int
   image_url   String?
+  map_url     String?
+  latitude    Float?
+  longitude   Float?
 
   city  City          @relation(fields: [city_id], references: [city_id])
   items ScheduleItem[]
