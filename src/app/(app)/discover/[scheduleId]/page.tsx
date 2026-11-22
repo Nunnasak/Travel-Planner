@@ -42,7 +42,7 @@ export default async function PlanDetail({ params }: { params: Promise<{ schedul
         <aside className="detail-side">
           <div className={`detail-cover ${coverUrl ? "" : `cover-x ${coverTintClass(plan.categories)}`}`}>
             {coverUrl ? (
-              <CoverImage src={coverUrl} alt={plan.schedule_name} sizes="280px" priority />
+              <CoverImage src={coverUrl} alt={plan.schedule_name} sizes="240px" eager />
             ) : (
               <span className="cover-badge">IMG</span>
             )}
