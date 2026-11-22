@@ -2,11 +2,25 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { sendJson, type ApiResult } from "@/lib/api-client";
+import ConfirmDialog from "@/components/ui/confirm-dialog";
+import SelectMenu, { type MenuOption } from "@/components/ui/select-menu";
 import type { MemberRole } from "@/core/schema/share.schema";
 import type { SharedPerson, Sharing } from "@/lib/schedule";
 
 type Props = { scheduleId: number; onClose: () => void };
 const ROLE_LABEL: Record<MemberRole, string> = { VIEWER: "Viewer", EDITOR: "Editor" };
+
+const ROLE_OPTIONS: MenuOption<MemberRole>[] = [
+  { value: "VIEWER", label: "Viewer", description: "Can see the plan" },
+  { value: "EDITOR", label: "Editor", description: "Can change the plan" },
+];
+
+const ACCESS_OPTIONS: MenuOption<"RESTRICTED" | "ANYONE">[] = [
+  { value: "RESTRICTED", label: "Only people added", description: "Only people added above can open the link" },
+  { value: "ANYONE", label: "Anyone with the link", description: "Anyone who logs in with the link joins" },
+];
+
+type Confirming = "reset" | "remove" | null;
 
 function initial(name: string) {
   return name.trim().charAt(0).toUpperCase() || "?";
@@ -22,6 +36,7 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState("");
+  const [confirming, setConfirming] = useState<Confirming>(null);
   const base = `/api/schedules/${scheduleId}`;
 
   useEffect(() => {
@@ -41,7 +56,7 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape" && !event.defaultPrevented) onClose();
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
@@ -82,7 +97,6 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
 
   async function changePost(method: "POST" | "DELETE") {
     if (!sharing) return;
-    if (method === "DELETE" && !confirm("Remove this plan from Discover? Your plan stays as it is.")) return;
     setBusy(true);
     setError("");
     try {
@@ -127,18 +141,13 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
           <span className="share-role-label">Owner</span>
         ) : manage ? (
           <>
-            <select
-              className="select share-role"
-              aria-label={`Role for ${person.username}`}
+            <SelectMenu
+              label={`Role for ${person.username}`}
               value={role}
+              options={ROLE_OPTIONS}
               disabled={busy}
-              onChange={(e) =>
-                run(sendJson("PATCH", `${base}/members/${person.user_id}`, { role: e.target.value }))
-              }
-            >
-              <option value="VIEWER">Viewer</option>
-              <option value="EDITOR">Editor</option>
-            </select>
+              onChange={(next) => run(sendJson("PATCH", `${base}/members/${person.user_id}`, { role: next }))}
+            />
             <button
               type="button"
               className="share-remove"
@@ -189,15 +198,7 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
                       setFieldError("");
                     }}
                   />
-                  <select
-                    className="select share-role"
-                    aria-label="Role for new person"
-                    value={newRole}
-                    onChange={(e) => setNewRole(e.target.value as MemberRole)}
-                  >
-                    <option value="VIEWER">Viewer</option>
-                    <option value="EDITOR">Editor</option>
-                  </select>
+                  <SelectMenu label="Role for new person" value={newRole} options={ROLE_OPTIONS} onChange={setNewRole} />
                   <button type="submit" className="btn-outline" disabled={busy}>Add</button>
                 </form>
               )}
@@ -228,22 +229,16 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
                 </span>
                 <div className="share-access-text">
                   {manage ? (
-                    <select
-                      className="select share-link-select"
-                      aria-label="Who can open the link"
+                    <SelectMenu
+                      label="Who can open the link"
+                      variant="plain"
                       value={linkOpen ? "ANYONE" : "RESTRICTED"}
+                      options={ACCESS_OPTIONS}
                       disabled={busy}
-                      onChange={(e) =>
-                        run(
-                          sendJson("PUT", `${base}/link`, {
-                            link_access: e.target.value === "ANYONE" ? "VIEWER" : "RESTRICTED",
-                          }),
-                        )
+                      onChange={(next) =>
+                        run(sendJson("PUT", `${base}/link`, { link_access: next === "ANYONE" ? "VIEWER" : "RESTRICTED" }))
                       }
-                    >
-                      <option value="RESTRICTED">Only people added</option>
-                      <option value="ANYONE">Anyone with the link</option>
-                    </select>
+                    />
                   ) : (
                     <strong>{linkOpen ? "Anyone with the link" : "Only people added"}</strong>
                   )}
@@ -255,16 +250,13 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
                 </div>
                 {linkOpen &&
                   (manage ? (
-                    <select
-                      className="select share-role"
-                      aria-label="Role for people with the link"
-                      value={sharing.link_access}
+                    <SelectMenu
+                      label="Role for people with the link"
+                      value={sharing.link_access as MemberRole}
+                      options={ROLE_OPTIONS}
                       disabled={busy}
-                      onChange={(e) => run(sendJson("PUT", `${base}/link`, { link_access: e.target.value }))}
-                    >
-                      <option value="VIEWER">Viewer</option>
-                      <option value="EDITOR">Editor</option>
-                    </select>
+                      onChange={(next) => run(sendJson("PUT", `${base}/link`, { link_access: next }))}
+                    />
                   ) : (
                     <span className="share-role-label">{ROLE_LABEL[sharing.link_access as MemberRole]}</span>
                   ))}
@@ -274,11 +266,7 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
                   type="button"
                   className="share-reset"
                   disabled={busy}
-                  onClick={() => {
-                    if (confirm("Make a new link? The old link will stop working.")) {
-                      run(sendJson("POST", `${base}/link/reset`), () => setCopied(""));
-                    }
-                  }}
+                  onClick={() => setConfirming("reset")}
                 >
                   Reset link
                 </button>
@@ -316,7 +304,7 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
                       type="button"
                       className="btn-outline danger"
                       disabled={busy}
-                      onClick={() => changePost("DELETE")}
+                      onClick={() => setConfirming("remove")}
                     >
                       Remove
                     </button>
@@ -332,6 +320,33 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
           </>
         )}
       </div>
+
+      {confirming === "reset" && (
+        <ConfirmDialog
+          title="Make a new link?"
+          message="The old link will stop working. People who already joined keep their access."
+          confirmLabel="Make new link"
+          busy={busy}
+          onCancel={() => setConfirming(null)}
+          onConfirm={async () => {
+            await run(sendJson("POST", `${base}/link/reset`), () => setCopied(""));
+            setConfirming(null);
+          }}
+        />
+      )}
+      {confirming === "remove" && (
+        <ConfirmDialog
+          title="Remove from Discover?"
+          message="The post will disappear from Discover. Your plan stays as it is."
+          confirmLabel="Remove post"
+          busy={busy}
+          onCancel={() => setConfirming(null)}
+          onConfirm={async () => {
+            await changePost("DELETE");
+            setConfirming(null);
+          }}
+        />
+      )}
     </div>
   );
 }

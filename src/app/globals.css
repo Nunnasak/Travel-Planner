@@ -12,6 +12,7 @@
 @import "../styles/components/tint.css";
 @import "../styles/components/pagination.css";
 @import "../styles/components/modal.css";
+@import "../styles/components/menu.css";
 
 @import "../styles/features/auth.css";
 @import "../styles/features/discover-filter.css";

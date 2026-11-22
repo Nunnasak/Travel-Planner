@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type DragEvent } from "react";
+import ConfirmDialog from "@/components/ui/confirm-dialog";
 import { sendJson } from "@/lib/api-client";
 import { formatVisitTime, type ScheduleDay, type ScheduleStop } from "@/lib/schedule";
 import AddPlaceModal from "./AddPlaceModal";
@@ -42,6 +43,7 @@ export default function DayList({ scheduleId, totalDays, days, canEdit }: Props)
   const [busyId, setBusyId] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [addDay, setAddDay] = useState<number | null>(null);
+  const [pendingRemove, setPendingRemove] = useState<{ itemId: number; name: string } | null>(null);
   const [order, setOrder] = useState(days);
   const [dragId, setDragId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
@@ -118,8 +120,8 @@ export default function DayList({ scheduleId, totalDays, days, canEdit }: Props)
 
   finishRef.current = finishDrag;
 
-  async function remove(itemId: number, name: string) {
-    if (!confirm(`Remove "${name}" from this plan?`)) return;
+  async function remove(itemId: number) {
+    setPendingRemove(null);
     setBusyId(itemId);
     setError("");
     const result = await sendJson("DELETE", `/api/schedules/${scheduleId}/items/${itemId}`);
@@ -182,7 +184,7 @@ export default function DayList({ scheduleId, totalDays, days, canEdit }: Props)
                   type="button"
                   className="stop-remove"
                   aria-label={`Remove ${stop.location.name}`}
-                  onClick={() => remove(stop.item_id, stop.location.name)}
+                  onClick={() => setPendingRemove({ itemId: stop.item_id, name: stop.location.name })}
                 >
                   ×
                 </button>
@@ -202,6 +204,15 @@ export default function DayList({ scheduleId, totalDays, days, canEdit }: Props)
           ) : null,
         ];
       })}
+      {pendingRemove && (
+        <ConfirmDialog
+          title="Remove this place?"
+          message={`"${pendingRemove.name}" will be removed from this plan.`}
+          confirmLabel="Remove"
+          onCancel={() => setPendingRemove(null)}
+          onConfirm={() => remove(pendingRemove.itemId)}
+        />
+      )}
       {addDay !== null && (
         <AddPlaceModal
           scheduleId={scheduleId}
