@@ -14,9 +14,9 @@ function canOptimize(src: string) {
   }
 }
 
-type Props = { src: string; alt: string; sizes: string; eager?: boolean };
+type Props = { src: string; alt: string; sizes: string; eager?: boolean; onError?: () => void };
 
-export default function CoverImage({ src, alt, sizes, eager }: Props) {
+export default function CoverImage({ src, alt, sizes, eager, onError }: Props) {
   return (
     <Image
       src={src}
@@ -27,6 +27,7 @@ export default function CoverImage({ src, alt, sizes, eager }: Props) {
       fetchPriority={eager ? "high" : "auto"}
       unoptimized={!canOptimize(src)}
       draggable={false}
+      onError={onError}
       className="cover-image"
     />
   );
