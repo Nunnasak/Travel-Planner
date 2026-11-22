@@ -49,7 +49,7 @@ export default async function DiscoverPage({ searchParams }: { searchParams: SP 
       ) : (
         <>
           <section className="plan-grid">
-            {data.items.map((p) => <PlanCard key={p.schedule_id} plan={p} />)}
+            {data.items.map((p, i) => <PlanCard key={p.schedule_id} plan={p} eager={i < 4} />)}
           </section>
           <Pagination page={data.page} totalPages={data.total_pages} params={filters} />
         </>

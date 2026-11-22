@@ -4,10 +4,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import CategoryTags from "@/components/ui/category-tags";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
+import CoverImage, { CARD_IMAGE_SIZES } from "@/components/ui/cover-image";
 import { coverTintClass } from "@/lib/categories";
 import type { MySchedule } from "@/lib/schedule";
 
-export default function ScheduleCard({ plan }: { plan: MySchedule }) {
+export default function ScheduleCard({ plan, eager = false }: { plan: MySchedule; eager?: boolean }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -40,11 +41,12 @@ export default function ScheduleCard({ plan }: { plan: MySchedule }) {
   return (
     <article className={`plan-card schedule-card ${busy ? "is-busy" : ""}`}>
       <Link href={`/schedules/${plan.schedule_id}`} className="schedule-card-link">
-        <div
-          className={`plan-cover ${plan.cover_url ? "" : `cover-x ${coverTintClass(plan.categories)}`}`}
-          style={plan.cover_url ? { backgroundImage: `url(${plan.cover_url})` } : undefined}
-        >
-          {!plan.cover_url && <span className="cover-badge">IMG</span>}
+        <div className={`plan-cover ${plan.cover_url ? "" : `cover-x ${coverTintClass(plan.categories)}`}`}>
+          {plan.cover_url ? (
+            <CoverImage src={plan.cover_url} alt="" sizes={CARD_IMAGE_SIZES} eager={eager} />
+          ) : (
+            <span className="cover-badge">IMG</span>
+          )}
           <CategoryTags categories={plan.categories} max={2} />
           {plan.post && <span className="tag tag-public">On Discover</span>}
         </div>
