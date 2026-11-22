@@ -25,13 +25,6 @@
   overflow: hidden;
   border: 3px solid var(--border);
   border-radius: 16px;
-  background-size: cover;
-  background-position: center;
-}
-
-.cover-image {
-  object-fit: cover;
-  object-position: center;
 }
 
 :where(.detail-side, .detail-plan) h2 {

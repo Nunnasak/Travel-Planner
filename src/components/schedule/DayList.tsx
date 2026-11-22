@@ -2,11 +2,11 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type DragEvent } from "react";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
+import CoverImage from "@/components/ui/cover-image";
 import { sendJson } from "@/lib/api-client";
+import { TINTS, tintClass } from "@/lib/categories";
 import { formatVisitTime, type ScheduleDay, type ScheduleStop } from "@/lib/schedule";
 import AddPlaceModal from "./AddPlaceModal";
-
-const TINTS = ["#FFF0C2", "#FFDDD6", "#D6F1F7", "#E6E0FF", "#D3F3EE"];
 
 function orderKey(days: ScheduleDay[]) {
   return days.map((day) => `${day.day_no}:${day.stops.map((s) => s.item_id).join(",")}`).join("|");
@@ -165,14 +165,15 @@ export default function DayList({ scheduleId, totalDays, days, canEdit }: Props)
             >
               {canEdit && <span className="drag-handle" aria-hidden>⋮⋮</span>}
               <div
-                className={`stop-thumb ${stop.location.image_url ? "" : "cover-x"}`}
-                style={
-                  stop.location.image_url
-                    ? { backgroundImage: `url(${stop.location.image_url})`, backgroundSize: "cover" }
-                    : { backgroundColor: TINTS[stop.item_id % TINTS.length] }
-                }
+                className={`stop-thumb ${
+                  stop.location.image_url ? "" : `cover-x ${tintClass(TINTS[stop.item_id % TINTS.length])}`
+                }`}
               >
-                {!stop.location.image_url && <span className="cover-badge">IMG</span>}
+                {stop.location.image_url ? (
+                  <CoverImage src={stop.location.image_url} alt={stop.location.name} sizes="60px" />
+                ) : (
+                  <span className="cover-badge">IMG</span>
+                )}
               </div>
               <div className="stop-info">
                 <strong>{stop.location.name}</strong>

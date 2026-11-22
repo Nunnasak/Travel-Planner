@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import CategoryTags from "@/components/ui/category-tags";
+import CoverImage from "@/components/ui/cover-image";
 import { MAX_DAYS } from "@/core/schema/schedule.schema";
 import { CATEGORY_KEYS, categoryInfo, coverTintClass } from "@/lib/categories";
 import type { ScheduleDetail } from "@/lib/schedule";
@@ -61,11 +62,12 @@ export default function PlanInfoPanel({ plan, onSave }: Props) {
 
   return (
     <aside className="detail-side">
-      <div
-        className={`detail-cover ${plan.cover_url ? "" : `cover-x ${coverTintClass(plan.categories)}`}`}
-        style={plan.cover_url ? { backgroundImage: `url(${plan.cover_url})` } : undefined}
-      >
-        {!plan.cover_url && <span className="cover-badge">IMG</span>}
+      <div className={`detail-cover ${plan.cover_url ? "" : `cover-x ${coverTintClass(plan.categories)}`}`}>
+        {plan.cover_url ? (
+          <CoverImage src={plan.cover_url} alt={plan.schedule_name} sizes="240px" eager />
+        ) : (
+          <span className="cover-badge">IMG</span>
+        )}
         {editable && !coverOpen && (
           <span className="cover-actions">
             <button type="button" className="cover-action" onClick={() => setCoverOpen(true)}>

@@ -35,7 +35,7 @@ export default async function MySchedulePage({ searchParams }: { searchParams: S
           <p className="empty">No plans match &quot;{q}&quot;.</p>
         ) : (
           <section className="plan-grid">
-            {shown.map((plan) => <ScheduleCard key={plan.schedule_id} plan={plan} />)}
+            {shown.map((plan, i) => <ScheduleCard key={plan.schedule_id} plan={plan} eager={i < 4} />)}
           </section>
         )}
       </div>
