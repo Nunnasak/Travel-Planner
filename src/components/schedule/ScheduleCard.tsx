@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import CategoryTags from "@/components/ui/category-tags";
+import ConfirmDialog from "@/components/ui/confirm-dialog";
 import { coverTintClass } from "@/lib/categories";
 import type { MySchedule } from "@/lib/schedule";
 
@@ -11,6 +12,7 @@ export default function ScheduleCard({ plan }: { plan: MySchedule }) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [confirming, setConfirming] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -23,8 +25,7 @@ export default function ScheduleCard({ plan }: { plan: MySchedule }) {
   }, [open]);
 
   async function remove() {
-    setOpen(false);
-    if (!confirm(`Delete "${plan.schedule_name}"? This can't be undone.`)) return;
+    setConfirming(false);
     setBusy(true);
     setError("");
     const res = await fetch(`/api/schedules/${plan.schedule_id}`, { method: "DELETE" });
@@ -71,7 +72,15 @@ export default function ScheduleCard({ plan }: { plan: MySchedule }) {
           <div className="card-menu-list" role="menu">
             <Link href={`/schedules/${plan.schedule_id}`} role="menuitem">Open</Link>
             {plan.is_owner && (
-              <button type="button" role="menuitem" className="danger" onClick={remove}>
+              <button
+                type="button"
+                role="menuitem"
+                className="danger"
+                onClick={() => {
+                  setOpen(false);
+                  setConfirming(true);
+                }}
+              >
                 Delete
               </button>
             )}
@@ -79,6 +88,15 @@ export default function ScheduleCard({ plan }: { plan: MySchedule }) {
         )}
       </div>
       {error && <p className="field-error card-error">{error}</p>}
+      {confirming && (
+        <ConfirmDialog
+          title="Delete this plan?"
+          message={`"${plan.schedule_name}"${plan.post ? " and its post on Discover" : ""} will be deleted. This can't be undone.`}
+          confirmLabel="Delete plan"
+          onCancel={() => setConfirming(false)}
+          onConfirm={remove}
+        />
+      )}
     </article>
   );
 }
