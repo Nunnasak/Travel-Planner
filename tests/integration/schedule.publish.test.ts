@@ -134,6 +134,23 @@ describe("ScheduleService.publish with empty days", () => {
   });
 });
 
+describe("ScheduleService.publish with times out of order", () => {
+  it("refuses to post while a place is earlier than the one before it", async () => {
+    await add(0, 1, "10:31");
+    const later = await add(1, 1, "10:30");
+
+    await expect(schedules.publish(ctx.scheduleId, ctx.userId)).rejects.toThrow(
+      "Put the places on day 1 in time order before posting.",
+    );
+    await expect(prisma.schedule.count({ where: { is_public: true } })).resolves.toBe(0);
+
+    await items.editInSchedule(ctx.scheduleId, later.item_id, ctx.userId, { visit_time: "11:00" });
+    await expect(schedules.publish(ctx.scheduleId, ctx.userId)).resolves.toMatchObject({
+      schedule_id: expect.any(Number),
+    });
+  });
+});
+
 describe("ScheduleService.unpublish", () => {
   it("removes the post and leaves the plan", async () => {
     await add(0, 1);

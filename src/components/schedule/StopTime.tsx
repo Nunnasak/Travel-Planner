@@ -3,16 +3,18 @@ import { useId, useRef, useState, type KeyboardEvent } from "react";
 import { formatVisitTime, parseTimeInput } from "@/lib/schedule";
 
 const BAD_TIME = "ใส่เวลาแบบ 09:30 (00:00–23:59)";
+const OUT_OF_ORDER = "เวลานี้เร็วกว่าสถานที่ก่อนหน้า";
 
 type Props = {
   value: string | null;
   placeName: string;
   editable: boolean;
+  outOfOrder: boolean;
   onEditingChange: (editing: boolean) => void;
   onSave: (time: string) => Promise<string | null>;
 };
 
-export default function StopTime({ value, placeName, editable, onEditingChange, onSave }: Props) {
+export default function StopTime({ value, placeName, editable, outOfOrder, onEditingChange, onSave }: Props) {
   const shown = formatVisitTime(value);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
@@ -20,7 +22,15 @@ export default function StopTime({ value, placeName, editable, onEditingChange, 
   const busy = useRef(false);
   const errorId = useId();
 
-  if (!editable) return <span className="stop-time">{shown}</span>;
+  const warning = outOfOrder ? OUT_OF_ORDER : undefined;
+
+  if (!editable) {
+    return (
+      <span className={`stop-time ${outOfOrder ? "is-out-of-order" : ""}`} title={warning}>
+        {shown}
+      </span>
+    );
+  }
 
   function open() {
     setDraft(shown === "--:--" ? "" : shown);
@@ -61,9 +71,9 @@ export default function StopTime({ value, placeName, editable, onEditingChange, 
     return (
       <button
         type="button"
-        className="stop-time stop-time-edit"
-        title="กดเพื่อแก้เวลา"
-        aria-label={`แก้เวลาของ ${placeName} ตอนนี้ ${shown}`}
+        className={`stop-time stop-time-edit ${outOfOrder ? "is-out-of-order" : ""}`}
+        title={warning ? `${warning} กดเพื่อแก้เวลา` : "กดเพื่อแก้เวลา"}
+        aria-label={`แก้เวลาของ ${placeName} ตอนนี้ ${shown}${warning ? ` ${warning}` : ""}`}
         onClick={open}
       >
         {shown}

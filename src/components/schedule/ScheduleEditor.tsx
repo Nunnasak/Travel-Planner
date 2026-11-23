@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import { emptyDayNumbers } from "@/core/domain/schedule";
-import type { ScheduleDetail } from "@/lib/schedule";
+import { emptyDayNumbers, unorderedDayNumbers } from "@/core/domain/schedule";
+import { formatVisitTime, type ScheduleDetail } from "@/lib/schedule";
 import DayList from "./DayList";
 import InlineTitle from "./InlineTitle";
 import PlanInfoPanel from "./PlanInfoPanel";
@@ -55,6 +55,11 @@ export default function ScheduleEditor({ plan }: { plan: ScheduleDetail }) {
           emptyDays={emptyDayNumbers(
             plan.total_day,
             plan.days.filter((day) => day.stops.length > 0),
+          )}
+          unorderedDays={unorderedDayNumbers(
+            plan.days.flatMap((day) =>
+              day.stops.map((stop) => ({ day_no: day.day_no, visit_time: formatVisitTime(stop.visit_time) })),
+            ),
           )}
           onClose={() => setSharing(false)}
         />

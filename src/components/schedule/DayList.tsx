@@ -192,6 +192,10 @@ export default function DayList({ scheduleId, totalDays, days, canEdit }: Props)
                 value={stop.visit_time}
                 placeName={stop.location.name}
                 editable={canEdit && !saving}
+                outOfOrder={
+                  index > 0 &&
+                  formatVisitTime(stop.visit_time) < formatVisitTime(day.stops[index - 1].visit_time)
+                }
                 onEditingChange={(editing) => setEditingTime(editing ? stop.item_id : null)}
                 onSave={(time) => saveTime(stop.item_id, time)}
               />

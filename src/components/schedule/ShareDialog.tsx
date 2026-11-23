@@ -8,7 +8,7 @@ import SelectMenu, { type MenuOption } from "@/components/ui/select-menu";
 import type { MemberRole } from "@/core/schema/share.schema";
 import type { SharedPerson, Sharing } from "@/lib/schedule";
 
-type Props = { scheduleId: number; emptyDays: number[]; onClose: () => void };
+type Props = { scheduleId: number; emptyDays: number[]; unorderedDays: number[]; onClose: () => void };
 const LISTED_DAYS = 5;
 const ROLE_LABEL: Record<MemberRole, string> = { VIEWER: "ดูได้อย่างเดียว", EDITOR: "แก้ไขได้" };
 
@@ -34,7 +34,7 @@ function dayList(days: number[]) {
   return rest > 0 ? `${shown} และอีก ${rest} วัน` : shown;
 }
 
-export default function ShareDialog({ scheduleId, emptyDays, onClose }: Props) {
+export default function ShareDialog({ scheduleId, emptyDays, unorderedDays, onClose }: Props) {
   const router = useRouter();
   const [sharing, setSharing] = useState<Sharing | null>(null);
   const [loadError, setLoadError] = useState("");
@@ -46,6 +46,7 @@ export default function ShareDialog({ scheduleId, emptyDays, onClose }: Props) {
   const [copied, setCopied] = useState("");
   const [confirming, setConfirming] = useState<Confirming>(null);
   const base = `/api/schedules/${scheduleId}`;
+  const postBlocked = emptyDays.length > 0 || unorderedDays.length > 0;
 
   useEffect(() => {
     let cancelled = false;
@@ -305,9 +306,16 @@ export default function ShareDialog({ scheduleId, emptyDays, onClose }: Props) {
                   ) : (
                     <span>โพสต์สำเนาของแผนตามที่เป็นอยู่ตอนนี้ ทุกคนค้นเจอและคัดลอกไปใช้ได้</span>
                   )}
-                  {emptyDays.length > 0 && (
+                  {postBlocked && (
                     <span className="share-blocked" id="post-blocked">
-                      ทุกวันต้องมีอย่างน้อย 1 สถานที่ก่อนโพสต์ ยังว่าง: วันที่ {dayList(emptyDays)}
+                      {emptyDays.length > 0 && (
+                        <span>ทุกวันต้องมีอย่างน้อย 1 สถานที่ก่อนโพสต์ ยังว่าง: วันที่ {dayList(emptyDays)}</span>
+                      )}
+                      {unorderedDays.length > 0 && (
+                        <span>
+                          เวลาต้องเรียงจากเช้าไปเย็นก่อนโพสต์ ยังไม่เรียง: วันที่ {dayList(unorderedDays)}
+                        </span>
+                      )}
                     </span>
                   )}
                 </div>
@@ -325,8 +333,8 @@ export default function ShareDialog({ scheduleId, emptyDays, onClose }: Props) {
                   <button
                     type="button"
                     className="btn-outline"
-                    disabled={busy || emptyDays.length > 0}
-                    aria-describedby={emptyDays.length > 0 ? "post-blocked" : undefined}
+                    disabled={busy || postBlocked}
+                    aria-describedby={postBlocked ? "post-blocked" : undefined}
                     onClick={() => changePost("POST")}
                   >
                     {sharing.post ? "อัปเดตโพสต์" : "โพสต์"}

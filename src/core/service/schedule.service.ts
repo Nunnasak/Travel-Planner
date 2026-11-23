@@ -1,5 +1,5 @@
 import type { Prisma, PrismaClient } from "../../generated/prisma/client";
-import { emptyDayNumbers } from "../domain/schedule";
+import { emptyDayNumbers, unorderedDayNumbers } from "../domain/schedule";
 import { BadRequestError } from "../errors/bad-request.error";
 import { ForbiddenError } from "../errors/forbidden.error";
 import { NotFoundError } from "../errors/not-found.error";
@@ -207,6 +207,12 @@ export class ScheduleService {
     const emptyDays = emptyDayNumbers(fields.total_day, items);
     if (emptyDays.length > 0) {
       throw new BadRequestError(`Add at least one place to day ${emptyDays.join(", ")} before posting.`);
+    }
+    const unorderedDays = unorderedDayNumbers(
+      items.map((item) => ({ day_no: item.day_no, visit_time: formatTime(item.visit_time) })),
+    );
+    if (unorderedDays.length > 0) {
+      throw new BadRequestError(`Put the places on day ${unorderedDays.join(", ")} in time order before posting.`);
     }
 
     return this.prisma.$transaction(async (tx) => {

@@ -123,6 +123,13 @@
   outline-offset: 1px;
 }
 
+.stop-time.is-out-of-order {
+  color: var(--lotus);
+  text-decoration: underline wavy var(--lotus);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
 .stop-time-editing {
   position: relative;
   display: flex;
