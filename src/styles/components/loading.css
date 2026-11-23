@@ -1,0 +1,182 @@
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skel {
+  display: block;
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    var(--surface-sunken) 0%,
+    var(--rule) 45%,
+    var(--surface-sunken) 90%
+  );
+  background-size: 220% 100%;
+  animation: skel-shimmer 1.4s ease-in-out infinite;
+}
+
+.skel-line {
+  height: 14px;
+}
+
+.skel-title {
+  height: 22px;
+}
+
+.skel-heading {
+  width: min(320px, 70%);
+  height: 40px;
+  border-radius: 10px;
+}
+
+.skel-pill {
+  height: 22px;
+  border-radius: 999px;
+}
+
+.skel-chip {
+  height: 34px;
+}
+
+.skel-button {
+  width: 96px;
+  height: 40px;
+  border-radius: 999px;
+}
+
+.skel-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ticket-cover.skel {
+  min-height: 124px;
+}
+
+.ticket-stub .skel {
+  width: 40px;
+}
+
+.skel-card .ticket {
+  pointer-events: none;
+}
+
+.skel-stop .stop-time .skel {
+  margin-left: auto;
+}
+
+.skel-stop .stop-ring {
+  background: var(--surface);
+}
+
+.skel-map {
+  height: min(55vh, 460px);
+  border-radius: var(--radius-card);
+}
+
+.route-loader {
+  min-height: 60vh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 18px;
+  padding: 48px 16px;
+  color: var(--ink-soft);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.route-loader svg {
+  width: 220px;
+  height: auto;
+  overflow: visible;
+}
+
+.route-loader-line {
+  fill: none;
+  stroke: var(--route-soft);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.route-loader-trail {
+  fill: none;
+  stroke: var(--route);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 60 260;
+  animation: route-trail 1.6s ease-in-out infinite;
+}
+
+.route-loader-stop {
+  fill: var(--surface);
+  stroke: var(--route);
+  stroke-width: 4;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: route-stop 1.6s ease-in-out infinite;
+}
+
+.route-loader-stop:nth-of-type(2) {
+  animation-delay: 0.4s;
+}
+
+.route-loader-stop:nth-of-type(3) {
+  animation-delay: 0.8s;
+}
+
+.route-loader-stop:nth-of-type(4) {
+  animation-delay: 1.2s;
+}
+
+@keyframes skel-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -120% 0;
+  }
+}
+
+@keyframes route-trail {
+  from {
+    stroke-dashoffset: 60;
+  }
+  to {
+    stroke-dashoffset: -260;
+  }
+}
+
+@keyframes route-stop {
+  0%,
+  100% {
+    fill: var(--surface);
+    transform: scale(1);
+  }
+  25% {
+    fill: var(--route);
+    transform: scale(1.25);
+  }
+  50% {
+    fill: var(--surface);
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skel,
+  .route-loader-trail,
+  .route-loader-stop {
+    animation: none;
+  }
+}

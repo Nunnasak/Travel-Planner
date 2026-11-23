@@ -12,6 +12,7 @@
 @import "../styles/components/pagination.css";
 @import "../styles/components/modal.css";
 @import "../styles/components/menu.css";
+@import "../styles/components/loading.css";
 
 @import "../styles/features/auth.css";
 @import "../styles/features/discover.css";
