@@ -1,4 +1,5 @@
 import type { Prisma, PrismaClient } from "../../generated/prisma/client";
+import { dailySeed, orderForDiscover } from "../domain/discover-order";
 import { NotFoundError } from "../errors/not-found.error";
 import { DAYS_OR_MORE, discoveryQuerySchema } from "../schema/discovery.schema";
 
@@ -29,7 +30,7 @@ export class DiscoveryService {
   constructor(private readonly prisma: PrismaClient) {}
 
   // GET /api/discovery - public plans with search, filters and pages
-  async list(input: unknown) {
+  async list(input: unknown, seed: string = dailySeed()) {
     const query = discoveryQuerySchema.parse(input);
 
     const where: Prisma.ScheduleWhereInput = { is_public: true };
@@ -54,13 +55,29 @@ export class DiscoveryService {
       ];
     }
 
-    const [total, rows] = await this.prisma.$transaction([
-      this.prisma.schedule.count({ where }),
-      this.prisma.schedule.findMany({
-        where,
-        orderBy: { created_at: "desc" },
-        skip: (query.page - 1) * query.page_size,
-        take: query.page_size,
+    const candidates = await this.prisma.schedule.findMany({
+      where,
+      select: {
+        schedule_id: true,
+        cover_url: true,
+        items: { where: { location: { image_url: { not: null } } }, select: { day_no: true }, take: 1 },
+      },
+    });
+    const ordered = orderForDiscover(
+      candidates.map((plan) => ({
+        schedule_id: plan.schedule_id,
+        has_cover: Boolean(plan.cover_url) || plan.items.length > 0,
+      })),
+      seed,
+    );
+    const total = ordered.length;
+    const start = (query.page - 1) * query.page_size;
+    const pageIds = ordered.slice(start, start + query.page_size).map((plan) => plan.schedule_id);
+    const position = new Map(pageIds.map((id, index) => [id, index]));
+
+    const rows = (
+      await this.prisma.schedule.findMany({
+        where: { schedule_id: { in: pageIds } },
         select: {
           schedule_id: true,
           schedule_name: true,
@@ -75,8 +92,8 @@ export class DiscoveryService {
             select: { location: { select: LOCATION_SELECT } },
           },
         },
-      }),
-    ]);
+      })
+    ).sort((a, b) => position.get(a.schedule_id)! - position.get(b.schedule_id)!);
 
     const items = rows.map((row) => {
       const provinces = [
