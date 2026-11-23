@@ -5,6 +5,7 @@ import ConfirmDialog from "@/components/ui/confirm-dialog";
 import CoverImage from "@/components/ui/cover-image";
 import { sendJson } from "@/lib/api-client";
 import { TINTS, tintClass } from "@/lib/categories";
+import { placeLine } from "@/lib/place";
 import { formatVisitTime, type ScheduleDay, type ScheduleStop } from "@/lib/schedule";
 import AddPlaceModal from "./AddPlaceModal";
 
@@ -178,7 +179,7 @@ export default function DayList({ scheduleId, totalDays, days, canEdit }: Props)
               </div>
               <div className="stop-info">
                 <strong>{stop.location.name}</strong>
-                <span>{stop.location.address}</span>
+                <span>{placeLine(stop.location)}</span>
               </div>
               {canEdit && <span className="drag-handle" aria-hidden>⋮⋮</span>}
               {canEdit && (

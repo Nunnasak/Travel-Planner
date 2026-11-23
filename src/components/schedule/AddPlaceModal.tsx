@@ -6,11 +6,12 @@ import { NETWORK_ERROR } from "@/lib/messages";
 import ImageDropzone from "@/components/ui/image-dropzone";
 import SelectMenu from "@/components/ui/select-menu";
 import { UPLOAD_PATH } from "@/core/schema/image.schema";
+import { placeLine } from "@/lib/place";
 
 type Place = {
   location_id: number;
   name: string;
-  address: string;
+  address: string | null;
   image_url: string | null;
   city: { city_name: string; province: { province_name: string } };
 };
@@ -108,7 +109,6 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
     if (mode === "search" && !picked) next.location_id = "เลือกสถานที่จากรายการ";
     if (mode === "new") {
       if (!name.trim()) next.name = "ใส่ชื่อสถานที่";
-      if (!address.trim()) next.address = "ใส่ที่อยู่";
       if (!cityId) next.city_id = "เลือกอำเภอ";
     }
     if (!time) next.visit_time = "เลือกเวลา";
@@ -190,7 +190,11 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
           <div className="modal-main">
             {mode === "search" ? (
               <>
-                <div className="searchbar modal-search">
+                <div className="modal-search">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="m20 20-3.5-3.5" />
+                  </svg>
                   <input
                     autoFocus
                     placeholder="ค้นหาสถานที่ อำเภอ หรือจังหวัด"
@@ -212,9 +216,7 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
                         }}
                       >
                         <strong>{place.name}</strong>
-                        <span>
-                          {place.address} · {place.city.city_name}, {place.city.province.province_name}
-                        </span>
+                        <span>{placeLine(place)}</span>
                       </button>
                     </li>
                   ))}
@@ -239,20 +241,6 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
                     aria-invalid={errors.name ? true : undefined}
                   />
                   {errors.name && <p className="field-error">{errors.name}</p>}
-                </div>
-                <div className="field">
-                  <label htmlFor="place-address">ที่อยู่</label>
-                  <input
-                    id="place-address"
-                    placeholder="เช่น ต.สุเทพ อ.เมือง จ.เชียงใหม่"
-                    value={address}
-                    onChange={(e) => {
-                      setAddress(e.target.value);
-                      clear("address");
-                    }}
-                    aria-invalid={errors.address ? true : undefined}
-                  />
-                  {errors.address && <p className="field-error">{errors.address}</p>}
                 </div>
                 <div className="form-row half">
                   <div className="field">
@@ -289,6 +277,20 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
                     />
                     {errors.city_id && <p className="field-error">{errors.city_id}</p>}
                   </div>
+                </div>
+                <div className="field">
+                  <label htmlFor="place-address">รายละเอียดที่อยู่ (ไม่บังคับ)</label>
+                  <input
+                    id="place-address"
+                    placeholder="เช่น ถ.นิมมานเหมินท์ ต.สุเทพ"
+                    value={address}
+                    onChange={(e) => {
+                      setAddress(e.target.value);
+                      clear("address");
+                    }}
+                    aria-invalid={errors.address ? true : undefined}
+                  />
+                  {errors.address && <p className="field-error">{errors.address}</p>}
                 </div>
                 <div className="field">
                   <span className="field-label">รูป (ไม่บังคับ)</span>

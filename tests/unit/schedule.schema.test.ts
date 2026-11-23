@@ -114,9 +114,14 @@ describe("createLocationSchema", () => {
     expect(parsed).toEqual({ name: "Cafe", address: "1 Road", city_id: 4, image_url: null });
   });
 
+  it.each([undefined, "", "   "])("treats an address of %j as no address", (address) => {
+    const parsed = createLocationSchema.parse({ name: "Cafe", address, city_id: 4 });
+    expect(parsed.address).toBeNull();
+  });
+
   it.each([
     ["name", { name: "" }],
-    ["address", { address: "  " }],
+    ["address", { address: "x".repeat(301) }],
     ["city_id", { city_id: 0 }],
     ["image_url", { image_url: "ftp//x" }],
   ])("rejects a bad %s", (field, override) => {

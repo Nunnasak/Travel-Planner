@@ -15,11 +15,10 @@ export const createLocationSchema = z.object({
     .trim()
     .min(1, "Enter the place name.")
     .max(150, "Keep the name under 150 characters."),
-  address: z
-    .string({ error: "Enter the address." })
-    .trim()
-    .min(1, "Enter the address.")
-    .max(300, "Keep the address under 300 characters."),
+  address: z.preprocess(
+    (value) => (typeof value === "string" && value.trim() === "" ? null : value),
+    z.string().trim().max(300, "Keep the address under 300 characters.").nullable().default(null),
+  ),
   city_id: idSchema,
   image_url: imageUrlSchema,
   map_url: z.preprocess(
