@@ -219,6 +219,12 @@
   font-size: 12px;
 }
 
+.share-public-text .share-blocked {
+  margin-top: 4px;
+  color: var(--lotus);
+  font-weight: 600;
+}
+
 .share-public-text a {
   color: var(--primary-text);
   font-weight: 600;

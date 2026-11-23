@@ -8,7 +8,8 @@ import SelectMenu, { type MenuOption } from "@/components/ui/select-menu";
 import type { MemberRole } from "@/core/schema/share.schema";
 import type { SharedPerson, Sharing } from "@/lib/schedule";
 
-type Props = { scheduleId: number; onClose: () => void };
+type Props = { scheduleId: number; emptyDays: number[]; onClose: () => void };
+const LISTED_DAYS = 5;
 const ROLE_LABEL: Record<MemberRole, string> = { VIEWER: "ดูได้อย่างเดียว", EDITOR: "แก้ไขได้" };
 
 const ROLE_OPTIONS: MenuOption<MemberRole>[] = [
@@ -27,7 +28,13 @@ function initial(name: string) {
   return name.trim().charAt(0).toUpperCase() || "?";
 }
 
-export default function ShareDialog({ scheduleId, onClose }: Props) {
+function dayList(days: number[]) {
+  const shown = days.slice(0, LISTED_DAYS).join(", ");
+  const rest = days.length - LISTED_DAYS;
+  return rest > 0 ? `${shown} และอีก ${rest} วัน` : shown;
+}
+
+export default function ShareDialog({ scheduleId, emptyDays, onClose }: Props) {
   const router = useRouter();
   const [sharing, setSharing] = useState<Sharing | null>(null);
   const [loadError, setLoadError] = useState("");
@@ -298,6 +305,11 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
                   ) : (
                     <span>โพสต์สำเนาของแผนตามที่เป็นอยู่ตอนนี้ ทุกคนค้นเจอและคัดลอกไปใช้ได้</span>
                   )}
+                  {emptyDays.length > 0 && (
+                    <span className="share-blocked" id="post-blocked">
+                      ทุกวันต้องมีอย่างน้อย 1 สถานที่ก่อนโพสต์ ยังว่าง: วันที่ {dayList(emptyDays)}
+                    </span>
+                  )}
                 </div>
                 <div className="share-public-actions">
                   {sharing.post && (
@@ -310,7 +322,13 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
                       เอาโพสต์ออก
                     </button>
                   )}
-                  <button type="button" className="btn-outline" disabled={busy} onClick={() => changePost("POST")}>
+                  <button
+                    type="button"
+                    className="btn-outline"
+                    disabled={busy || emptyDays.length > 0}
+                    aria-describedby={emptyDays.length > 0 ? "post-blocked" : undefined}
+                    onClick={() => changePost("POST")}
+                  >
                     {sharing.post ? "อัปเดตโพสต์" : "โพสต์"}
                   </button>
                 </div>
