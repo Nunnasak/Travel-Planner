@@ -84,6 +84,10 @@ const PATTERNS: [RegExp, (match: RegExpMatchArray) => string][] = [
     /^Add at least one place to day ([\d, ]+) before posting\.$/,
     (m) => `เพิ่มสถานที่ในวันที่ ${m[1]} ก่อนโพสต์ ทุกวันต้องมีอย่างน้อย 1 ที่`,
   ],
+  [
+    /^Put the places on day ([\d, ]+) in time order before posting\.$/,
+    (m) => `เวลาในวันที่ ${m[1]} ยังไม่เรียงจากเช้าไปเย็น แก้เวลาให้ถูกก่อนโพสต์`,
+  ],
 ];
 
 export function toThai(message: string): string;

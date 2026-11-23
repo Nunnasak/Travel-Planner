@@ -8,9 +8,17 @@ import { TINTS, tintClass } from "@/lib/categories";
 import { placeLine } from "@/lib/place";
 import { formatVisitTime, type ScheduleDay, type ScheduleStop } from "@/lib/schedule";
 import AddPlaceModal from "./AddPlaceModal";
+import StopTime from "./StopTime";
 
 function orderKey(days: ScheduleDay[]) {
   return days.map((day) => `${day.day_no}:${day.stops.map((s) => s.item_id).join(",")}`).join("|");
+}
+
+function sortByTime(stops: ScheduleStop[]) {
+  return stops
+    .map((stop, index) => ({ stop, index }))
+    .sort((a, b) => formatVisitTime(a.stop.visit_time).localeCompare(formatVisitTime(b.stop.visit_time)) || a.index - b.index)
+    .map(({ stop }) => stop);
 }
 
 function moveStop(days: ScheduleDay[], itemId: number, toDay: number, toIndex: number) {
@@ -48,6 +56,7 @@ export default function DayList({ scheduleId, totalDays, days, canEdit }: Props)
   const [order, setOrder] = useState(days);
   const [dragId, setDragId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
+  const [editingTime, setEditingTime] = useState<number | null>(null);
   const orderRef = useRef(days);
   const draggingRef = useRef(false);
   const finishRef = useRef<() => void>(() => {});
@@ -131,10 +140,25 @@ export default function DayList({ scheduleId, totalDays, days, canEdit }: Props)
     router.refresh();
   }
 
+  async function saveTime(itemId: number, time: string) {
+    setError("");
+    const result = await sendJson("PATCH", `/api/schedules/${scheduleId}/items/${itemId}`, { visit_time: time });
+    if (!result.ok) return result.data.errors?.visit_time ?? result.data.message ?? "แก้เวลาไม่สำเร็จ ลองอีกครั้ง";
+    const next = orderRef.current.map((day) => {
+      if (!day.stops.some((stop) => stop.item_id === itemId)) return day;
+      const stops = day.stops.map((stop) => (stop.item_id === itemId ? { ...stop, visit_time: time } : stop));
+      return { ...day, stops: sortByTime(stops) };
+    });
+    orderRef.current = next;
+    setOrder(next);
+    router.refresh();
+    return null;
+  }
+
   return (
     <div className={`day-list ${saving ? "is-saving" : ""}`}>
       {error && <p className="form-error" role="alert">{error}</p>}
-      {canEdit && <p className="drag-hint">ลากสถานที่เพื่อเปลี่ยนลำดับ หรือย้ายไปวันอื่น</p>}
+      {canEdit && <p className="drag-hint">ลากสถานที่เพื่อเปลี่ยนลำดับ หรือย้ายไปวันอื่น กดที่เวลาเพื่อแก้ไข</p>}
       {order.flatMap((day) => {
         const dropOnDay = {
           onDragOver: (event: DragEvent) => overDay(event, day.day_no),
@@ -153,7 +177,7 @@ export default function DayList({ scheduleId, totalDays, days, canEdit }: Props)
             <div
               key={`stop-${stop.item_id}`}
               className={`stop-row ${index === day.stops.length - 1 ? "is-last" : ""} ${busyId === stop.item_id ? "is-busy" : ""} ${dragId === stop.item_id ? "is-dragging" : ""}`}
-              draggable={canEdit && !saving}
+              draggable={canEdit && !saving && editingTime !== stop.item_id}
               onDragStart={(event) => {
                 event.dataTransfer.effectAllowed = "move";
                 event.dataTransfer.setData("text/plain", String(stop.item_id));
@@ -164,7 +188,17 @@ export default function DayList({ scheduleId, totalDays, days, canEdit }: Props)
               onDrop={(event) => event.preventDefault()}
               onDragEnd={finishDrag}
             >
-              <span className="stop-time">{formatVisitTime(stop.visit_time)}</span>
+              <StopTime
+                value={stop.visit_time}
+                placeName={stop.location.name}
+                editable={canEdit && !saving}
+                outOfOrder={
+                  index > 0 &&
+                  formatVisitTime(stop.visit_time) < formatVisitTime(day.stops[index - 1].visit_time)
+                }
+                onEditingChange={(editing) => setEditingTime(editing ? stop.item_id : null)}
+                onSave={(time) => saveTime(stop.item_id, time)}
+              />
               <span className="stop-ring" aria-hidden="true">{index + 1}</span>
               <div
                 className={`stop-thumb ${
