@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { sendJson } from "@/lib/api-client";
+import { NETWORK_ERROR } from "@/lib/messages";
 
 export type SaveState =
   | { kind: "idle" }
@@ -28,14 +29,14 @@ export function usePlanPatch(scheduleId: number) {
         const result = await sendJson("PATCH", `/api/schedules/${scheduleId}`, patch);
         if (!result.ok) {
           const fieldMessage = Object.values(result.data.errors ?? {})[0];
-          setState({ kind: "error", message: fieldMessage ?? result.data.message ?? "Couldn't save that change." });
+          setState({ kind: "error", message: fieldMessage ?? result.data.message ?? "บันทึกไม่สำเร็จ ลองอีกครั้ง" });
           return false;
         }
         setState({ kind: "saved" });
         router.refresh();
         return true;
       } catch {
-        setState({ kind: "error", message: "Cannot reach the server. Check your connection and try again." });
+        setState({ kind: "error", message: NETWORK_ERROR });
         return false;
       }
     },

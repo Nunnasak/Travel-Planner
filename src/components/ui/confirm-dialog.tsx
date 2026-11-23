@@ -38,7 +38,7 @@ export default function ConfirmDialog({ title, message, confirmLabel, busy, onCo
         <p id={`${id}-message`}>{message}</p>
         <div className="confirm-actions">
           <button type="button" className="btn-outline" autoFocus onClick={onCancel} disabled={busy}>
-            Cancel
+            ยกเลิก
           </button>
           <button type="button" className="btn-coral" onClick={onConfirm} disabled={busy}>
             {confirmLabel}

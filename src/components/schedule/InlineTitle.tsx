@@ -18,7 +18,7 @@ export default function InlineTitle({ value, onSave }: Props) {
   return (
     <input
       className="inline-title"
-      aria-label="Plan name"
+      aria-label="ชื่อแผน"
       maxLength={100}
       value={draft}
       onChange={(e) => setDraft(e.target.value)}

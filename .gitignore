@@ -13,3 +13,4 @@ playwright/.cache/
 AGENTS.md
 CLAUDE.md
 uploads/
+.claude/

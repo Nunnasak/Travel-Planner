@@ -2,10 +2,9 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import CategoryTags from "@/components/ui/category-tags";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
-import CoverImage, { CARD_IMAGE_SIZES } from "@/components/ui/cover-image";
-import { coverTintClass } from "@/lib/categories";
+import TicketCard from "@/components/ui/ticket-card";
+import { toThai } from "@/lib/messages";
 import type { MySchedule } from "@/lib/schedule";
 
 export default function ScheduleCard({ plan, eager = false }: { plan: MySchedule; eager?: boolean }) {
@@ -33,38 +32,29 @@ export default function ScheduleCard({ plan, eager = false }: { plan: MySchedule
     setBusy(false);
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      return setError(data.message ?? "Couldn't delete this plan.");
+      return setError(toThai(data.message) ?? "ลบแผนไม่สำเร็จ ลองอีกครั้ง");
     }
     router.refresh();
   }
 
   return (
-    <article className={`plan-card schedule-card ${busy ? "is-busy" : ""}`}>
-      <Link href={`/schedules/${plan.schedule_id}`} className="schedule-card-link">
-        <div className={`plan-cover ${plan.cover_url ? "" : `cover-x ${coverTintClass(plan.categories)}`}`}>
-          {plan.cover_url ? (
-            <CoverImage src={plan.cover_url} alt="" sizes={CARD_IMAGE_SIZES} eager={eager} />
-          ) : (
-            <span className="cover-badge">IMG</span>
-          )}
-          <CategoryTags categories={plan.categories} max={2} />
-          {plan.post && <span className="tag tag-public">On Discover</span>}
-        </div>
-        <div className="plan-body">
-          <h3>{plan.schedule_name}</h3>
-          <p className="plan-desc">{plan.description || "No description yet."}</p>
-          <p className="plan-meta">
-            {plan.total_day} {plan.total_day === 1 ? "day" : "days"} · {plan.place_count}{" "}
-            {plan.place_count === 1 ? "place" : "places"}
-          </p>
-        </div>
-      </Link>
-
+    <TicketCard
+      className={`schedule-card ${busy ? "is-busy" : ""}`}
+      href={`/schedules/${plan.schedule_id}`}
+      title={plan.schedule_name}
+      subtitle={plan.description || "ยังไม่มีคำอธิบาย"}
+      coverUrl={plan.cover_url}
+      categories={plan.categories}
+      days={plan.total_day}
+      placeCount={plan.place_count}
+      badges={[...(plan.post ? ["โพสต์แล้ว"] : []), ...(plan.is_owner ? [] : ["แชร์มาให้คุณ"])]}
+      eager={eager}
+    >
       <div className="card-menu" ref={menuRef}>
         <button
           type="button"
           className="card-menu-btn"
-          aria-label="Plan options"
+          aria-label="ตัวเลือกของแผน"
           aria-expanded={open}
           onClick={() => setOpen((value) => !value)}
         >
@@ -72,7 +62,7 @@ export default function ScheduleCard({ plan, eager = false }: { plan: MySchedule
         </button>
         {open && (
           <div className="card-menu-list" role="menu">
-            <Link href={`/schedules/${plan.schedule_id}`} role="menuitem">Open</Link>
+            <Link href={`/schedules/${plan.schedule_id}`} role="menuitem">เปิดแผน</Link>
             {plan.is_owner && (
               <button
                 type="button"
@@ -83,7 +73,7 @@ export default function ScheduleCard({ plan, eager = false }: { plan: MySchedule
                   setConfirming(true);
                 }}
               >
-                Delete
+                ลบแผน
               </button>
             )}
           </div>
@@ -92,13 +82,13 @@ export default function ScheduleCard({ plan, eager = false }: { plan: MySchedule
       {error && <p className="field-error card-error">{error}</p>}
       {confirming && (
         <ConfirmDialog
-          title="Delete this plan?"
-          message={`"${plan.schedule_name}"${plan.post ? " and its post on Discover" : ""} will be deleted. This can't be undone.`}
-          confirmLabel="Delete plan"
+          title="ลบแผนนี้ไหม?"
+          message={`แผน "${plan.schedule_name}"${plan.post ? " และโพสต์ในหน้าสำรวจทริป" : ""} จะถูกลบ และกู้คืนไม่ได้`}
+          confirmLabel="ลบแผน"
           onCancel={() => setConfirming(false)}
           onConfirm={remove}
         />
       )}
-    </article>
+    </TicketCard>
   );
 }

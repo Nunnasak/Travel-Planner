@@ -54,19 +54,19 @@ export function PasswordSection({ onUpdatePassword }: PasswordSectionProps) {
     if (isSaving) return;
 
     if (!currentPassword) {
-      setError("Please enter your current password.");
+      setError("ใส่รหัสผ่านปัจจุบัน");
       return;
     }
     if (newPassword.length < PASSWORD_MIN_LENGTH) {
-      setError(`New password must be at least ${PASSWORD_MIN_LENGTH} characters.`);
+      setError(`รหัสผ่านใหม่ต้องมีอย่างน้อย ${PASSWORD_MIN_LENGTH} ตัวอักษร`);
       return;
     }
     if (newPassword === currentPassword) {
-      setError("New password must be different from the current one.");
+      setError("รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสผ่านเดิม");
       return;
     }
     if (newPassword !== confirmPassword) {
-      setError("New passwords do not match.");
+      setError("รหัสผ่านใหม่ทั้งสองช่องไม่ตรงกัน");
       return;
     }
 
@@ -75,7 +75,7 @@ export function PasswordSection({ onUpdatePassword }: PasswordSectionProps) {
       await onUpdatePassword?.({ currentPassword, newPassword });
       close();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not change password.");
+      setError(err instanceof Error ? err.message : "เปลี่ยนรหัสผ่านไม่สำเร็จ ลองอีกครั้ง");
     } finally {
       setIsSaving(false);
     }
@@ -85,7 +85,7 @@ export function PasswordSection({ onUpdatePassword }: PasswordSectionProps) {
     <>
       <div className={styles.passwordRow}>
         <div>
-          <div className={styles.rowTitle}>Change password</div>
+          <div className={styles.rowTitle}>เปลี่ยนรหัสผ่าน</div>
         </div>
 
         <AccountButton
@@ -94,7 +94,7 @@ export function PasswordSection({ onUpdatePassword }: PasswordSectionProps) {
           aria-controls={panelId}
           onClick={toggle}
         >
-          Change password
+          เปลี่ยนรหัสผ่าน
         </AccountButton>
       </div>
 
@@ -104,7 +104,7 @@ export function PasswordSection({ onUpdatePassword }: PasswordSectionProps) {
             <form key={formKey} onSubmit={handleSubmit} noValidate className={styles.passwordForm}>
               <PasswordField
                 id={`${uid}-current`}
-                label="Current password"
+                label="รหัสผ่านปัจจุบัน"
                 value={currentPassword}
                 onChange={(value) => {
                   setCurrentPassword(value);
@@ -116,26 +116,26 @@ export function PasswordSection({ onUpdatePassword }: PasswordSectionProps) {
               />
               <PasswordField
                 id={`${uid}-new`}
-                label="New password"
+                label="รหัสผ่านใหม่"
                 value={newPassword}
                 onChange={(value) => {
                   setNewPassword(value);
                   clearError();
                 }}
                 autoComplete="new-password"
-                placeholder={`Minimum ${PASSWORD_MIN_LENGTH} characters`}
+                placeholder={`อย่างน้อย ${PASSWORD_MIN_LENGTH} ตัวอักษร`}
                 disabled={isSaving}
               />
               <PasswordField
                 id={`${uid}-confirm`}
-                label="Confirm new password"
+                label="ยืนยันรหัสผ่านใหม่"
                 value={confirmPassword}
                 onChange={(value) => {
                   setConfirmPassword(value);
                   clearError();
                 }}
                 autoComplete="new-password"
-                placeholder="Re-enter new password"
+                placeholder="ใส่รหัสผ่านใหม่อีกครั้ง"
                 disabled={isSaving}
               />
 
@@ -147,10 +147,10 @@ export function PasswordSection({ onUpdatePassword }: PasswordSectionProps) {
 
               <div className={styles.passwordActions}>
                 <AccountButton variant="secondary" onClick={close} disabled={isSaving}>
-                  Cancel
+                  ยกเลิก
                 </AccountButton>
                 <AccountButton type="submit" disabled={isSaving}>
-                  {isSaving ? "Saving..." : "Save password"}
+                  {isSaving ? "กำลังบันทึก..." : "บันทึกรหัสผ่าน"}
                 </AccountButton>
               </div>
             </form>

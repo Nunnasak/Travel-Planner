@@ -31,7 +31,7 @@ export function DangerZone({ email, onDeleteAccount }: DangerZoneProps) {
       await onDeleteAccount?.(password);
       setIsModalOpen(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not delete account.");
+      setError(err instanceof Error ? err.message : "ลบบัญชีไม่สำเร็จ ลองอีกครั้ง");
     } finally {
       setIsDeleting(false);
     }
@@ -41,16 +41,15 @@ export function DangerZone({ email, onDeleteAccount }: DangerZoneProps) {
     <section aria-labelledby={headingId} className={`${styles.card} ${styles.cardDanger}`}>
       <div>
         <h2 id={headingId} className={styles.dangerTitle}>
-          Delete account
+          ลบบัญชี
         </h2>
         <p className={styles.dangerDesc}>
-          Permanently remove your account and all saved travel plans. This
-          action cannot be undone.
+          ลบบัญชีและแผนเที่ยวทั้งหมดของคุณถาวร กู้คืนไม่ได้
         </p>
       </div>
 
-      <AccountButton size="lg" onClick={openModal}>
-        Delete account
+      <AccountButton variant="danger" size="lg" onClick={openModal}>
+        ลบบัญชี
       </AccountButton>
 
       {isModalOpen && (

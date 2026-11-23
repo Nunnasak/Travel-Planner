@@ -1,5 +1,7 @@
 // Small fetch helper for the frontend forms.
 
+import { localizeErrors, toThai } from "@/lib/messages";
+
 export type ApiResult = {
   ok: boolean;
   status: number;
@@ -28,7 +30,11 @@ export async function sendJson(
   } catch {
     // response had no JSON body
   }
-  return { ok: response.ok, status: response.status, data };
+  return { ok: response.ok, status: response.status, data: localize(data) };
+}
+
+function localize(data: ApiResult["data"]): ApiResult["data"] {
+  return { ...data, message: toThai(data.message), errors: localizeErrors(data.errors) };
 }
 
 // Keep only the field errors the form actually has.
@@ -49,5 +55,5 @@ export async function uploadImage(file: File): Promise<ApiResult> {
   body.append("file", file);
   const response = await fetch("/api/uploads", { method: "POST", body, credentials: "same-origin" });
   const data = await response.json().catch(() => ({}));
-  return { ok: response.ok, status: response.status, data };
+  return { ok: response.ok, status: response.status, data: localize(data) };
 }

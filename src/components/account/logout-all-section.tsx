@@ -19,7 +19,7 @@ export function LogoutAllSection({ onLogoutAll }: LogoutAllSectionProps) {
     try {
       await onLogoutAll?.();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not log out of all devices.");
+      setError(err instanceof Error ? err.message : "ออกจากระบบทุกเครื่องไม่สำเร็จ ลองอีกครั้ง");
       setIsLoading(false);
     }
   }
@@ -28,14 +28,14 @@ export function LogoutAllSection({ onLogoutAll }: LogoutAllSectionProps) {
     <>
       <div className={styles.passwordRow}>
         <div>
-          <div className={styles.rowTitle}>Log out of all devices</div>
+          <div className={styles.rowTitle}>ออกจากระบบทุกเครื่อง</div>
           <p className={styles.rowDesc}>
             ออกจากระบบทุกเครื่องที่เคยล็อกอินไว้ รวมถึงเครื่องนี้ด้วย
           </p>
         </div>
 
         <AccountButton variant="outline" onClick={handleClick} disabled={isLoading}>
-          {isLoading ? "Logging out..." : "Log out all devices"}
+          {isLoading ? "กำลังออกจากระบบ..." : "ออกจากระบบทุกเครื่อง"}
         </AccountButton>
       </div>
 

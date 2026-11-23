@@ -7,7 +7,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 export function Button({
   loading = false,
-  loadingText = "Please wait...",
+  loadingText = "รอสักครู่...",
   disabled,
   className = "",
   children,

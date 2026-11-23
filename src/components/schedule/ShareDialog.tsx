@@ -2,22 +2,23 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { sendJson, type ApiResult } from "@/lib/api-client";
+import { NETWORK_ERROR, toThai } from "@/lib/messages";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import SelectMenu, { type MenuOption } from "@/components/ui/select-menu";
 import type { MemberRole } from "@/core/schema/share.schema";
 import type { SharedPerson, Sharing } from "@/lib/schedule";
 
 type Props = { scheduleId: number; onClose: () => void };
-const ROLE_LABEL: Record<MemberRole, string> = { VIEWER: "Viewer", EDITOR: "Editor" };
+const ROLE_LABEL: Record<MemberRole, string> = { VIEWER: "ดูได้อย่างเดียว", EDITOR: "แก้ไขได้" };
 
 const ROLE_OPTIONS: MenuOption<MemberRole>[] = [
-  { value: "VIEWER", label: "Viewer", description: "Can see the plan" },
-  { value: "EDITOR", label: "Editor", description: "Can change the plan" },
+  { value: "VIEWER", label: "ดูได้อย่างเดียว", description: "เปิดดูแผนได้ แต่แก้ไม่ได้" },
+  { value: "EDITOR", label: "แก้ไขได้", description: "แก้แผนได้เหมือนเจ้าของ" },
 ];
 
 const ACCESS_OPTIONS: MenuOption<"RESTRICTED" | "ANYONE">[] = [
-  { value: "RESTRICTED", label: "Only people added", description: "Only people added above can open the link" },
-  { value: "ANYONE", label: "Anyone with the link", description: "Anyone who logs in with the link joins" },
+  { value: "RESTRICTED", label: "เฉพาะคนที่เพิ่มไว้", description: "เฉพาะคนในรายชื่อด้านบนที่เปิดลิงก์ได้" },
+  { value: "ANYONE", label: "ทุกคนที่มีลิงก์", description: "ใครเข้าสู่ระบบแล้วเปิดลิงก์ จะเข้าร่วมแผนได้" },
 ];
 
 type Confirming = "reset" | "remove" | null;
@@ -46,9 +47,9 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
         const data = await res.json().catch(() => ({}));
         if (cancelled) return;
         if (res.ok) setSharing(data as Sharing);
-        else setLoadError(data.message ?? "Couldn't load who has access.");
+        else setLoadError(toThai(data.message) ?? "โหลดรายชื่อคนที่เข้าถึงไม่สำเร็จ");
       })
-      .catch(() => !cancelled && setLoadError("Cannot reach the server. Check your connection and try again."));
+      .catch(() => !cancelled && setLoadError(NETWORK_ERROR));
     return () => {
       cancelled = true;
     };
@@ -68,7 +69,7 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
     try {
       const result = await request;
       if (!result.ok) {
-        setError(result.data.message ?? "Couldn't save that change.");
+        setError(result.data.message ?? "บันทึกไม่สำเร็จ ลองอีกครั้ง");
         return result;
       }
       setSharing(result.data as unknown as Sharing);
@@ -76,7 +77,7 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
       router.refresh();
       return result;
     } catch {
-      setError("Cannot reach the server. Check your connection and try again.");
+      setError(NETWORK_ERROR);
     } finally {
       setBusy(false);
     }
@@ -85,7 +86,7 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
   async function addPerson(event: FormEvent) {
     event.preventDefault();
     setFieldError("");
-    if (!identifier.trim()) return setFieldError("Enter a username or email.");
+    if (!identifier.trim()) return setFieldError("ใส่ชื่อผู้ใช้หรืออีเมล");
     const result = await run(sendJson("POST", `${base}/members`, { identifier, role: newRole }), () =>
       setIdentifier(""),
     );
@@ -101,12 +102,12 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
     setError("");
     try {
       const result = await sendJson(method, `${base}/post`);
-      if (!result.ok) return setError(result.data.message ?? "Couldn't update Discover.");
+      if (!result.ok) return setError(result.data.message ?? "อัปเดตโพสต์ไม่สำเร็จ ลองอีกครั้ง");
       const post = method === "POST" ? (result.data as unknown as Sharing["post"]) : null;
       setSharing({ ...sharing, post });
       router.refresh();
     } catch {
-      setError("Cannot reach the server. Check your connection and try again.");
+      setError(NETWORK_ERROR);
     } finally {
       setBusy(false);
     }
@@ -117,7 +118,7 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
     const link = `${window.location.origin}${sharing.share_path}`;
     try {
       await navigator.clipboard.writeText(link);
-      setCopied("Link copied");
+      setCopied("คัดลอกลิงก์แล้ว");
     } catch {
       setCopied(link);
     }
@@ -138,11 +139,11 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
           {person.email && <span>{person.email}</span>}
         </span>
         {role === "OWNER" ? (
-          <span className="share-role-label">Owner</span>
+          <span className="share-role-label">เจ้าของ</span>
         ) : manage ? (
           <>
             <SelectMenu
-              label={`Role for ${person.username}`}
+              label={`สิทธิ์ของ ${person.username}`}
               value={role}
               options={ROLE_OPTIONS}
               disabled={busy}
@@ -151,7 +152,7 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
             <button
               type="button"
               className="share-remove"
-              aria-label={`Remove ${person.username}`}
+              aria-label={`เอา ${person.username} ออก`}
               disabled={busy}
               onClick={() => run(sendJson("DELETE", `${base}/members/${person.user_id}`))}
             >
@@ -169,8 +170,8 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
     <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal share-dialog" role="dialog" aria-modal="true" aria-labelledby="share-title">
         <div className="modal-head">
-          <h2 id="share-title">Share plan</h2>
-          <button type="button" className="filter-close" aria-label="Close" onClick={onClose}>
+          <h2 id="share-title">แชร์แผน</h2>
+          <button type="button" className="filter-close" aria-label="ปิด" onClick={onClose}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
               <path d="M6 6l12 12M18 6L6 18" />
             </svg>
@@ -179,18 +180,18 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
 
         {!sharing ? (
           <p className={loadError ? "form-error" : "share-hint"} role={loadError ? "alert" : "status"}>
-            {loadError || "Loading…"}
+            {loadError || "กำลังโหลด…"}
           </p>
         ) : (
           <>
             <section className="share-section">
-              <h3>People with access</h3>
+              <h3>คนที่เข้าถึงได้</h3>
               {manage && (
                 <form className="share-add" onSubmit={addPerson} noValidate>
                   <input
                     className="share-input"
-                    placeholder="Add people by username or email"
-                    aria-label="Username or email"
+                    placeholder="เพิ่มคนด้วยชื่อผู้ใช้หรืออีเมล"
+                    aria-label="ชื่อผู้ใช้หรืออีเมล"
                     value={identifier}
                     aria-invalid={fieldError ? true : undefined}
                     onChange={(e) => {
@@ -198,8 +199,8 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
                       setFieldError("");
                     }}
                   />
-                  <SelectMenu label="Role for new person" value={newRole} options={ROLE_OPTIONS} onChange={setNewRole} />
-                  <button type="submit" className="btn-outline" disabled={busy}>Add</button>
+                  <SelectMenu label="สิทธิ์ของคนที่จะเพิ่ม" value={newRole} options={ROLE_OPTIONS} onChange={setNewRole} />
+                  <button type="submit" className="btn-outline" disabled={busy}>เพิ่ม</button>
                 </form>
               )}
               {fieldError && <p className="field-error">{fieldError}</p>}
@@ -210,7 +211,7 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
             </section>
 
             <section className="share-section">
-              <h3>General access</h3>
+              <h3>การเข้าถึงผ่านลิงก์</h3>
               <div className="share-access">
                 <span className="share-globe" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
@@ -230,7 +231,7 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
                 <div className="share-access-text">
                   {manage ? (
                     <SelectMenu
-                      label="Who can open the link"
+                      label="ใครเปิดลิงก์ได้"
                       variant="plain"
                       value={linkOpen ? "ANYONE" : "RESTRICTED"}
                       options={ACCESS_OPTIONS}
@@ -240,18 +241,18 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
                       }
                     />
                   ) : (
-                    <strong>{linkOpen ? "Anyone with the link" : "Only people added"}</strong>
+                    <strong>{linkOpen ? "ทุกคนที่มีลิงก์" : "เฉพาะคนที่เพิ่มไว้"}</strong>
                   )}
                   <span>
                     {linkOpen
-                      ? "Anyone who logs in with the link joins this plan."
-                      : "Only people added above can open the link."}
+                      ? "ใครเข้าสู่ระบบแล้วเปิดลิงก์ จะเข้าร่วมแผนนี้ได้"
+                      : "เฉพาะคนในรายชื่อด้านบนที่เปิดลิงก์ได้"}
                   </span>
                 </div>
                 {linkOpen &&
                   (manage ? (
                     <SelectMenu
-                      label="Role for people with the link"
+                      label="สิทธิ์ของคนที่เปิดผ่านลิงก์"
                       value={sharing.link_access as MemberRole}
                       options={ROLE_OPTIONS}
                       disabled={busy}
@@ -268,7 +269,7 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
                   disabled={busy}
                   onClick={() => setConfirming("reset")}
                 >
-                  Reset link
+                  สร้างลิงก์ใหม่
                 </button>
               )}
             </section>
@@ -278,24 +279,24 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
                 <path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1" />
                 <path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1" />
               </svg>
-              Copy link
+              คัดลอกลิงก์
             </button>
             {copied && <p className="share-hint" role="status">{copied}</p>}
 
             {manage && (
               <section className="share-public">
                 <div className="share-public-text">
-                  <strong>Post to Discover</strong>
+                  <strong>โพสต์ลงหน้าสำรวจทริป</strong>
                   {sharing.post ? (
                     <span>
-                      Posted {new Date(sharing.post.updated_at).toLocaleString()}. Changes you make later stay
-                      private until you update the post.{" "}
+                      โพสต์เมื่อ {new Date(sharing.post.updated_at).toLocaleString("th-TH")} ถ้าแก้แผนหลังจากนี้
+                      คนอื่นจะยังไม่เห็นจนกว่าจะอัปเดตโพสต์{" "}
                       <a href={`/discover/${sharing.post.schedule_id}`} target="_blank" rel="noopener noreferrer">
-                        View post
+                        ดูโพสต์
                       </a>
                     </span>
                   ) : (
-                    <span>Post a copy of this plan as it is now. Anyone can find and duplicate it.</span>
+                    <span>โพสต์สำเนาของแผนตามที่เป็นอยู่ตอนนี้ ทุกคนค้นเจอและคัดลอกไปใช้ได้</span>
                   )}
                 </div>
                 <div className="share-public-actions">
@@ -306,11 +307,11 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
                       disabled={busy}
                       onClick={() => setConfirming("remove")}
                     >
-                      Remove
+                      เอาโพสต์ออก
                     </button>
                   )}
                   <button type="button" className="btn-outline" disabled={busy} onClick={() => changePost("POST")}>
-                    {sharing.post ? "Update post" : "Post"}
+                    {sharing.post ? "อัปเดตโพสต์" : "โพสต์"}
                   </button>
                 </div>
               </section>
@@ -323,9 +324,9 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
 
       {confirming === "reset" && (
         <ConfirmDialog
-          title="Make a new link?"
-          message="The old link will stop working. People who already joined keep their access."
-          confirmLabel="Make new link"
+          title="สร้างลิงก์ใหม่ไหม?"
+          message="ลิงก์เดิมจะใช้ไม่ได้ คนที่เข้าร่วมแล้วยังเข้าถึงได้เหมือนเดิม"
+          confirmLabel="สร้างลิงก์ใหม่"
           busy={busy}
           onCancel={() => setConfirming(null)}
           onConfirm={async () => {
@@ -336,9 +337,9 @@ export default function ShareDialog({ scheduleId, onClose }: Props) {
       )}
       {confirming === "remove" && (
         <ConfirmDialog
-          title="Remove from Discover?"
-          message="The post will disappear from Discover. Your plan stays as it is."
-          confirmLabel="Remove post"
+          title="เอาโพสต์ออกไหม?"
+          message="โพสต์จะหายไปจากหน้าสำรวจทริป แต่แผนของคุณยังอยู่เหมือนเดิม"
+          confirmLabel="เอาโพสต์ออก"
           busy={busy}
           onCancel={() => setConfirming(null)}
           onConfirm={async () => {

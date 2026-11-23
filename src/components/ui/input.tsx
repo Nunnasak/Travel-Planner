@@ -39,7 +39,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           <button
             type="button"
             className="toggle-pass"
-            aria-label={visible ? "Hide password" : "Show password"}
+            aria-label={visible ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
             aria-pressed={visible}
             onClick={() => setVisible((v) => !v)}
           >

@@ -9,8 +9,8 @@ export default async function NewSchedulePage() {
   return (
     <div className="page-content create-page">
       <div className="create-heading">
-        <h1>Create a plan</h1>
-        <p>Give your trip a name and a few details. You&apos;ll add places on the next page.</p>
+        <h1>สร้างแผนใหม่</h1>
+        <p>ตั้งชื่อทริปและใส่รายละเอียดเล็กน้อย จะได้เพิ่มสถานที่ในหน้าถัดไป</p>
       </div>
       <ScheduleForm />
     </div>

@@ -11,7 +11,7 @@ import { usePlanPatch } from "./usePlanPatch";
 export default function ScheduleEditor({ plan }: { plan: ScheduleDetail }) {
   const { state, save } = usePlanPatch(plan.schedule_id);
   const [sharing, setSharing] = useState(false);
-  const status = state.kind === "saving" ? "Saving…" : state.kind === "saved" ? "Saved" : "";
+  const status = state.kind === "saving" ? "กำลังบันทึก…" : state.kind === "saved" ? "บันทึกแล้ว" : "";
 
   return (
     <div className="page-content">
@@ -20,7 +20,7 @@ export default function ScheduleEditor({ plan }: { plan: ScheduleDetail }) {
         <div className="header-actions">
           {status && <span className="save-status" role="status">{status}</span>}
           <button type="button" className="btn-coral" onClick={() => setSharing(true)}>
-            Share
+            แชร์
           </button>
         </div>
       </div>
@@ -32,7 +32,7 @@ export default function ScheduleEditor({ plan }: { plan: ScheduleDetail }) {
 
         <section className="detail-plan">
           <div className="plan-head">
-            <h2>Plan</h2>
+            <h2>แผนการเดินทาง</h2>
           </div>
           <DayList
             scheduleId={plan.schedule_id}
@@ -42,8 +42,8 @@ export default function ScheduleEditor({ plan }: { plan: ScheduleDetail }) {
           />
         </section>
 
-        <aside className="detail-map" aria-label="Map">
-          <h2>Map</h2>
+        <aside className="detail-map" aria-label="แผนที่">
+          <h2>แผนที่</h2>
           <PlanMapColumn days={plan.days} />
         </aside>
       </div>

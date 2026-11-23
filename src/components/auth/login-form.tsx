@@ -6,6 +6,7 @@ import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { pickFieldErrors, postJson } from "@/lib/api-client";
+import { NETWORK_ERROR } from "@/lib/messages";
 import { EMAIL_PATTERN } from "@/lib/validation";
 
 type Field = "email" | "password";
@@ -31,10 +32,10 @@ export function LoginForm({ redirectTo = "/discover" }: { redirectTo?: string })
 
     const trimmedEmail = email.trim();
     const next: Errors = {};
-    if (!trimmedEmail) next.email = "Enter your email.";
+    if (!trimmedEmail) next.email = "ใส่อีเมล";
     else if (!EMAIL_PATTERN.test(trimmedEmail))
-      next.email = "Enter a valid email, like name@example.com.";
-    if (!password) next.password = "Enter your password.";
+      next.email = "ใส่อีเมลให้ถูกรูปแบบ เช่น name@example.com";
+    if (!password) next.password = "ใส่รหัสผ่าน";
 
     setErrors(next);
     if (Object.keys(next).length > 0) return;
@@ -61,24 +62,24 @@ export function LoginForm({ redirectTo = "/discover" }: { redirectTo?: string })
         setFormError(
           result.data.message ??
           (result.status === 401
-            ? "Email or password is incorrect."
-            : "Could not log in. Please try again.")
+            ? "อีเมลหรือรหัสผ่านไม่ถูกต้อง"
+            : "เข้าสู่ระบบไม่สำเร็จ ลองอีกครั้ง")
         );
       }
     } catch {
-      setFormError("Cannot reach the server. Check your connection and try again.");
+      setFormError(NETWORK_ERROR);
     }
     setLoading(false);
   }
 
   return (
     <section className="auth-card">
-      <h1>Login</h1>
+      <h1>เข้าสู่ระบบ</h1>
       <p className="auth-subtitle">เข้าสู่ระบบเพื่อจัดแผนท่องเที่ยว</p>
 
       <form onSubmit={handleSubmit} noValidate>
         <Input
-          label="Email"
+          label="อีเมล"
           name="email"
           type="email"
           autoComplete="email"
@@ -92,11 +93,11 @@ export function LoginForm({ redirectTo = "/discover" }: { redirectTo?: string })
         />
 
         <Input
-          label="Password"
+          label="รหัสผ่าน"
           name="password"
           type="password"
           autoComplete="current-password"
-          placeholder="Enter your password"
+          placeholder="ใส่รหัสผ่าน"
           value={password}
           onChange={(e) => {
             setPassword(e.target.value);
@@ -120,15 +121,15 @@ export function LoginForm({ redirectTo = "/discover" }: { redirectTo?: string })
           </p>
         )}
 
-        <Button type="submit" loading={loading} loadingText="Signing in...">
-          Login
+        <Button type="submit" loading={loading} loadingText="กำลังเข้าสู่ระบบ...">
+          เข้าสู่ระบบ
         </Button>
       </form>
 
       <p className="auth-switch">
         ยังไม่มีบัญชี?{" "}
         <Link href="/register" className="link">
-          Sign up
+          สมัครสมาชิก
         </Link>
       </p>
     </section>

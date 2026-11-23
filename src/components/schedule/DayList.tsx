@@ -113,7 +113,7 @@ export default function DayList({ scheduleId, totalDays, days, canEdit }: Props)
     if (!result.ok) {
       orderRef.current = days;
       setOrder(days);
-      return setError(result.data.message ?? "Couldn't save the new order.");
+      return setError(result.data.message ?? "บันทึกลำดับใหม่ไม่สำเร็จ ลองอีกครั้ง");
     }
     router.refresh();
   }
@@ -126,14 +126,14 @@ export default function DayList({ scheduleId, totalDays, days, canEdit }: Props)
     setError("");
     const result = await sendJson("DELETE", `/api/schedules/${scheduleId}/items/${itemId}`);
     setBusyId(null);
-    if (!result.ok) return setError(result.data.message ?? "Couldn't remove this place.");
+    if (!result.ok) return setError(result.data.message ?? "ลบสถานที่ไม่สำเร็จ ลองอีกครั้ง");
     router.refresh();
   }
 
   return (
     <div className={`day-list ${saving ? "is-saving" : ""}`}>
       {error && <p className="form-error" role="alert">{error}</p>}
-      {canEdit && <p className="drag-hint">Drag a place to change the order or move it to another day.</p>}
+      {canEdit && <p className="drag-hint">ลากสถานที่เพื่อเปลี่ยนลำดับ หรือย้ายไปวันอื่น</p>}
       {order.flatMap((day) => {
         const dropOnDay = {
           onDragOver: (event: DragEvent) => overDay(event, day.day_no),
@@ -141,17 +141,17 @@ export default function DayList({ scheduleId, totalDays, days, canEdit }: Props)
         };
         return [
           <div key={`day-${day.day_no}`} id={`day-${day.day_no}`} className="day-divider" {...dropOnDay}>
-            DAY {day.day_no}
+            วันที่ {day.day_no}
           </div>,
           day.stops.length === 0 ? (
             <p key={`empty-${day.day_no}`} className={`day-empty ${dragId !== null ? "drop-zone" : ""}`} {...dropOnDay}>
-              {dragId !== null ? "Drop here" : "No places yet."}
+              {dragId !== null ? "วางที่นี่" : "ยังไม่มีสถานที่"}
             </p>
           ) : null,
-          ...day.stops.map((stop) => (
+          ...day.stops.map((stop, index) => (
             <div
               key={`stop-${stop.item_id}`}
-              className={`stop-row ${busyId === stop.item_id ? "is-busy" : ""} ${dragId === stop.item_id ? "is-dragging" : ""}`}
+              className={`stop-row ${index === day.stops.length - 1 ? "is-last" : ""} ${busyId === stop.item_id ? "is-busy" : ""} ${dragId === stop.item_id ? "is-dragging" : ""}`}
               draggable={canEdit && !saving}
               onDragStart={(event) => {
                 event.dataTransfer.effectAllowed = "move";
@@ -163,7 +163,8 @@ export default function DayList({ scheduleId, totalDays, days, canEdit }: Props)
               onDrop={(event) => event.preventDefault()}
               onDragEnd={finishDrag}
             >
-              {canEdit && <span className="drag-handle" aria-hidden>⋮⋮</span>}
+              <span className="stop-time">{formatVisitTime(stop.visit_time)}</span>
+              <span className="stop-ring" aria-hidden="true">{index + 1}</span>
               <div
                 className={`stop-thumb ${
                   stop.location.image_url ? "" : `cover-x ${tintClass(TINTS[stop.item_id % TINTS.length])}`
@@ -172,19 +173,19 @@ export default function DayList({ scheduleId, totalDays, days, canEdit }: Props)
                 {stop.location.image_url ? (
                   <CoverImage src={stop.location.image_url} alt={stop.location.name} sizes="60px" />
                 ) : (
-                  <span className="cover-badge">IMG</span>
+                  <span className="cover-badge">ไม่มีรูป</span>
                 )}
               </div>
               <div className="stop-info">
                 <strong>{stop.location.name}</strong>
                 <span>{stop.location.address}</span>
               </div>
-              <span className="stop-time">{formatVisitTime(stop.visit_time)}</span>
+              {canEdit && <span className="drag-handle" aria-hidden>⋮⋮</span>}
               {canEdit && (
                 <button
                   type="button"
                   className="stop-remove"
-                  aria-label={`Remove ${stop.location.name}`}
+                  aria-label={`ลบ ${stop.location.name}`}
                   onClick={() => setPendingRemove({ itemId: stop.item_id, name: stop.location.name })}
                 >
                   ×
@@ -200,16 +201,17 @@ export default function DayList({ scheduleId, totalDays, days, canEdit }: Props)
               onClick={() => setAddDay(day.day_no)}
               {...dropOnDay}
             >
-              + Add plan
+              <span className="add-place-ring" aria-hidden="true">+</span>
+              เพิ่มสถานที่ในวันที่ {day.day_no}
             </button>
           ) : null,
         ];
       })}
       {pendingRemove && (
         <ConfirmDialog
-          title="Remove this place?"
-          message={`"${pendingRemove.name}" will be removed from this plan.`}
-          confirmLabel="Remove"
+          title="ลบสถานที่นี้ไหม?"
+          message={`"${pendingRemove.name}" จะถูกลบออกจากแผนนี้`}
+          confirmLabel="ลบสถานที่"
           onCancel={() => setPendingRemove(null)}
           onConfirm={() => remove(pendingRemove.itemId)}
         />

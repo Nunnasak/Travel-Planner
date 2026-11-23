@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { sendJson } from "@/lib/api-client";
+import { NETWORK_ERROR } from "@/lib/messages";
 
 export default function CopyButton({ scheduleId }: { scheduleId: number }) {
   const router = useRouter();
@@ -18,13 +19,13 @@ export default function CopyButton({ scheduleId }: { scheduleId: number }) {
         return;
       }
       if (!result.ok) {
-        setError(result.data.message ?? "Couldn't duplicate this plan.");
+        setError(result.data.message ?? "คัดลอกแผนไม่สำเร็จ ลองอีกครั้ง");
         setBusy(false);
         return;
       }
       router.push(`/schedules/${result.data.schedule_id}`);
     } catch {
-      setError("Cannot reach the server. Check your connection and try again.");
+      setError(NETWORK_ERROR);
       setBusy(false);
     }
   }
@@ -32,7 +33,7 @@ export default function CopyButton({ scheduleId }: { scheduleId: number }) {
   return (
     <div className="copy-action">
       <button type="button" className="btn-coral" onClick={copy} disabled={busy}>
-        {busy ? "Duplicating…" : "Duplicate to my schedule"}
+        {busy ? "กำลังคัดลอก…" : "คัดลอกไปที่แผนของฉัน"}
       </button>
       {error && <p className="field-error" role="alert">{error}</p>}
     </div>

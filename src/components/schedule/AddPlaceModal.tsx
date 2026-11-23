@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { pickFieldErrors, sendJson } from "@/lib/api-client";
+import { NETWORK_ERROR } from "@/lib/messages";
 import ImageDropzone from "@/components/ui/image-dropzone";
 import SelectMenu from "@/components/ui/select-menu";
 import { UPLOAD_PATH } from "@/core/schema/image.schema";
@@ -104,13 +105,13 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
     setFormError("");
 
     const next: Partial<Record<Field, string>> = {};
-    if (mode === "search" && !picked) next.location_id = "Pick a place from the list.";
+    if (mode === "search" && !picked) next.location_id = "เลือกสถานที่จากรายการ";
     if (mode === "new") {
-      if (!name.trim()) next.name = "Enter the place name.";
-      if (!address.trim()) next.address = "Enter the address.";
-      if (!cityId) next.city_id = "Pick a district.";
+      if (!name.trim()) next.name = "ใส่ชื่อสถานที่";
+      if (!address.trim()) next.address = "ใส่ที่อยู่";
+      if (!cityId) next.city_id = "เลือกอำเภอ";
     }
-    if (!time) next.visit_time = "Pick a time.";
+    if (!time) next.visit_time = "เลือกเวลา";
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
@@ -129,7 +130,7 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
           const fieldErrors = pickFieldErrors(created.data.errors, FIELDS);
           setErrors(fieldErrors);
           if (Object.keys(fieldErrors).length === 0) {
-            setFormError(created.data.message ?? "Couldn't add the place.");
+            setFormError(created.data.message ?? "เพิ่มสถานที่ไม่สำเร็จ ลองอีกครั้ง");
           }
           setSaving(false);
           return;
@@ -148,7 +149,7 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
         const fieldErrors = pickFieldErrors(result.data.errors, FIELDS);
         setErrors(fieldErrors);
         if (Object.keys(fieldErrors).length === 0) {
-          setFormError(result.data.message ?? "Couldn't add the place to the plan.");
+          setFormError(result.data.message ?? "เพิ่มสถานที่ลงแผนไม่สำเร็จ ลองอีกครั้ง");
         }
         setSaving(false);
         return;
@@ -156,7 +157,7 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
       router.refresh();
       onClose();
     } catch {
-      setFormError("Cannot reach the server. Check your connection and try again.");
+      setFormError(NETWORK_ERROR);
       setSaving(false);
     }
   }
@@ -172,16 +173,16 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
         noValidate
       >
         <div className="modal-head">
-          <h2 id="add-place-title">Add plan</h2>
-          <button type="button" className="stop-remove" aria-label="Close" onClick={onClose}>×</button>
+          <h2 id="add-place-title">เพิ่มสถานที่</h2>
+          <button type="button" className="stop-remove" aria-label="ปิด" onClick={onClose}>×</button>
         </div>
 
         <div className="modal-tabs" role="tablist">
           <button type="button" role="tab" aria-selected={mode === "search"} onClick={() => setMode("search")}>
-            Find a place
+            ค้นหาสถานที่
           </button>
           <button type="button" role="tab" aria-selected={mode === "new"} onClick={() => setMode("new")}>
-            New place
+            สถานที่ใหม่
           </button>
         </div>
 
@@ -192,8 +193,8 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
                 <div className="searchbar modal-search">
                   <input
                     autoFocus
-                    placeholder="Search places, districts, provinces…"
-                    aria-label="Search places"
+                    placeholder="ค้นหาสถานที่ อำเภอ หรือจังหวัด"
+                    aria-label="ค้นหาสถานที่"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                   />
@@ -218,7 +219,7 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
                     </li>
                   ))}
                   {!searching && results.length === 0 && (
-                    <li className="day-empty">No places found. Use &quot;New place&quot; to add it.</li>
+                    <li className="day-empty">ไม่พบสถานที่ เพิ่มเองได้ที่แท็บ &quot;สถานที่ใหม่&quot;</li>
                   )}
                 </ul>
                 {errors.location_id && <p className="field-error">{errors.location_id}</p>}
@@ -226,10 +227,10 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
             ) : (
               <>
                 <div className="field">
-                  <label htmlFor="place-name">Name</label>
+                  <label htmlFor="place-name">ชื่อสถานที่</label>
                   <input
                     id="place-name"
-                    placeholder="Write here…"
+                    placeholder="เช่น วัดพระธาตุดอยสุเทพ"
                     value={name}
                     onChange={(e) => {
                       setName(e.target.value);
@@ -240,10 +241,10 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
                   {errors.name && <p className="field-error">{errors.name}</p>}
                 </div>
                 <div className="field">
-                  <label htmlFor="place-address">Address</label>
+                  <label htmlFor="place-address">ที่อยู่</label>
                   <input
                     id="place-address"
-                    placeholder="Write here…"
+                    placeholder="เช่น ต.สุเทพ อ.เมือง จ.เชียงใหม่"
                     value={address}
                     onChange={(e) => {
                       setAddress(e.target.value);
@@ -255,30 +256,30 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
                 </div>
                 <div className="form-row half">
                   <div className="field">
-                    <label htmlFor="place-province">Province</label>
+                    <label htmlFor="place-province">จังหวัด</label>
                     <SelectMenu
                       block
                       id="place-province"
-                      label="Province"
+                      label="จังหวัด"
                       value={provinceId}
                       options={[
-                        { value: "", label: "Select Province" },
+                        { value: "", label: "เลือกจังหวัด" },
                         ...provinces.map((p) => ({ value: String(p.province_id), label: p.province_name })),
                       ]}
                       onChange={changeProvince}
                     />
                   </div>
                   <div className="field">
-                    <label htmlFor="place-city">District</label>
+                    <label htmlFor="place-city">อำเภอ</label>
                     <SelectMenu
                       block
                       id="place-city"
-                      label="District"
+                      label="อำเภอ"
                       value={cityId}
                       disabled={!provinceId}
                       invalid={Boolean(errors.city_id)}
                       options={[
-                        { value: "", label: "Select District" },
+                        { value: "", label: "เลือกอำเภอ" },
                         ...cities.map((c) => ({ value: String(c.city_id), label: c.city_name })),
                       ]}
                       onChange={(next) => {
@@ -290,12 +291,12 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
                   </div>
                 </div>
                 <div className="field">
-                  <span className="field-label">Photo (optional)</span>
+                  <span className="field-label">รูป (ไม่บังคับ)</span>
                   {imageUrl.startsWith(UPLOAD_PATH) ? (
                     <div className="uploaded-row">
-                      <span>Using your uploaded photo</span>
+                      <span>ใช้รูปที่อัปโหลดแล้ว</span>
                       <button type="button" className="btn-outline small" onClick={() => setImageUrl("")}>
-                        Remove
+                        ลบรูป
                       </button>
                     </div>
                   ) : (
@@ -310,7 +311,7 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
                   {errors.image_url && <p className="field-error">{errors.image_url}</p>}
                 </div>
                 <div className="field">
-                  <label htmlFor="place-map">Google Maps link (optional)</label>
+                  <label htmlFor="place-map">ลิงก์ Google Maps (ไม่บังคับ)</label>
                   <input
                     id="place-map"
                     type="url"
@@ -328,7 +329,7 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
                     <p className="field-error">{errors.map_url}</p>
                   ) : (
                     <p id="place-map-hint" className="field-hint">
-                      Open the place in Google Maps, tap Share and paste the link here to pin the exact spot.
+                      เปิดสถานที่ใน Google Maps กดแชร์ แล้ววางลิงก์ที่นี่ เพื่อปักหมุดให้ตรงจุด
                     </p>
                   )}
                 </div>
@@ -338,15 +339,15 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
 
           <div className="modal-side">
             <div className="field">
-              <label>Visit date</label>
+              <label>วันที่ไป</label>
               <div className="stepper">
-                <button type="button" aria-label="Previous day" disabled={day <= 1} onClick={() => setDay((d) => d - 1)}>
+                <button type="button" aria-label="วันก่อนหน้า" disabled={day <= 1} onClick={() => setDay((d) => d - 1)}>
                   −
                 </button>
-                <span>DAY {day}</span>
+                <span>วันที่ {day}</span>
                 <button
                   type="button"
-                  aria-label="Next day"
+                  aria-label="วันถัดไป"
                   disabled={day >= totalDays}
                   onClick={() => setDay((d) => d + 1)}
                 >
@@ -356,7 +357,7 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
               {errors.day_no && <p className="field-error">{errors.day_no}</p>}
             </div>
             <div className="field">
-              <label htmlFor="visit-time">Visit time</label>
+              <label htmlFor="visit-time">เวลา</label>
               <input
                 id="visit-time"
                 type="time"
@@ -370,7 +371,7 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
               {errors.visit_time && <p className="field-error">{errors.visit_time}</p>}
             </div>
             {picked && mode === "search" && (
-              <p className="picked">Selected: <strong>{picked.name}</strong></p>
+              <p className="picked">เลือกแล้ว: <strong>{picked.name}</strong></p>
             )}
           </div>
         </div>
@@ -378,8 +379,8 @@ export default function AddPlaceModal({ scheduleId, totalDays, initialDay, onClo
         {formError && <p className="form-error" role="alert">{formError}</p>}
 
         <div className="form-actions">
-          <button type="button" className="btn-outline" onClick={onClose} disabled={saving}>Cancel</button>
-          <button type="submit" className="btn-coral" disabled={saving}>{saving ? "Adding…" : "Add"}</button>
+          <button type="button" className="btn-outline" onClick={onClose} disabled={saving}>ยกเลิก</button>
+          <button type="submit" className="btn-coral" disabled={saving}>{saving ? "กำลังเพิ่ม…" : "เพิ่มสถานที่"}</button>
         </div>
       </form>
     </div>

@@ -1,6 +1,7 @@
 "use client";
 import { useId, useRef, useState, type DragEvent } from "react";
 import { uploadImage } from "@/lib/api-client";
+import { NETWORK_ERROR } from "@/lib/messages";
 
 const MAX_BYTES = 5 * 1024 * 1024;
 const TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -23,20 +24,20 @@ export default function ImageDropzone({ onUploaded, disabled, compact }: Props) 
     setError("");
     setDone("");
     if (!file) return;
-    if (!TYPES.includes(file.type)) return setError("Upload a JPG, PNG or WebP photo.");
-    if (file.size > MAX_BYTES) return setError("The photo must be 5 MB or smaller.");
+    if (!TYPES.includes(file.type)) return setError("อัปโหลดได้เฉพาะรูป JPG, PNG หรือ WebP");
+    if (file.size > MAX_BYTES) return setError("รูปต้องมีขนาดไม่เกิน 5 MB");
 
     setBusy(true);
     try {
       const result = await uploadImage(file);
       if (!result.ok) {
-        setError(result.data.errors?.file ?? result.data.message ?? "Couldn't upload the photo.");
+        setError(result.data.errors?.file ?? result.data.message ?? "อัปโหลดรูปไม่สำเร็จ ลองอีกครั้ง");
         return;
       }
       setDone(file.name);
       onUploaded(String(result.data.url));
     } catch {
-      setError("Cannot reach the server. Check your connection and try again.");
+      setError(NETWORK_ERROR);
     } finally {
       setBusy(false);
       if (inputRef.current) inputRef.current.value = "";
@@ -67,8 +68,8 @@ export default function ImageDropzone({ onUploaded, disabled, compact }: Props) 
           <path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" />
         </svg>
         <span className="dropzone-text">
-          <strong>{busy ? "Uploading…" : "Upload a photo"}</strong>
-          {!compact && <span>Drag a file here or click to choose. JPG, PNG or WebP up to 5 MB.</span>}
+          <strong>{busy ? "กำลังอัปโหลด…" : "อัปโหลดรูป"}</strong>
+          {!compact && <span>ลากไฟล์มาวาง หรือคลิกเพื่อเลือก รองรับ JPG, PNG, WebP ไม่เกิน 5 MB</span>}
         </span>
         <input
           ref={inputRef}
@@ -81,7 +82,7 @@ export default function ImageDropzone({ onUploaded, disabled, compact }: Props) 
         />
       </label>
       {error && <p className="field-error" role="alert">{error}</p>}
-      {done && !error && <p className="dropzone-done" role="status">Uploaded {done}</p>}
+      {done && !error && <p className="dropzone-done" role="status">อัปโหลด {done} แล้ว</p>}
     </div>
   );
 }

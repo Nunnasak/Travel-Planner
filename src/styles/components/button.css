@@ -2,18 +2,18 @@
   width: 100%;
   height: 48px;
   border: 0;
-  border-radius: 12px;
-  background: var(--coral);
-  color: var(--white);
-  font-family: var(--font-body);
-  font-size: 15px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-family: var(--font-display);
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s, transform 0.05s;
 }
 
 .btn:hover {
-  background: var(--coral-hover);
+  background: var(--primary-hover);
 }
 
 .btn:active {
@@ -21,7 +21,7 @@
 }
 
 .btn:focus-visible {
-  outline: 3px solid rgba(221, 75, 51, 0.35);
+  outline: 3px solid var(--focus);
   outline-offset: 2px;
 }
 
@@ -35,8 +35,8 @@
   align-items: center;
   height: 40px;
   padding: 0 22px;
-  background-color: #dd4b33;
-  color: #ffffff;
+  background-color: var(--primary);
+  color: var(--on-primary);
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 600;
@@ -52,10 +52,10 @@
   align-items: center;
   height: 32px;
   padding: 0 16px;
-  border: 1px solid #19b5a5;
+  border: 1px solid var(--primary);
   border-radius: 16px;
-  background: #fff;
-  color: #0b5d5b;
+  background: var(--surface);
+  color: var(--primary-deep);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -67,8 +67,8 @@
 }
 
 .btn-outline.danger {
-  border-color: #dd4b33;
-  color: #dd4b33;
+  border-color: var(--lotus);
+  color: var(--lotus);
 }
 
 .btn-outline.small {

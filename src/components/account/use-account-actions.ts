@@ -2,8 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { sendJson, type ApiResult } from "@/lib/api-client";
-
-const NETWORK_ERROR = "Cannot reach the server. Check your connection and try again.";
+import { NETWORK_ERROR } from "@/lib/messages";
 
 async function request(
   method: "PATCH" | "POST",
@@ -28,7 +27,7 @@ export function useAccountActions() {
     const result = await request("PATCH", "/api/account/username", { username });
     if (!result.ok) {
       if (result.status === 401) router.push("/login");
-      throw new Error(messageFrom(result, "username", "Could not update username."));
+      throw new Error(messageFrom(result, "username", "เปลี่ยนชื่อผู้ใช้ไม่สำเร็จ ลองอีกครั้ง"));
     }
     router.refresh(); // ให้ sidebar ดึงชื่อใหม่
   }
@@ -38,14 +37,14 @@ export function useAccountActions() {
     if (!result.ok) {
       if (result.status === 401) router.push("/login");
       const field = result.data.errors?.currentPassword ? "currentPassword" : "newPassword";
-      throw new Error(messageFrom(result, field, "Could not change password."));
+      throw new Error(messageFrom(result, field, "เปลี่ยนรหัสผ่านไม่สำเร็จ ลองอีกครั้ง"));
     }
   }
 
   async function deleteAccount(password: string) {
     const result = await request("POST", "/api/account/delete", { password });
     if (!result.ok) {
-      throw new Error(messageFrom(result, "password", "Could not delete account."));
+      throw new Error(messageFrom(result, "password", "ลบบัญชีไม่สำเร็จ ลองอีกครั้ง"));
     }
     router.push("/login");
     router.refresh();
@@ -54,7 +53,7 @@ export function useAccountActions() {
   async function logoutAllDevices() {
     const result = await request("POST", "/api/auth/logout-all", {});
     if (!result.ok) {
-      throw new Error(messageFrom(result, "form", "Could not log out of all devices."));
+      throw new Error(messageFrom(result, "form", "ออกจากระบบทุกเครื่องไม่สำเร็จ ลองอีกครั้ง"));
     }
     router.push("/login");
     router.refresh();

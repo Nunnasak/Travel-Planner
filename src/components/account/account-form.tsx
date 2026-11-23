@@ -39,7 +39,7 @@ export function AccountForm({
   return (
     <main className={styles.accountMain}>
       <div className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>Account</h1>
+        <h1 className={styles.pageTitle}>บัญชีของฉัน</h1>
         <p className={styles.pageSubtitle}>
           จัดการชื่อผู้ใช้ รหัสผ่าน และการตั้งค่าบัญชีของคุณ
         </p>
@@ -48,7 +48,7 @@ export function AccountForm({
       <div className={styles.cardsStack}>
         <section aria-labelledby="account-settings-heading" className={styles.card}>
           <h2 id="account-settings-heading" className={styles.srOnly}>
-            Profile and password settings
+            ตั้งค่าโปรไฟล์และรหัสผ่าน
           </h2>
 
           <div className={styles.cardSection}>

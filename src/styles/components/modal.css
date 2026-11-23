@@ -5,7 +5,7 @@
   display: grid;
   place-items: center;
   padding: 16px;
-  background: rgba(31, 45, 45, 0.35);
+  background: var(--scrim);
 }
 
 .modal {
@@ -16,8 +16,8 @@
   padding: 20px;
   overflow-y: auto;
   border-radius: 20px;
-  background: #fff;
-  box-shadow: 0 20px 50px rgba(11, 93, 91, 0.25);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
 }
 
 .modal-head {
@@ -28,8 +28,8 @@
 
 .modal-head h2 {
   margin: 0;
-  color: #0b5d5b;
-  font-family: var(--font-mitr), sans-serif;
+  color: var(--primary-deep);
+  font-family: var(--font-display);
   font-size: 20px;
 }
 
@@ -40,18 +40,18 @@
 
 .modal-tabs button {
   padding: 6px 14px;
-  border: 1px solid #eadfcb;
+  border: 1px solid var(--rule);
   border-radius: 999px;
-  background: #fff;
-  color: #1f2d2d;
+  background: var(--surface);
+  color: var(--ink);
   font-size: 13px;
   cursor: pointer;
 }
 
 .modal-tabs button[aria-selected="true"] {
-  border-color: #19b5a5;
-  background: #19b5a5;
-  color: #fff;
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--on-primary);
 }
 
 .modal-body {
@@ -93,14 +93,14 @@
 
 .confirm-dialog h2 {
   margin: 0;
-  color: #0b5d5b;
-  font-family: var(--font-mitr), sans-serif;
+  color: var(--primary-deep);
+  font-family: var(--font-display);
   font-size: 18px;
 }
 
 .confirm-dialog p {
   margin: 0;
-  color: #6b7c7c;
+  color: var(--ink-soft);
   font-size: 14px;
   line-height: 1.6;
 }

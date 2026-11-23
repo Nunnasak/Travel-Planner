@@ -6,28 +6,28 @@ test.describe("login page", () => {
   });
 
   test("renders the form", async ({ page }) => {
-    await expect(page).toHaveTitle("Login · ไปเรื่อย");
-    await expect(page.getByRole("heading", { name: "Login" })).toBeVisible();
-    await expect(page.getByLabel("Email", { exact: true })).toBeVisible();
-    await expect(page.getByLabel("Password", { exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Login" })).toBeEnabled();
+    await expect(page).toHaveTitle("เข้าสู่ระบบ · ไปเรื่อย");
+    await expect(page.getByRole("heading", { name: "เข้าสู่ระบบ" })).toBeVisible();
+    await expect(page.getByLabel("อีเมล", { exact: true })).toBeVisible();
+    await expect(page.getByLabel("รหัสผ่าน", { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "เข้าสู่ระบบ", exact: true })).toBeEnabled();
   });
 
   test("shows required-field errors on empty submit", async ({ page }) => {
-    await page.getByRole("button", { name: "Login" }).click();
+    await page.getByRole("button", { name: "เข้าสู่ระบบ", exact: true }).click();
 
-    await expect(page.getByText("Enter your email.")).toBeVisible();
-    await expect(page.getByText("Enter your password.")).toBeVisible();
-    await expect(page.getByLabel("Email", { exact: true })).toHaveAttribute("aria-invalid", "true");
+    await expect(page.getByText("ใส่อีเมล", { exact: true })).toBeVisible();
+    await expect(page.getByText("ใส่รหัสผ่าน", { exact: true })).toBeVisible();
+    await expect(page.getByLabel("อีเมล", { exact: true })).toHaveAttribute("aria-invalid", "true");
   });
 
   test("rejects an invalid email and clears the error on edit", async ({ page }) => {
-    const email = page.getByLabel("Email", { exact: true });
+    const email = page.getByLabel("อีเมล", { exact: true });
     await email.fill("not-an-email");
-    await page.getByLabel("Password", { exact: true }).fill("secret123");
-    await page.getByRole("button", { name: "Login" }).click();
+    await page.getByLabel("รหัสผ่าน", { exact: true }).fill("secret123");
+    await page.getByRole("button", { name: "เข้าสู่ระบบ", exact: true }).click();
 
-    const error = page.getByText("Enter a valid email, like name@example.com.");
+    const error = page.getByText("ใส่อีเมลให้ถูกรูปแบบ เช่น name@example.com");
     await expect(error).toBeVisible();
 
     await email.fill("name@example.com");
@@ -35,13 +35,13 @@ test.describe("login page", () => {
   });
 
   test("toggles password visibility", async ({ page }) => {
-    const password = page.getByLabel("Password", { exact: true });
+    const password = page.getByLabel("รหัสผ่าน", { exact: true });
     await expect(password).toHaveAttribute("type", "password");
 
-    await page.getByRole("button", { name: "Show password" }).click();
+    await page.getByRole("button", { name: "แสดงรหัสผ่าน" }).click();
     await expect(password).toHaveAttribute("type", "text");
 
-    await page.getByRole("button", { name: "Hide password" }).click();
+    await page.getByRole("button", { name: "ซ่อนรหัสผ่าน" }).click();
     await expect(password).toHaveAttribute("type", "password");
   });
 
@@ -52,9 +52,9 @@ test.describe("login page", () => {
       await route.fulfill({ status: 200, json: {} });
     });
 
-    await page.getByLabel("Email", { exact: true }).fill("name@example.com");
-    await page.getByLabel("Password", { exact: true }).fill("secret123");
-    await page.getByRole("button", { name: "Login" }).click();
+    await page.getByLabel("อีเมล", { exact: true }).fill("name@example.com");
+    await page.getByLabel("รหัสผ่าน", { exact: true }).fill("secret123");
+    await page.getByRole("button", { name: "เข้าสู่ระบบ", exact: true }).click();
 
     await expect(page).toHaveURL(/\/discover$/);
     expect(body).toEqual({ email: "name@example.com", password: "secret123", remember: false });
@@ -63,11 +63,11 @@ test.describe("login page", () => {
   test("shows an error when the credentials are wrong", async ({ page }) => {
     await page.route("**/api/auth/login", (route) => route.fulfill({ status: 401, json: {} }));
 
-    await page.getByLabel("Email", { exact: true }).fill("name@example.com");
-    await page.getByLabel("Password", { exact: true }).fill("wrong-password");
-    await page.getByRole("button", { name: "Login" }).click();
+    await page.getByLabel("อีเมล", { exact: true }).fill("name@example.com");
+    await page.getByLabel("รหัสผ่าน", { exact: true }).fill("wrong-password");
+    await page.getByRole("button", { name: "เข้าสู่ระบบ", exact: true }).click();
 
-    await expect(page.getByText("Email or password is incorrect.")).toBeVisible();
+    await expect(page.getByText("อีเมลหรือรหัสผ่านไม่ถูกต้อง")).toBeVisible();
     await expect(page).toHaveURL(/\/login$/);
   });
 
@@ -76,9 +76,9 @@ test.describe("login page", () => {
       route.fulfill({ status: 422, json: { errors: { email: "No account uses this email." } } }),
     );
 
-    await page.getByLabel("Email", { exact: true }).fill("name@example.com");
-    await page.getByLabel("Password", { exact: true }).fill("secret123");
-    await page.getByRole("button", { name: "Login" }).click();
+    await page.getByLabel("อีเมล", { exact: true }).fill("name@example.com");
+    await page.getByLabel("รหัสผ่าน", { exact: true }).fill("secret123");
+    await page.getByRole("button", { name: "เข้าสู่ระบบ", exact: true }).click();
 
     await expect(page.getByText("No account uses this email.")).toBeVisible();
   });
@@ -93,32 +93,32 @@ test.describe("login page", () => {
       await route.fulfill({ status: 401, json: {} });
     });
 
-    await page.getByLabel("Email", { exact: true }).fill("name@example.com");
-    await page.getByLabel("Password", { exact: true }).fill("secret123");
-    await page.getByRole("button", { name: "Login" }).click();
+    await page.getByLabel("อีเมล", { exact: true }).fill("name@example.com");
+    await page.getByLabel("รหัสผ่าน", { exact: true }).fill("secret123");
+    await page.getByRole("button", { name: "เข้าสู่ระบบ", exact: true }).click();
 
-    await expect(page.getByRole("button", { name: "Signing in..." })).toBeDisabled();
+    await expect(page.getByRole("button", { name: "กำลังเข้าสู่ระบบ..." })).toBeDisabled();
     release();
-    await expect(page.getByRole("button", { name: "Login" })).toBeEnabled();
+    await expect(page.getByRole("button", { name: "เข้าสู่ระบบ", exact: true })).toBeEnabled();
   });
 
   test("shows an error when the server cannot be reached", async ({ page }) => {
     await page.route("**/api/auth/login", (route) => route.abort("failed"));
 
-    await page.getByLabel("Email", { exact: true }).fill("name@example.com");
-    await page.getByLabel("Password", { exact: true }).fill("secret123");
-    await page.getByRole("button", { name: "Login" }).click();
+    await page.getByLabel("อีเมล", { exact: true }).fill("name@example.com");
+    await page.getByLabel("รหัสผ่าน", { exact: true }).fill("secret123");
+    await page.getByRole("button", { name: "เข้าสู่ระบบ", exact: true }).click();
 
     await expect(
-      page.getByText("Cannot reach the server. Check your connection and try again."),
+      page.getByText("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วลองอีกครั้ง"),
     ).toBeVisible();
-    await expect(page.getByRole("button", { name: "Login" })).toBeEnabled();
+    await expect(page.getByRole("button", { name: "เข้าสู่ระบบ", exact: true })).toBeEnabled();
   });
 
   test("links to the sign-up page", async ({ page }) => {
-    await page.getByRole("link", { name: "Sign up" }).click();
+    await page.getByRole("link", { name: "สมัครสมาชิก" }).click();
 
     await expect(page).toHaveURL(/\/register$/);
-    await expect(page.getByRole("heading", { name: "Sign up" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "สมัครสมาชิก" })).toBeVisible();
   });
 });

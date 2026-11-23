@@ -2,8 +2,7 @@
 @import "../styles/base/base.css";
 
 @import "../styles/layout/page.css";
-@import "../styles/layout/sidebar.css";
-@import "../styles/layout/topbar.css";
+@import "../styles/layout/nav.css";
 
 @import "../styles/components/button.css";
 @import "../styles/components/form.css";
@@ -15,7 +14,7 @@
 @import "../styles/components/menu.css";
 
 @import "../styles/features/auth.css";
-@import "../styles/features/discover-filter.css";
+@import "../styles/features/discover.css";
 @import "../styles/features/plan-detail.css";
 @import "../styles/features/schedule.css";
 @import "../styles/features/schedule-create.css";

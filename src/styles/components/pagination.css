@@ -1,30 +1,41 @@
 .pagination {
   display: flex;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
+  padding-top: 8px;
 }
 
 .pg {
-  min-width: 32px;
-  height: 32px;
+  min-width: 40px;
+  height: 40px;
   display: grid;
   place-items: center;
-  padding: 0 10px;
-  border: 1px solid #eadfcb;
-  border-radius: 14px;
-  background: #fff;
-  color: #1f2d2d;
-  font-size: 13px;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: var(--ink-soft);
+  font-family: var(--font-display);
+  font-size: 15px;
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
   text-decoration: none;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+a.pg:hover {
+  background: var(--surface-sunken);
+  color: var(--ink);
 }
 
 .pg[aria-current="page"] {
-  border-color: #19b5a5;
-  background: #19b5a5;
-  color: #fff;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.pg:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .pg-disabled {
-  opacity: 0.45;
+  opacity: 0.35;
 }

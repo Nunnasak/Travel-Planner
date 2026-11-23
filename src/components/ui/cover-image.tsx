@@ -3,9 +3,6 @@ import { UPLOAD_PATH } from "@/core/schema/image.schema";
 
 const OPTIMIZED_HOSTS = ["images.unsplash.com"];
 
-export const CARD_IMAGE_SIZES =
-  "(max-width: 700px) 100vw, (max-width: 1100px) 50vw, (max-width: 1500px) 33vw, 25vw";
-
 function canOptimize(src: string) {
   if (src.startsWith(UPLOAD_PATH)) return true;
   try {
