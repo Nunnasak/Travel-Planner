@@ -9,9 +9,32 @@ const prisma = createTestPrisma();
 const service = new DiscoveryService(prisma);
 let ctx: DiscoveryContext;
 
+const SEED = "2026-11-24";
+
 async function listIds(input: Record<string, unknown> = {}) {
-  const result = await service.list(input);
-  return result.items.map((item) => item.schedule_id);
+  const result = await service.list(input, SEED);
+  return result.items.map((item) => item.schedule_id).sort((a, b) => a - b);
+}
+
+function ids(...values: number[]) {
+  return [...values].sort((a, b) => a - b);
+}
+
+async function addPlanWithoutCover() {
+  const owner = await prisma.user.findFirstOrThrow({ select: { user_id: true } });
+  const place = await prisma.location.findFirstOrThrow({ where: { image_url: null }, select: { location_id: true } });
+  const plan = await prisma.schedule.create({
+    data: {
+      schedule_name: "Plain trip",
+      total_day: 1,
+      is_public: true,
+      owner_id: owner.user_id,
+      items: {
+        create: [{ day_no: 1, sequence_no: 1, visit_time: new Date("1970-01-01T09:00:00Z"), location_id: place.location_id }],
+      },
+    },
+  });
+  return plan.schedule_id;
 }
 
 beforeAll(async () => {
@@ -28,17 +51,32 @@ afterAll(async () => {
 });
 
 describe("DiscoveryService.list", () => {
-  it("returns only public plans, newest first", async () => {
+  it("returns only public plans", async () => {
     const { plans } = ctx;
 
-    const result = await service.list({});
+    const result = await service.list({}, SEED);
 
-    expect(result.items.map((item) => item.schedule_id)).toEqual([
-      plans.longTrip,
-      plans.northern,
-      plans.temples,
-    ]);
+    expect(result.items.map((item) => item.schedule_id).sort((a, b) => a - b)).toEqual(
+      ids(plans.longTrip, plans.northern, plans.temples),
+    );
     expect(result).toMatchObject({ page: 1, page_size: 12, total: 3, total_pages: 1 });
+  });
+
+  it("puts plans with a cover before plans without one", async () => {
+    const plain = await addPlanWithoutCover();
+
+    for (const seed of ["2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"]) {
+      const { items } = await service.list({}, seed);
+      expect(items.map((item) => item.schedule_id).at(-1)).toBe(plain);
+      expect(items.at(-1)?.cover_url).toBeNull();
+    }
+  });
+
+  it("keeps the same order for the same day", async () => {
+    const first = await service.list({}, SEED);
+    const again = await service.list({}, SEED);
+
+    expect(again.items.map((item) => item.schedule_id)).toEqual(first.items.map((item) => item.schedule_id));
   });
 
   it("never returns a private plan, even when the search matches it", async () => {
@@ -47,26 +85,26 @@ describe("DiscoveryService.list", () => {
   });
 
   it("filters by category", async () => {
-    await expect(listIds({ category: "NATURE" })).resolves.toEqual([
+    await expect(listIds({ category: "NATURE" })).resolves.toEqual(ids(
       ctx.plans.longTrip,
       ctx.plans.northern,
-    ]);
+    ));
   });
 
   it("matches a plan that has any of the picked categories", async () => {
-    await expect(listIds({ category: "CULTURE" })).resolves.toEqual([ctx.plans.northern, ctx.plans.temples]);
-    await expect(listIds({ category: "CULTURE,NATURE" })).resolves.toEqual([
+    await expect(listIds({ category: "CULTURE" })).resolves.toEqual(ids(ctx.plans.northern, ctx.plans.temples));
+    await expect(listIds({ category: "CULTURE,NATURE" })).resolves.toEqual(ids(
       ctx.plans.longTrip,
       ctx.plans.northern,
       ctx.plans.temples,
-    ]);
+    ));
   });
 
   it("filters by district through any stop of the plan", async () => {
-    await expect(listIds({ city_id: String(ctx.phraNakhonId) })).resolves.toEqual([
+    await expect(listIds({ city_id: String(ctx.phraNakhonId) })).resolves.toEqual(ids(
       ctx.plans.northern,
       ctx.plans.temples,
-    ]);
+    ));
   });
 
   it("matches days 1-3 exactly", async () => {
@@ -75,18 +113,18 @@ describe("DiscoveryService.list", () => {
   });
 
   it("treats days = 4 as four days or more", async () => {
-    await expect(listIds({ days: "4" })).resolves.toEqual([ctx.plans.longTrip, ctx.plans.northern]);
+    await expect(listIds({ days: "4" })).resolves.toEqual(ids(ctx.plans.longTrip, ctx.plans.northern));
   });
 
   it("filters by province through any stop of the plan", async () => {
-    await expect(listIds({ province_id: String(ctx.chiangMaiId) })).resolves.toEqual([
+    await expect(listIds({ province_id: String(ctx.chiangMaiId) })).resolves.toEqual(ids(
       ctx.plans.longTrip,
       ctx.plans.northern,
-    ]);
-    await expect(listIds({ province_id: String(ctx.bangkokId) })).resolves.toEqual([
+    ));
+    await expect(listIds({ province_id: String(ctx.bangkokId) })).resolves.toEqual(ids(
       ctx.plans.northern,
       ctx.plans.temples,
-    ]);
+    ));
   });
 
   it("searches plan names case-insensitively", async () => {
@@ -98,7 +136,7 @@ describe("DiscoveryService.list", () => {
   });
 
   it("searches place names", async () => {
-    await expect(listIds({ q: "wat pho" })).resolves.toEqual([ctx.plans.northern, ctx.plans.temples]);
+    await expect(listIds({ q: "wat pho" })).resolves.toEqual(ids(ctx.plans.northern, ctx.plans.temples));
   });
 
   it("combines search and filters with AND", async () => {
@@ -107,13 +145,16 @@ describe("DiscoveryService.list", () => {
     ]);
   });
 
-  it("pages through results", async () => {
-    const first = await service.list({ page: "1", page_size: "2" });
-    const second = await service.list({ page: "2", page_size: "2" });
-    const past = await service.list({ page: "3", page_size: "2" });
+  it("pages through results without repeating or skipping a plan", async () => {
+    const all = await service.list({}, SEED);
+    const first = await service.list({ page: "1", page_size: "2" }, SEED);
+    const second = await service.list({ page: "2", page_size: "2" }, SEED);
+    const past = await service.list({ page: "3", page_size: "2" }, SEED);
 
-    expect(first.items.map((item) => item.schedule_id)).toEqual([ctx.plans.longTrip, ctx.plans.northern]);
-    expect(second.items.map((item) => item.schedule_id)).toEqual([ctx.plans.temples]);
+    expect([...first.items, ...second.items].map((item) => item.schedule_id)).toEqual(
+      all.items.map((item) => item.schedule_id),
+    );
+    expect(first.items).toHaveLength(2);
     expect(past.items).toEqual([]);
     expect(first).toMatchObject({ total: 3, total_pages: 2 });
   });
