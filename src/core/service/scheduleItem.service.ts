@@ -12,6 +12,13 @@ import { ScheduleService } from "./schedule.service";
 
 type Tx = Prisma.TransactionClient;
 
+const BY_SEQUENCE: Prisma.ScheduleItemOrderByWithRelationInput[] = [{ sequence_no: "asc" }];
+const BY_TIME: Prisma.ScheduleItemOrderByWithRelationInput[] = [
+  { visit_time: "asc" },
+  { sequence_no: "asc" },
+  { item_id: "asc" },
+];
+
 export class ScheduleItemService {
   constructor(
     private readonly prisma: PrismaClient,
@@ -56,9 +63,13 @@ export class ScheduleItemService {
     const item = await this.findItem(scheduleId, itemId);
 
     if (data.day_no === undefined || data.day_no === item.day_no) {
-      return this.prisma.scheduleItem.update({
-        where: { item_id: itemId },
-        data: { visit_time: data.visit_time },
+      return this.prisma.$transaction(async (tx) => {
+        const updated = await tx.scheduleItem.update({
+          where: { item_id: itemId },
+          data: { visit_time: data.visit_time },
+        });
+        if (data.visit_time !== undefined) await this.renumberDay(tx, scheduleId, item.day_no, BY_TIME);
+        return updated;
       });
     }
 
@@ -74,6 +85,7 @@ export class ScheduleItemService {
         },
       });
       await this.renumberDay(tx, scheduleId, item.day_no);
+      if (data.visit_time !== undefined) await this.renumberDay(tx, scheduleId, newDay, BY_TIME);
       return moved;
     });
   }
@@ -153,10 +165,15 @@ export class ScheduleItemService {
     return (last._max.sequence_no ?? 0) + 1;
   }
 
-  private async renumberDay(tx: Tx, scheduleId: number, dayNo: number) {
+  private async renumberDay(
+    tx: Tx,
+    scheduleId: number,
+    dayNo: number,
+    orderBy: Prisma.ScheduleItemOrderByWithRelationInput[] = BY_SEQUENCE,
+  ) {
     const items = await tx.scheduleItem.findMany({
       where: { schedule_id: scheduleId, day_no: dayNo },
-      orderBy: { sequence_no: "asc" },
+      orderBy,
       select: { item_id: true },
     });
     for (const item of items) {

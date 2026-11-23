@@ -6,12 +6,19 @@ import CoverImage from "@/components/ui/cover-image";
 import { sendJson } from "@/lib/api-client";
 import { TINTS, tintClass } from "@/lib/categories";
 import { placeLine } from "@/lib/place";
-import type { ScheduleDay, ScheduleStop } from "@/lib/schedule";
+import { formatVisitTime, type ScheduleDay, type ScheduleStop } from "@/lib/schedule";
 import AddPlaceModal from "./AddPlaceModal";
 import StopTime from "./StopTime";
 
 function orderKey(days: ScheduleDay[]) {
   return days.map((day) => `${day.day_no}:${day.stops.map((s) => s.item_id).join(",")}`).join("|");
+}
+
+function sortByTime(stops: ScheduleStop[]) {
+  return stops
+    .map((stop, index) => ({ stop, index }))
+    .sort((a, b) => formatVisitTime(a.stop.visit_time).localeCompare(formatVisitTime(b.stop.visit_time)) || a.index - b.index)
+    .map(({ stop }) => stop);
 }
 
 function moveStop(days: ScheduleDay[], itemId: number, toDay: number, toIndex: number) {
@@ -137,10 +144,11 @@ export default function DayList({ scheduleId, totalDays, days, canEdit }: Props)
     setError("");
     const result = await sendJson("PATCH", `/api/schedules/${scheduleId}/items/${itemId}`, { visit_time: time });
     if (!result.ok) return result.data.errors?.visit_time ?? result.data.message ?? "แก้เวลาไม่สำเร็จ ลองอีกครั้ง";
-    const next = orderRef.current.map((day) => ({
-      ...day,
-      stops: day.stops.map((stop) => (stop.item_id === itemId ? { ...stop, visit_time: time } : stop)),
-    }));
+    const next = orderRef.current.map((day) => {
+      if (!day.stops.some((stop) => stop.item_id === itemId)) return day;
+      const stops = day.stops.map((stop) => (stop.item_id === itemId ? { ...stop, visit_time: time } : stop));
+      return { ...day, stops: sortByTime(stops) };
+    });
     orderRef.current = next;
     setOrder(next);
     router.refresh();

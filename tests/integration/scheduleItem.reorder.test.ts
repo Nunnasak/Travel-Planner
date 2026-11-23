@@ -93,6 +93,66 @@ describe("ScheduleItemService.removeFromSchedule / editInSchedule", () => {
     ]);
   });
 
+  it("moves a place to its spot in the day when its time changes", async () => {
+    const a = await add(0, 1);
+    const b = await add(1, 1);
+    const c = await add(2, 1);
+    await items.editInSchedule(ctx.scheduleId, a.item_id, ctx.userId, { visit_time: "08:00" });
+    await items.editInSchedule(ctx.scheduleId, c.item_id, ctx.userId, { visit_time: "12:00" });
+
+    await items.editInSchedule(ctx.scheduleId, a.item_id, ctx.userId, { visit_time: "15:30" });
+
+    expect(await layout()).toEqual([
+      [1, 1, b.item_id],
+      [1, 2, c.item_id],
+      [1, 3, a.item_id],
+    ]);
+  });
+
+  it("keeps the current order between places with the same time", async () => {
+    const a = await add(0, 1);
+    const b = await add(1, 1);
+    const c = await add(2, 1);
+
+    await items.editInSchedule(ctx.scheduleId, c.item_id, ctx.userId, { visit_time: "09:00" });
+
+    expect(await layout()).toEqual([
+      [1, 1, a.item_id],
+      [1, 2, b.item_id],
+      [1, 3, c.item_id],
+    ]);
+  });
+
+  it("only reorders the day of the edited place", async () => {
+    const a = await add(0, 1);
+    const b = await add(1, 2);
+    const c = await add(2, 2);
+    await prisma.scheduleItem.update({ where: { item_id: b.item_id }, data: { visit_time: new Date("1970-01-01T18:00:00Z") } });
+
+    await items.editInSchedule(ctx.scheduleId, a.item_id, ctx.userId, { visit_time: "10:00" });
+
+    expect(await layout()).toEqual([
+      [1, 1, a.item_id],
+      [2, 1, b.item_id],
+      [2, 2, c.item_id],
+    ]);
+  });
+
+  it("puts a place moved to another day at its time in that day", async () => {
+    const a = await add(0, 1);
+    const b = await add(1, 2);
+    const c = await add(2, 2);
+    await items.editInSchedule(ctx.scheduleId, c.item_id, ctx.userId, { visit_time: "16:00" });
+
+    await items.editInSchedule(ctx.scheduleId, a.item_id, ctx.userId, { day_no: 2, visit_time: "12:00" });
+
+    expect(await layout()).toEqual([
+      [2, 1, b.item_id],
+      [2, 2, a.item_id],
+      [2, 3, c.item_id],
+    ]);
+  });
+
   it("does not find an item through another plan's id", async () => {
     const a = await add(0, 1);
     const other = await schedules.create(ctx.userId, { schedule_name: "Other", total_day: 1, categories: ["NATURE"] });
