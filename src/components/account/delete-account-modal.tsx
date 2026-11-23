@@ -59,11 +59,11 @@ export function DeleteAccountModal({
         </div>
 
         <h3 id={titleId} className={styles.modalTitle}>
-          Delete your account?
+          ลบบัญชีของคุณไหม?
         </h3>
         <p className={styles.modalDesc}>
-          This will permanently delete <strong>{email}</strong> and all of your
-          saved travel plans. You will not be able to recover your account.
+          บัญชี <strong>{email}</strong> และแผนเที่ยวทั้งหมดของคุณจะถูกลบถาวร
+          และกู้คืนไม่ได้
         </p>
 
         <form
@@ -76,11 +76,11 @@ export function DeleteAccountModal({
         >
           <PasswordField
             id={passwordId}
-            label="Confirm your password"
+            label="ใส่รหัสผ่านเพื่อยืนยัน"
             value={password}
             onChange={setPassword}
             autoComplete="current-password"
-            placeholder="Enter your password"
+            placeholder="ใส่รหัสผ่าน"
             disabled={isDeleting}
           />
         </form>
@@ -93,14 +93,15 @@ export function DeleteAccountModal({
 
         <div className={styles.modalActions}>
           <AccountButton ref={cancelRef} variant="secondary" disabled={isDeleting} onClick={onCancel}>
-            Cancel
+            ยกเลิก
           </AccountButton>
           <AccountButton
+            variant="danger"
             type="submit"
             form={`${titleId}-form`}
             disabled={isDeleting || !password}
           >
-            {isDeleting ? "Deleting..." : "Yes, delete account"}
+            {isDeleting ? "กำลังลบ..." : "ลบบัญชีถาวร"}
           </AccountButton>
         </div>
       </div>

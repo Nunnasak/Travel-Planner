@@ -4,12 +4,12 @@ async function fillForm(
   page: Page,
   values: { username?: string; email?: string; password?: string; confirm?: string },
 ) {
-  if (values.username !== undefined) await page.getByLabel("Username").fill(values.username);
-  if (values.email !== undefined) await page.getByLabel("Email", { exact: true }).fill(values.email);
+  if (values.username !== undefined) await page.getByLabel("ชื่อผู้ใช้").fill(values.username);
+  if (values.email !== undefined) await page.getByLabel("อีเมล", { exact: true }).fill(values.email);
   if (values.password !== undefined)
-    await page.getByLabel("Password", { exact: true }).fill(values.password);
+    await page.getByLabel("รหัสผ่าน", { exact: true }).fill(values.password);
   if (values.confirm !== undefined)
-    await page.getByLabel("Confirm password", { exact: true }).fill(values.confirm);
+    await page.getByLabel("ยืนยันรหัสผ่าน", { exact: true }).fill(values.confirm);
 }
 
 const valid = {
@@ -25,34 +25,34 @@ test.describe("register page", () => {
   });
 
   test("renders the form", async ({ page }) => {
-    await expect(page).toHaveTitle("Sign up · ไปเรื่อย");
-    await expect(page.getByRole("heading", { name: "Sign up" })).toBeVisible();
-    for (const label of ["Username", "Email", "Password", "Confirm password"]) {
+    await expect(page).toHaveTitle("สมัครสมาชิก · ไปเรื่อย");
+    await expect(page.getByRole("heading", { name: "สมัครสมาชิก" })).toBeVisible();
+    for (const label of ["ชื่อผู้ใช้", "อีเมล", "รหัสผ่าน", "ยืนยันรหัสผ่าน"]) {
       await expect(page.getByLabel(label, { exact: true })).toBeVisible();
     }
   });
 
   test("shows an error for every field on empty submit", async ({ page }) => {
-    await page.getByRole("button", { name: "Sign up" }).click();
+    await page.getByRole("button", { name: "สมัครสมาชิก", exact: true }).click();
 
-    await expect(page.getByText("Username must be at least 3 characters.")).toBeVisible();
-    await expect(page.getByText("Enter your email.")).toBeVisible();
-    await expect(page.getByText("Password must be at least 8 characters.")).toBeVisible();
-    await expect(page.getByText("Re-enter your password.")).toBeVisible();
+    await expect(page.getByText("ชื่อผู้ใช้ต้องมีอย่างน้อย 3 ตัวอักษร")).toBeVisible();
+    await expect(page.getByText("ใส่อีเมล", { exact: true })).toBeVisible();
+    await expect(page.getByText("รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร")).toBeVisible();
+    await expect(page.getByText("ใส่รหัสผ่านอีกครั้ง", { exact: true })).toBeVisible();
   });
 
   test("rejects a username that is too long", async ({ page }) => {
     await fillForm(page, { ...valid, username: "a".repeat(31) });
-    await page.getByRole("button", { name: "Sign up" }).click();
+    await page.getByRole("button", { name: "สมัครสมาชิก", exact: true }).click();
 
-    await expect(page.getByText("Username must be 30 characters or fewer.")).toBeVisible();
+    await expect(page.getByText("ชื่อผู้ใช้ต้องไม่เกิน 30 ตัวอักษร")).toBeVisible();
   });
 
   test("rejects mismatched passwords", async ({ page }) => {
     await fillForm(page, { ...valid, confirm: "different123" });
-    await page.getByRole("button", { name: "Sign up" }).click();
+    await page.getByRole("button", { name: "สมัครสมาชิก", exact: true }).click();
 
-    await expect(page.getByText("Passwords do not match.")).toBeVisible();
+    await expect(page.getByText("รหัสผ่านทั้งสองช่องไม่ตรงกัน")).toBeVisible();
   });
 
   test("sends the account and redirects to /login on success", async ({ page }) => {
@@ -63,7 +63,7 @@ test.describe("register page", () => {
     });
 
     await fillForm(page, { ...valid, username: "  traveler  " });
-    await page.getByRole("button", { name: "Sign up" }).click();
+    await page.getByRole("button", { name: "สมัครสมาชิก", exact: true }).click();
 
     await expect(page).toHaveURL(/\/login$/);
     expect(body).toEqual({
@@ -77,9 +77,9 @@ test.describe("register page", () => {
     await page.route("**/api/auth/register", (route) => route.fulfill({ status: 409, json: {} }));
 
     await fillForm(page, valid);
-    await page.getByRole("button", { name: "Sign up" }).click();
+    await page.getByRole("button", { name: "สมัครสมาชิก", exact: true }).click();
 
-    await expect(page.getByText("That email or username is already taken.")).toBeVisible();
+    await expect(page.getByText("อีเมลหรือชื่อผู้ใช้นี้มีคนใช้แล้ว")).toBeVisible();
     await expect(page).toHaveURL(/\/register$/);
   });
 
@@ -91,28 +91,28 @@ test.describe("register page", () => {
     );
 
     await fillForm(page, valid);
-    await page.getByRole("button", { name: "Sign up" }).click();
+    await page.getByRole("button", { name: "สมัครสมาชิก", exact: true }).click();
 
     await expect(page.getByText("That username is taken.")).toBeVisible();
-    await expect(page.getByLabel("Username")).toHaveAttribute("aria-invalid", "true");
-    await expect(page.getByText("That email or username is already taken.")).toBeHidden();
+    await expect(page.getByLabel("ชื่อผู้ใช้")).toHaveAttribute("aria-invalid", "true");
+    await expect(page.getByText("อีเมลหรือชื่อผู้ใช้นี้มีคนใช้แล้ว")).toBeHidden();
   });
 
   test("shows an error when the server cannot be reached", async ({ page }) => {
     await page.route("**/api/auth/register", (route) => route.abort("failed"));
 
     await fillForm(page, valid);
-    await page.getByRole("button", { name: "Sign up" }).click();
+    await page.getByRole("button", { name: "สมัครสมาชิก", exact: true }).click();
 
     await expect(
-      page.getByText("Cannot reach the server. Check your connection and try again."),
+      page.getByText("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วลองอีกครั้ง"),
     ).toBeVisible();
   });
 
   test("links to the login page", async ({ page }) => {
-    await page.getByRole("link", { name: "Log in" }).click();
+    await page.getByRole("link", { name: "เข้าสู่ระบบ" }).click();
 
     await expect(page).toHaveURL(/\/login$/);
-    await expect(page.getByRole("heading", { name: "Login" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "เข้าสู่ระบบ" })).toBeVisible();
   });
 });

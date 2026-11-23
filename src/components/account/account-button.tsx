@@ -1,7 +1,7 @@
 import { forwardRef, type ButtonHTMLAttributes } from "react";
 import styles from "./account-form.module.css";
 
-type Variant = "primary" | "secondary" | "outline";
+type Variant = "primary" | "secondary" | "outline" | "danger";
 type Size = "md" | "sm" | "lg";
 
 interface AccountButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -13,6 +13,7 @@ const VARIANT_CLASS: Record<Variant, string> = {
   primary: styles.btnPrimary,
   secondary: styles.btnSecondary,
   outline: styles.btnOutline,
+  danger: styles.btnDanger,
 };
 
 const SIZE_CLASS: Record<Size, string> = {

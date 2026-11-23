@@ -4,22 +4,22 @@
   left: 14px;
   padding: 4px 8px;
   border-radius: 10px;
-  background: #fff;
-  color: #0b5d5b;
+  background: var(--surface);
+  color: var(--primary-deep);
   font-size: 11px;
 }
 
 .tag-public {
   left: auto;
   right: 56px;
-  background: #19b5a5;
-  color: #fff;
+  background: var(--primary);
+  color: var(--on-primary);
 }
 
 .tag-row {
   position: absolute;
-  top: 14px;
-  left: 14px;
+  top: 12px;
+  left: 12px;
   right: 120px;
   display: flex;
   flex-wrap: wrap;
@@ -27,11 +27,13 @@
 }
 
 .tag-chip {
-  padding: 4px 8px;
-  border-radius: 10px;
-  background: #fff;
-  color: #0b5d5b;
-  font-size: 11px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 500;
   white-space: nowrap;
 }
 
@@ -43,6 +45,6 @@
 }
 
 .tag-list .tag-chip {
-  border: 1px solid #eadfcb;
+  border: 1px solid var(--rule);
   font-size: 12px;
 }

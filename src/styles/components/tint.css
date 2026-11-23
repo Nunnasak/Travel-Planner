@@ -1,19 +1,19 @@
 .tint-mint {
-  background-color: #d3f3ee;
+  background-color: var(--tint-mint);
 }
 
 .tint-butter {
-  background-color: #fff0c2;
+  background-color: var(--tint-butter);
 }
 
 .tint-peach {
-  background-color: #ffddd6;
+  background-color: var(--tint-peach);
 }
 
 .tint-sky {
-  background-color: #d6f1f7;
+  background-color: var(--tint-sky);
 }
 
 .tint-lilac {
-  background-color: #e6e0ff;
+  background-color: var(--tint-lilac);
 }

@@ -60,7 +60,7 @@ export default function RouteMap({ days, selected, onSelect }: Props) {
 
   return (
     <div className="route-map">
-      <div className="map-tabs" role="tablist" aria-label="Map day">
+      <div className="map-tabs" role="tablist" aria-label="เลือกวันบนแผนที่">
         {days.map((d) => (
           <button
             key={d.day_no}
@@ -69,28 +69,28 @@ export default function RouteMap({ days, selected, onSelect }: Props) {
             aria-selected={d.day_no === day?.day_no}
             onClick={() => choose(d.day_no)}
           >
-            Day {d.day_no}
+            วันที่ {d.day_no}
           </button>
         ))}
       </div>
 
       {stops.length === 0 ? (
-        <div className="map-empty">Add places to Day {day?.day_no ?? 1} to see them on the map.</div>
+        <div className="map-empty">เพิ่มสถานที่ในวันที่ {day?.day_no ?? 1} เพื่อดูบนแผนที่</div>
       ) : (
         <>
           <iframe
             key={embedUrl(stops)}
             className="map-frame"
-            title={`Map of day ${day.day_no}`}
+            title={`แผนที่วันที่ ${day.day_no}`}
             src={embedUrl(stops)}
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
           />
           <a className="btn-outline map-open" href={openUrl(stops)} target="_blank" rel="noopener noreferrer">
-            {stops.length === 1 ? "Open in Google Maps" : "Open route in Google Maps"}
+            {stops.length === 1 ? "เปิดใน Google Maps" : "เปิดเส้นทางใน Google Maps"}
           </a>
           {day.stops.length > MAX_STOPS && (
-            <p className="drag-hint">The map shows the first {MAX_STOPS} places of this day.</p>
+            <p className="drag-hint">แผนที่แสดงแค่ {MAX_STOPS} สถานที่แรกของวันนี้</p>
           )}
         </>
       )}

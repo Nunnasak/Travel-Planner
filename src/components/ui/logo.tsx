@@ -4,17 +4,17 @@ export function Logo({ className }: { className?: string }) {
     <svg viewBox="0 0 120 152" aria-hidden="true" className={className}>
       <path
         d="M 60 0 C 93 0 120 27 120 60 C 120 92 90 118 70 146 C 66 152 54 152 50 146 C 30 118 0 92 0 60 C 0 27 27 0 60 0 Z"
-        fill="#19B5A5"
+        style={{ fill: "var(--logo-pin, var(--primary))" }}
       />
       <path
         d="M 24 66 C 32 42 48 42 60 60 C 72 78 88 78 96 54"
         fill="none"
-        stroke="#fff"
+        style={{ stroke: "var(--logo-wave, var(--on-accent))" }}
         strokeWidth="9"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle cx="96" cy="54" r="9" fill="#FFC93C" />
+      <circle cx="96" cy="54" r="9" style={{ fill: "var(--route)" }} />
     </svg>
   );
 }

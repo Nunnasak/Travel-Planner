@@ -1,5 +1,6 @@
+import Link from "next/link";
+import DiscoverQuery from "@/components/discover/DiscoverQuery";
 import PlanCard from "@/components/discover/PlanCard";
-import FilterPanel from "@/components/discover/FilterPanel";
 import Pagination from "@/components/discover/Pagination";
 import { ZodError } from "zod";
 import { discoveryService } from "@/infrastructure/container";
@@ -35,17 +36,26 @@ export default async function DiscoverPage({ searchParams }: { searchParams: SP 
     orNull(discoveryService.listProvinces()),
   ]);
 
+  const filtered = filters.size > 0;
+  const hasFilters = DISCOVER_FILTER_KEYS.some((k) => get(k));
+  const clearHref = get("q") ? `/discover?${new URLSearchParams({ q: get("q") })}` : "/discover";
+
   return (
-    <div className="page-content">
-      <div className="page-header">
-        <h1>Discover</h1>
-        <FilterPanel provinces={provinces ?? []} />
+    <div className="page-content discover-page">
+      <DiscoverQuery provinces={provinces ?? []} />
+
+      <div className="results-bar">
+        <p className="results-count">{data ? `${data.total} แผน` : ""}</p>
+        {hasFilters && <Link href={clearHref} className="results-clear">ล้างตัวกรอง</Link>}
       </div>
 
       {!data ? (
-        <p className="empty">Couldn't load plans. Please try again.</p>
+        <p className="empty">โหลดแผนไม่สำเร็จ รีเฟรชหน้าแล้วลองอีกครั้ง</p>
       ) : data.items.length === 0 ? (
-        <p className="empty">No plans match your search.</p>
+        <div className="empty">
+          <p>{filtered ? "ไม่มีแผนที่ตรงกับที่ค้นหา" : "ยังไม่มีใครโพสต์แผนเที่ยว"}</p>
+          {filtered && <Link href="/discover" className="empty-action">ล้างการค้นหา</Link>}
+        </div>
       ) : (
         <>
           <section className="plan-grid">

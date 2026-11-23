@@ -6,7 +6,7 @@
   height: 34px;
   padding: 0 10px 0 12px;
   border-radius: 10px;
-  color: #1f2d2d;
+  color: var(--ink);
   font: inherit;
   font-size: 13px;
   font-weight: 600;
@@ -17,12 +17,12 @@
 
 .menu-button-outline {
   min-width: 96px;
-  border: 1px solid #d5c7aa;
-  background: #fff;
+  border: 1px solid var(--rule-strong);
+  background: var(--surface);
 }
 
 .menu-button-outline:hover:not(:disabled) {
-  border-color: #19b5a5;
+  border-color: var(--primary);
 }
 
 .menu-button-plain {
@@ -33,16 +33,16 @@
 }
 
 .menu-button-plain:hover:not(:disabled) {
-  background: #fff8ec;
+  background: var(--surface-sunken);
 }
 
 .menu-button[aria-expanded="true"] {
-  border-color: #19b5a5;
-  box-shadow: 0 0 0 3px rgba(25, 181, 165, 0.15);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--focus);
 }
 
 .menu-button:focus-visible {
-  outline: 2px solid #19b5a5;
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 
@@ -55,7 +55,7 @@
   flex: none;
   width: 10px;
   height: 10px;
-  color: #6b7c7c;
+  color: var(--ink-soft);
   transition: transform 0.2s;
 }
 
@@ -73,10 +73,10 @@
   padding: 6px;
   overflow-y: auto;
   list-style: none;
-  border: 1px solid #eadfcb;
+  border: 1px solid var(--rule);
   border-radius: 14px;
-  background: #fff;
-  box-shadow: 0 12px 28px rgba(11, 93, 91, 0.18);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
 }
 
 .menu-list:focus {
@@ -94,11 +94,11 @@
 }
 
 .menu-option.is-active {
-  background: #fff8ec;
+  background: var(--surface-sunken);
 }
 
 .menu-option[aria-selected="true"] {
-  background: #d3f3ee;
+  background: var(--primary-soft);
 }
 
 .menu-option-text {
@@ -107,13 +107,13 @@
 }
 
 .menu-option-text strong {
-  color: #1f2d2d;
+  color: var(--ink);
   font-size: 13px;
   font-weight: 600;
 }
 
 .menu-option-text span {
-  color: #6b7c7c;
+  color: var(--ink-soft);
   font-size: 12px;
 }
 
@@ -121,7 +121,7 @@
   flex: none;
   width: 16px;
   height: 16px;
-  color: #0b8478;
+  color: var(--primary-text);
 }
 
 .menu-button-block {
@@ -136,9 +136,9 @@
 }
 
 .menu-button.is-placeholder > span {
-  color: #8a8d8a;
+  color: var(--ink-faint);
 }
 
 .menu-button[aria-invalid="true"] {
-  border-color: var(--error);
+  border-color: var(--lotus);
 }

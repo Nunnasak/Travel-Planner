@@ -5,8 +5,10 @@
 .field label {
   display: block;
   margin-bottom: 6px;
-  font-size: 13px;
-  font-weight: 600;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 500;
 }
 
 .input-wrap {
@@ -15,32 +17,32 @@
 
 .field input {
   width: 100%;
-  height: 46px;
+  height: 48px;
   padding: 0 14px;
-  border: 1px solid var(--input-border);
-  border-radius: 12px;
-  background: var(--white);
+  border: 1.5px solid var(--rule-strong);
+  border-radius: 10px;
+  background: var(--surface);
   font: inherit;
-  color: var(--text);
+  color: var(--ink);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .field input::placeholder {
-  color: #9aa8a8;
+  color: var(--ink-faint);
 }
 
 .field input:focus {
   outline: none;
-  border-color: var(--teal);
-  box-shadow: 0 0 0 4px rgba(25, 181, 165, 0.18);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--focus);
 }
 
 .field input[aria-invalid="true"] {
-  border-color: var(--error);
+  border-color: var(--lotus);
 }
 
 .field input[aria-invalid="true"]:focus {
-  box-shadow: 0 0 0 4px rgba(192, 57, 43, 0.15);
+  box-shadow: 0 0 0 4px var(--lotus-ring);
 }
 
 .input-wrap input {
@@ -50,15 +52,15 @@
 .field-error {
   margin: 6px 0 0;
   font-size: 12.5px;
-  color: var(--error);
+  color: var(--lotus);
 }
 
 .form-error {
   margin: 0 0 14px;
   padding: 10px 12px;
   border-radius: 12px;
-  background: #fdebe7;
-  color: var(--error);
+  background: var(--lotus-soft);
+  color: var(--lotus);
   font-size: 13.5px;
 }
 
@@ -66,8 +68,8 @@
   margin: 0;
   padding: 10px 14px;
   border-radius: 12px;
-  background: #d3f3ee;
-  color: #0b5d5b;
+  background: var(--primary-soft);
+  color: var(--primary-deep);
   font-size: 13px;
   word-break: break-all;
 }
@@ -82,19 +84,19 @@
   border: 0;
   border-radius: 10px;
   background: transparent;
-  color: var(--muted);
+  color: var(--ink-soft);
   display: grid;
   place-items: center;
   cursor: pointer;
 }
 
 .toggle-pass:hover {
-  background: #f3ecdd;
-  color: var(--teal-deep);
+  background: var(--surface-sunken);
+  color: var(--primary-deep);
 }
 
 .toggle-pass:focus-visible {
-  outline: 2px solid var(--teal);
+  outline: 2px solid var(--primary);
   outline-offset: 1px;
 }
 
@@ -118,24 +120,24 @@
   appearance: none;
   width: 18px;
   height: 18px;
-  border: 1.5px solid var(--input-border);
+  border: 1.5px solid var(--rule-strong);
   border-radius: 5px;
-  background: #fff;
+  background: var(--surface);
   display: grid;
   place-content: center;
   cursor: pointer;
 }
 
 .check input:checked {
-  background: #19b5a5;
-  border-color: #19b5a5;
+  background: var(--primary);
+  border-color: var(--primary);
 }
 
 .check input::after {
   content: "";
   width: 4px;
   height: 8px;
-  border: solid #fff;
+  border: solid var(--surface);
   border-width: 0 2px 2px 0;
   transform: rotate(45deg) scale(0);
   transition: transform 0.12s;
@@ -155,7 +157,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #1f2d2d;
+  color: var(--ink);
   font-size: 13px;
   cursor: pointer;
   user-select: none;
@@ -172,14 +174,14 @@
   width: 14px;
   height: 14px;
   margin: 0;
-  border: 1px solid #d5c7aa;
+  border: 1px solid var(--rule-strong);
   border-radius: 4px;
-  background: #fff;
+  background: var(--surface);
 }
 
 .check-row input[type="checkbox"]:checked {
-  border-color: #19b5a5;
-  background: #19b5a5;
+  border-color: var(--primary);
+  background: var(--primary);
 }
 
 .check-box {
@@ -187,13 +189,13 @@
   height: 18px;
   flex-shrink: 0;
   border-radius: 5px;
-  border: 1.5px solid #dfd6c2;
-  background-color: #ffffff;
+  border: 1.5px solid var(--rule-strong);
+  background-color: var(--surface);
   transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
 }
 
 .check-row:hover .check-box {
-  border-color: #bdb096;
+  border-color: var(--ink-faint);
 }
 
 .check-row:active .check-box {
@@ -201,20 +203,20 @@
 }
 
 .check-row.is-checked .check-box {
-  background-color: #12b2a6;
-  border-color: #12b2a6;
+  background-color: var(--primary);
+  border-color: var(--primary);
 }
 
 .check-label {
   font-size: 14.5px;
   font-weight: 400;
-  color: #3a3d3a;
+  color: var(--ink);
   transition: color 0.2s ease, font-weight 0.15s ease;
 }
 
 .check-row.is-checked .check-label {
   font-weight: 700;
-  color: #232523;
+  color: var(--ink);
 }
 
 .stepper {
@@ -223,7 +225,7 @@
   justify-content: space-between;
   height: 38px;
   padding: 0 6px;
-  border: 1px solid #d5c7aa;
+  border: 1px solid var(--rule-strong);
   border-radius: 10px;
 }
 
@@ -232,8 +234,8 @@
   height: 28px;
   border: 0;
   border-radius: 8px;
-  background: #fff8ec;
-  color: #0b5d5b;
+  background: var(--surface-sunken);
+  color: var(--primary-deep);
   font-size: 16px;
   cursor: pointer;
 }
@@ -244,7 +246,7 @@
 }
 
 .stepper span {
-  color: #0b5d5b;
+  color: var(--primary-deep);
   font-weight: 600;
   font-size: 13px;
 }
@@ -262,10 +264,10 @@
   align-items: center;
   gap: 14px;
   padding: 18px;
-  border: 1.5px dashed #b9e3dc;
+  border: 1.5px dashed var(--primary-line);
   border-radius: 14px;
-  background: #f6fcfb;
-  color: #0b5d5b;
+  background: var(--primary-soft);
+  color: var(--primary-deep);
   cursor: pointer;
   transition: border-color 0.15s, background-color 0.15s;
 }
@@ -273,8 +275,8 @@
 .dropzone:hover,
 .dropzone.is-dragging,
 .dropzone:focus-within {
-  border-color: #19b5a5;
-  background: #d3f3ee;
+  border-color: var(--primary);
+  background: var(--primary-soft);
 }
 
 .dropzone[aria-disabled="true"] {
@@ -299,7 +301,7 @@
 }
 
 .dropzone-text span {
-  color: #6b7c7c;
+  color: var(--ink-soft);
   font-size: 12.5px;
 }
 
@@ -315,6 +317,8 @@
 
 .dropzone-input {
   position: absolute;
+  top: 0;
+  left: 0;
   width: 1px;
   height: 1px;
   opacity: 0;
@@ -323,7 +327,7 @@
 
 .dropzone-done {
   margin: 0;
-  color: #0b8478;
+  color: var(--primary-text);
   font-size: 12.5px;
 }
 
@@ -331,7 +335,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #8a8d8a;
+  color: var(--ink-faint);
   font-size: 12px;
 }
 
@@ -340,7 +344,7 @@
   content: "";
   flex: 1;
   height: 1px;
-  background: #eadfcb;
+  background: var(--rule);
 }
 
 .uploaded-row {
@@ -349,10 +353,10 @@
   justify-content: space-between;
   gap: 12px;
   padding: 12px 14px;
-  border: 1px solid #b9e3dc;
+  border: 1px solid var(--primary-line);
   border-radius: 12px;
-  background: #f6fcfb;
-  color: #0b5d5b;
+  background: var(--primary-soft);
+  color: var(--primary-deep);
   font-size: 14px;
   font-weight: 500;
 }
@@ -366,6 +370,6 @@
 
 .field-hint {
   margin: 6px 0 0;
-  color: #6b7c7c;
+  color: var(--ink-soft);
   font-size: 12.5px;
 }

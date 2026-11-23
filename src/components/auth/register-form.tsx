@@ -12,6 +12,7 @@ import {
   USERNAME_MAX_LENGTH,
   USERNAME_MIN_LENGTH,
 } from "@/lib/validation";
+import { NETWORK_ERROR } from "@/lib/messages";
 
 const FIELDS = ["username", "email", "password", "confirm"] as const;
 type Field = (typeof FIELDS)[number];
@@ -45,19 +46,19 @@ export function RegisterForm() {
     const next: Errors = {};
 
     if (username.length < USERNAME_MIN_LENGTH)
-      next.username = `Username must be at least ${USERNAME_MIN_LENGTH} characters.`;
+      next.username = `ชื่อผู้ใช้ต้องมีอย่างน้อย ${USERNAME_MIN_LENGTH} ตัวอักษร`;
     else if (username.length > USERNAME_MAX_LENGTH)
-      next.username = `Username must be ${USERNAME_MAX_LENGTH} characters or fewer.`;
+      next.username = `ชื่อผู้ใช้ต้องไม่เกิน ${USERNAME_MAX_LENGTH} ตัวอักษร`;
 
-    if (!email) next.email = "Enter your email.";
+    if (!email) next.email = "ใส่อีเมล";
     else if (!EMAIL_PATTERN.test(email))
-      next.email = "Enter a valid email, like name@example.com.";
+      next.email = "ใส่อีเมลให้ถูกรูปแบบ เช่น name@example.com";
 
     if (password.length < PASSWORD_MIN_LENGTH)
-      next.password = `Password must be at least ${PASSWORD_MIN_LENGTH} characters.`;
+      next.password = `รหัสผ่านต้องมีอย่างน้อย ${PASSWORD_MIN_LENGTH} ตัวอักษร`;
 
-    if (!confirm) next.confirm = "Re-enter your password.";
-    else if (confirm !== password) next.confirm = "Passwords do not match.";
+    if (!confirm) next.confirm = "ใส่รหัสผ่านอีกครั้ง";
+    else if (confirm !== password) next.confirm = "รหัสผ่านทั้งสองช่องไม่ตรงกัน";
 
     setErrors(next);
     if (Object.keys(next).length > 0) return;
@@ -83,35 +84,35 @@ export function RegisterForm() {
         setFormError(
           result.data.message ??
             (result.status === 409
-              ? "That email or username is already taken."
-              : "Could not create the account. Please try again.")
+              ? "อีเมลหรือชื่อผู้ใช้นี้มีคนใช้แล้ว"
+              : "สมัครสมาชิกไม่สำเร็จ ลองอีกครั้ง")
         );
       }
     } catch {
-      setFormError("Cannot reach the server. Check your connection and try again.");
+      setFormError(NETWORK_ERROR);
     }
     setLoading(false);
   }
 
   return (
     <section className="auth-card">
-      <h1>Sign up</h1>
+      <h1>สมัครสมาชิก</h1>
       <p className="auth-subtitle">สมัครบัญชีเพื่อเริ่มต้นสร้างแผนการท่องเที่ยว</p>
 
       <form onSubmit={handleSubmit} noValidate>
         <Input
-          label="Username"
+          label="ชื่อผู้ใช้"
           name="username"
           type="text"
           autoComplete="username"
-          placeholder="Choose a username"
+          placeholder="ตั้งชื่อผู้ใช้"
           value={values.username}
           onChange={(e) => update("username", e.target.value)}
           error={errors.username}
         />
 
         <Input
-          label="Email"
+          label="อีเมล"
           name="email"
           type="email"
           autoComplete="email"
@@ -122,22 +123,22 @@ export function RegisterForm() {
         />
 
         <Input
-          label="Password"
+          label="รหัสผ่าน"
           name="password"
           type="password"
           autoComplete="new-password"
-          placeholder="At least 8 characters"
+          placeholder="อย่างน้อย 8 ตัวอักษร"
           value={values.password}
           onChange={(e) => update("password", e.target.value)}
           error={errors.password}
         />
 
         <Input
-          label="Confirm password"
+          label="ยืนยันรหัสผ่าน"
           name="confirm"
           type="password"
           autoComplete="new-password"
-          placeholder="Re-enter your password"
+          placeholder="ใส่รหัสผ่านอีกครั้ง"
           value={values.confirm}
           onChange={(e) => update("confirm", e.target.value)}
           error={errors.confirm}
@@ -149,15 +150,15 @@ export function RegisterForm() {
           </p>
         )}
 
-        <Button type="submit" loading={loading} loadingText="Creating account...">
-          Sign up
+        <Button type="submit" loading={loading} loadingText="กำลังสมัครสมาชิก...">
+          สมัครสมาชิก
         </Button>
       </form>
 
       <p className="auth-switch">
         มีบัญชีอยู่แล้ว?{" "}
         <Link href="/login" className="link">
-          Log in
+          เข้าสู่ระบบ
         </Link>
       </p>
     </section>

@@ -43,7 +43,7 @@ export function ProfileSection({
 
     const trimmed = draft.trim();
     if (trimmed.length < USERNAME_MIN_LENGTH || trimmed.length > USERNAME_MAX_LENGTH) {
-      setError(`Username must be ${USERNAME_MIN_LENGTH}-${USERNAME_MAX_LENGTH} characters.`);
+      setError(`ชื่อผู้ใช้ต้องมี ${USERNAME_MIN_LENGTH}-${USERNAME_MAX_LENGTH} ตัวอักษร`);
       return;
     }
     if (trimmed === username) {
@@ -58,7 +58,7 @@ export function ProfileSection({
       setError("");
       setIsEditing(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not update username.");
+      setError(err instanceof Error ? err.message : "เปลี่ยนชื่อผู้ใช้ไม่สำเร็จ ลองอีกครั้ง");
     } finally {
       setIsSaving(false);
     }
@@ -91,7 +91,7 @@ export function ProfileSection({
           ) : (
             <div className={styles.reveal}>
               <label htmlFor="account-username-input" className={styles.editLabel}>
-                Username
+                ชื่อผู้ใช้
               </label>
               <div className={styles.editControls}>
                 <input
@@ -103,17 +103,17 @@ export function ProfileSection({
                     if (error) setError("");
                   }}
                   onKeyDown={handleKeyDown}
-                  placeholder="Enter username"
+                  placeholder="ใส่ชื่อผู้ใช้ใหม่"
                   autoComplete="username"
                   disabled={isSaving}
                   className={styles.editInput}
                   autoFocus
                 />
                 <AccountButton size="sm" onClick={save} disabled={isSaving}>
-                  {isSaving ? "Saving..." : "Save"}
+                  {isSaving ? "กำลังบันทึก..." : "บันทึก"}
                 </AccountButton>
                 <AccountButton variant="secondary" size="sm" onClick={cancelEditing} disabled={isSaving}>
-                  Cancel
+                  ยกเลิก
                 </AccountButton>
               </div>
               {error && (
@@ -129,7 +129,7 @@ export function ProfileSection({
 
       {!isEditing && (
         <AccountButton variant="outline" onClick={startEditing}>
-          Change username
+          เปลี่ยนชื่อผู้ใช้
         </AccountButton>
       )}
     </div>

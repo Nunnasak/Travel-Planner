@@ -62,7 +62,7 @@ export function PasswordField({
         <button
           type="button"
           onClick={() => setVisible((prev) => !prev)}
-          aria-label={`Show ${label.toLowerCase()}`}
+          aria-label={`แสดง${label}`}
           aria-pressed={visible}
           className={styles.fieldToggle}
         >

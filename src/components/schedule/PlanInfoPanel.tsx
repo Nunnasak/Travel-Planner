@@ -14,11 +14,11 @@ type Props = {
 };
 
 function metaLine(plan: ScheduleDetail, days: number) {
-  const parts = [`${days} ${days === 1 ? "day" : "days"}`, plan.post ? "Posted on Discover" : "Private"];
+  const parts = [`${days} วัน`, plan.post ? "โพสต์ในหน้าสำรวจทริปแล้ว" : "ส่วนตัว"];
   if (plan.member_count > 0) {
-    parts.push(`Shared with ${plan.member_count} ${plan.member_count === 1 ? "person" : "people"}`);
+    parts.push(`แชร์กับ ${plan.member_count} คน`);
   }
-  if (plan.access !== "owner") parts.push(`by ${plan.owner.username}`);
+  if (plan.access !== "owner") parts.push(`โดย ${plan.owner.username}`);
   return parts.join(" · ");
 }
 
@@ -72,16 +72,16 @@ export default function PlanInfoPanel({ plan, onSave }: Props) {
         {plan.cover_url ? (
           <CoverImage src={plan.cover_url} alt={plan.schedule_name} sizes="240px" eager />
         ) : (
-          <span className="cover-badge">IMG</span>
+          <span className="cover-badge">ไม่มีรูป</span>
         )}
         {editable && !coverOpen && (
           <span className="cover-actions">
             <button type="button" className="cover-action" onClick={() => setCoverOpen(true)}>
-              {plan.cover_url ? "Change cover" : "Add cover"}
+              {plan.cover_url ? "เปลี่ยนรูปปก" : "เพิ่มรูปปก"}
             </button>
             {plan.cover_url && (
               <button type="button" className="cover-action" onClick={() => saveCover(null)}>
-                Remove
+                ลบรูป
               </button>
             )}
           </span>
@@ -94,8 +94,8 @@ export default function PlanInfoPanel({ plan, onSave }: Props) {
             <input
               className="inline-field"
               type="url"
-              placeholder="or paste a link (https://…)"
-              aria-label="Cover image URL"
+              placeholder="หรือวางลิงก์รูป (https://…)"
+              aria-label="ลิงก์รูปปก"
               value={coverDraft}
               onChange={(e) => setCoverDraft(e.target.value)}
               onKeyDown={(e) => {
@@ -104,33 +104,33 @@ export default function PlanInfoPanel({ plan, onSave }: Props) {
               }}
             />
             <button type="button" className="btn-outline small" onClick={() => saveCover(coverDraft)}>
-              Use link
+              ใช้ลิงก์นี้
             </button>
           </div>
           <button type="button" className="cover-cancel" onClick={cancelCover}>
-            Cancel
+            ยกเลิก
           </button>
         </div>
       )}
 
-      <h2>Description</h2>
+      <h2>รายละเอียด</h2>
       {editable ? (
         <textarea
           className="inline-field inline-text"
-          placeholder="Add a description…"
-          aria-label="Description"
+          placeholder="เขียนรายละเอียดทริป…"
+          aria-label="รายละเอียด"
           maxLength={1000}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           onBlur={saveDescription}
         />
       ) : (
-        <p className="detail-desc">{plan.description || "No description yet."}</p>
+        <p className="detail-desc">{plan.description || "ยังไม่มีคำอธิบาย"}</p>
       )}
 
-      <h2>Category</h2>
+      <h2>หมวดหมู่</h2>
       {editable ? (
-        <div className="category-picker" role="group" aria-label="Categories">
+        <div className="category-picker" role="group" aria-label="หมวดหมู่">
           {CATEGORY_KEYS.map((key) => {
             const picked = categories.includes(key);
             const last = picked && categories.length === 1;
@@ -140,7 +140,7 @@ export default function PlanInfoPanel({ plan, onSave }: Props) {
                 type="button"
                 className={`category-option ${picked ? "is-checked" : ""}`}
                 aria-pressed={picked}
-                title={last ? "A plan needs at least one category" : undefined}
+                title={last ? "แผนต้องมีอย่างน้อย 1 หมวดหมู่" : undefined}
                 onClick={() => toggleCategory(key)}
               >
                 {categoryInfo(key).label}
@@ -154,17 +154,17 @@ export default function PlanInfoPanel({ plan, onSave }: Props) {
 
       {editable && (
         <>
-          <h2>Days</h2>
+          <h2>จำนวนวัน</h2>
           <div className="stepper days-stepper">
-            <button type="button" aria-label="One day less" disabled={days <= 1} onClick={() => changeDays(days - 1)}>
+            <button type="button" aria-label="ลดหนึ่งวัน" disabled={days <= 1} onClick={() => changeDays(days - 1)}>
               −
             </button>
             <span aria-live="polite">
-              {days} {days === 1 ? "day" : "days"}
+              {days} วัน
             </span>
             <button
               type="button"
-              aria-label="One day more"
+              aria-label="เพิ่มหนึ่งวัน"
               disabled={days >= MAX_DAYS}
               onClick={() => changeDays(days + 1)}
             >
