@@ -17,7 +17,7 @@ const MAX_STOPS = 10;
 function placeQuery(stop: MapStop) {
   const { name, city, latitude, longitude } = stop.location;
   if (latitude != null && longitude != null) return `${latitude},${longitude}`;
-  return `${name} ${city.city_name} ${city.province.province_name}`;
+  return `${name} ${city.city_name} ${city.province.province_name} ประเทศไทย`;
 }
 
 function embedUrl(stops: MapStop[]) {
