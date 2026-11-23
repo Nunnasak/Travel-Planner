@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { Role } from "../../src/generated/prisma/client";
+import { BadRequestError } from "@/core/errors/bad-request.error";
 import { ForbiddenError } from "@/core/errors/forbidden.error";
 import { NotFoundError } from "@/core/errors/not-found.error";
 import { DiscoveryService } from "@/core/service/discovery.service";
@@ -22,6 +23,10 @@ async function add(locationIndex: number, dayNo: number, time = "09:00") {
   });
 }
 
+async function setDays(total: number) {
+  await schedules.update(ctx.scheduleId, ctx.userId, { total_day: total });
+}
+
 async function postStops(postId: number) {
   const post = await discovery.getPublic(postId);
   return post.days.flatMap((day) => day.stops.map((stop) => `${day.day_no}:${stop.location.name}`));
@@ -34,6 +39,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   await resetDb(prisma);
   ctx = await seedPlanContext(prisma);
+  await setDays(1);
 });
 
 afterAll(async () => {
@@ -60,6 +66,7 @@ describe("ScheduleService.publish", () => {
     await add(0, 1);
     const post = await schedules.publish(ctx.scheduleId, ctx.userId);
 
+    await setDays(2);
     await add(1, 2);
     await schedules.update(ctx.scheduleId, ctx.userId, { schedule_name: "Changed later" });
 
@@ -70,6 +77,7 @@ describe("ScheduleService.publish", () => {
   it("updates the same post when posted again", async () => {
     await add(0, 1);
     const first = await schedules.publish(ctx.scheduleId, ctx.userId);
+    await setDays(2);
     await add(1, 2);
     await schedules.update(ctx.scheduleId, ctx.userId, { schedule_name: "Changed later" });
 
@@ -82,6 +90,7 @@ describe("ScheduleService.publish", () => {
   });
 
   it("keeps the post out of My Schedule and out of plan editing", async () => {
+    await add(0, 1);
     const post = await schedules.publish(ctx.scheduleId, ctx.userId);
 
     const mine = await schedules.listMine(ctx.userId);
@@ -95,10 +104,33 @@ describe("ScheduleService.publish", () => {
 
   it("only lets the owner post or remove the post", async () => {
     await addMember(prisma, ctx.scheduleId, ctx.otherUserId, Role.EDITOR);
+    await add(0, 1);
     await schedules.publish(ctx.scheduleId, ctx.userId);
 
     await expect(schedules.publish(ctx.scheduleId, ctx.otherUserId)).rejects.toBeInstanceOf(ForbiddenError);
     await expect(schedules.unpublish(ctx.scheduleId, ctx.otherUserId)).rejects.toBeInstanceOf(ForbiddenError);
+  });
+});
+
+describe("ScheduleService.publish with empty days", () => {
+  it("refuses to post while a day has no places", async () => {
+    await setDays(3);
+    await add(0, 1);
+
+    const attempt = schedules.publish(ctx.scheduleId, ctx.userId);
+
+    await expect(attempt).rejects.toBeInstanceOf(BadRequestError);
+    await expect(attempt).rejects.toThrow("Add at least one place to day 2, 3 before posting.");
+    await expect(prisma.schedule.count({ where: { is_public: true } })).resolves.toBe(0);
+  });
+
+  it("refuses to update an existing post once a day is empty", async () => {
+    await add(0, 1);
+    const post = await schedules.publish(ctx.scheduleId, ctx.userId);
+    await setDays(2);
+
+    await expect(schedules.publish(ctx.scheduleId, ctx.userId)).rejects.toBeInstanceOf(BadRequestError);
+    await expect(postStops(post.schedule_id)).resolves.toEqual(["1:Wat Phra That Doi Suthep"]);
   });
 });
 
@@ -115,6 +147,7 @@ describe("ScheduleService.unpublish", () => {
   });
 
   it("removes the post when the plan is deleted", async () => {
+    await add(0, 1);
     await schedules.publish(ctx.scheduleId, ctx.userId);
 
     await schedules.delete(ctx.scheduleId, ctx.userId);

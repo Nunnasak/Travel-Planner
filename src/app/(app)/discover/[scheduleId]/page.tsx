@@ -8,6 +8,7 @@ import { idSchema } from "@/core/schema/discovery.schema";
 import { discoveryService } from "@/infrastructure/container";
 import { coverTintClass, TINTS, tintClass } from "@/lib/categories";
 import type { PlanDetail as Plan } from "@/lib/discovery";
+import { placeLine } from "@/lib/place";
 import { formatVisitTime } from "@/lib/schedule";
 
 async function loadPlan(scheduleId: string): Promise<Plan | null> {
@@ -81,7 +82,7 @@ export default async function PlanDetail({ params }: { params: Promise<{ schedul
                   </div>
                   <div className="stop-info">
                     <strong>{s.location.name}</strong>
-                    <span>{s.location.address}</span>
+                    <span>{placeLine(s.location)}</span>
                   </div>
                 </div>
               ))}

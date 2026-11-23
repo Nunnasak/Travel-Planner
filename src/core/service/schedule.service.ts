@@ -1,4 +1,5 @@
 import type { Prisma, PrismaClient } from "../../generated/prisma/client";
+import { emptyDayNumbers } from "../domain/schedule";
 import { BadRequestError } from "../errors/bad-request.error";
 import { ForbiddenError } from "../errors/forbidden.error";
 import { NotFoundError } from "../errors/not-found.error";
@@ -203,6 +204,10 @@ export class ScheduleService {
       select: { ...SNAPSHOT_SELECT, post: POST_SELECT },
     });
     const { items, post, ...fields } = source;
+    const emptyDays = emptyDayNumbers(fields.total_day, items);
+    if (emptyDays.length > 0) {
+      throw new BadRequestError(`Add at least one place to day ${emptyDays.join(", ")} before posting.`);
+    }
 
     return this.prisma.$transaction(async (tx) => {
       if (post) {

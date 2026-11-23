@@ -51,7 +51,6 @@ const EXACT: Record<string, string> = {
   "Place not found in this plan.": "ไม่พบสถานที่นี้ในแผน",
   "That place no longer exists.": "สถานที่นี้ถูกลบไปแล้ว",
   "Enter the place name.": "ใส่ชื่อสถานที่",
-  "Enter the address.": "ใส่ที่อยู่",
   "Keep the name under 100 characters.": "ชื่อต้องไม่เกิน 100 ตัวอักษร",
   "Keep the name under 150 characters.": "ชื่อต้องไม่เกิน 150 ตัวอักษร",
   "Keep the address under 300 characters.": "ที่อยู่ต้องไม่เกิน 300 ตัวอักษร",
@@ -81,6 +80,10 @@ const PATTERNS: [RegExp, (match: RegExpMatchArray) => string][] = [
     (m) => `วันที่ ${m[1]} ยังมีสถานที่อยู่ ลบออกก่อนลดจำนวนวัน`,
   ],
   [/^Must be a whole number from 1 to \d+\.$/, () => "ต้องเป็นจำนวนเต็มตั้งแต่ 1 ขึ้นไป"],
+  [
+    /^Add at least one place to day ([\d, ]+) before posting\.$/,
+    (m) => `เพิ่มสถานที่ในวันที่ ${m[1]} ก่อนโพสต์ ทุกวันต้องมีอย่างน้อย 1 ที่`,
+  ],
 ];
 
 export function toThai(message: string): string;

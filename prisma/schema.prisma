@@ -111,7 +111,7 @@ model ScheduleItem {
 model Location {
   location_id Int    @id @default(autoincrement())
   name        String
-  address     String
+  address     String?
   city_id     Int
   image_url   String?
   map_url     String?

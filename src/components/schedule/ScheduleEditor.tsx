@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { emptyDayNumbers } from "@/core/domain/schedule";
 import type { ScheduleDetail } from "@/lib/schedule";
 import DayList from "./DayList";
 import InlineTitle from "./InlineTitle";
@@ -48,7 +49,16 @@ export default function ScheduleEditor({ plan }: { plan: ScheduleDetail }) {
         </aside>
       </div>
 
-      {sharing && <ShareDialog scheduleId={plan.schedule_id} onClose={() => setSharing(false)} />}
+      {sharing && (
+        <ShareDialog
+          scheduleId={plan.schedule_id}
+          emptyDays={emptyDayNumbers(
+            plan.total_day,
+            plan.days.filter((day) => day.stops.length > 0),
+          )}
+          onClose={() => setSharing(false)}
+        />
+      )}
     </div>
   );
 }

@@ -132,7 +132,7 @@ describe("ScheduleService.update / delete", () => {
 
 describe("ScheduleService.copy", () => {
   it("copies a Discover post with every stop into a new private plan of the user", async () => {
-    await schedules.update(ctx.scheduleId, ctx.userId, { categories: ["NATURE", "CULTURE"] });
+    await schedules.update(ctx.scheduleId, ctx.userId, { categories: ["NATURE", "CULTURE"], total_day: 2 });
     await items.addToSchedule(ctx.scheduleId, ctx.userId, { location_id: ctx.locationIds[0], day_no: 1, visit_time: "09:00" });
     await items.addToSchedule(ctx.scheduleId, ctx.userId, { location_id: ctx.locationIds[1], day_no: 1, visit_time: "11:00" });
     await items.addToSchedule(ctx.scheduleId, ctx.userId, { location_id: ctx.locationIds[2], day_no: 2, visit_time: "08:30" });
@@ -154,11 +154,11 @@ describe("ScheduleService.copy", () => {
         [ctx.locationIds[1], "11:00"],
       ],
       [[ctx.locationIds[2], "08:30"]],
-      [],
     ]);
   });
 
   it("leaves the post untouched", async () => {
+    await schedules.update(ctx.scheduleId, ctx.userId, { total_day: 1 });
     await items.addToSchedule(ctx.scheduleId, ctx.userId, { location_id: ctx.locationId, day_no: 1, visit_time: "09:00" });
     const post = await schedules.publish(ctx.scheduleId, ctx.userId);
 
