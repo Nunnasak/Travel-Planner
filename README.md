@@ -173,6 +173,8 @@ copy .env.example .env
 DATABASE_URL="postgresql://travel_user:travel_password@localhost:5432/travel_planner?schema=public"
 ```
 
+หากเครื่องมี PostgreSQL อื่นใช้ port 5432 อยู่แล้ว (พบบ่อยบน macOS) ให้ตั้ง `POSTGRES_PORT` ดูวิธีใน [ปัญหาที่ 4](#ปัญหาที่-4-port-3000-หรือ-5432-ถูกใช้งานอยู่)
+
 ไฟล์ `.env` ถูก exclude จาก Git ส่วน `.env.example` ใช้เป็นตัวอย่างสำหรับทีม
 
 #### แผนที่ Google Maps (ไม่ต้องใช้ API key)
@@ -508,7 +510,23 @@ docker compose logs database
 npm run dev -- --port 3001
 ```
 
-สำหรับ Docker ให้เปลี่ยน Host port ใน `docker-compose.yml` เช่น `3001:3000` หรือ `127.0.0.1:5433:5432` หากเปลี่ยน Host port ของฐานข้อมูลเป็น 5433 ให้ปรับ `.env` ของเครื่องเป็น `localhost:5433` ด้วย ส่วน URL ภายใน Docker ยังคงใช้ `database:5432`
+สำหรับ app container ให้เปลี่ยน Host port ใน `docker-compose.yml` เช่น `3001:3000`
+
+สำหรับฐานข้อมูล มักเกิดบน macOS ที่ติดตั้ง PostgreSQL ไว้ในเครื่องแล้ว (เช่น Postgres.app, Homebrew หรือตัวติดตั้งของ EDB) ซึ่งจะใช้ port 5432 อยู่ และ `docker compose up -d database` จะแจ้ง `bind: address already in use` ตรวจสอบว่าโปรแกรมใดใช้ port อยู่ได้ด้วย:
+
+```bash
+netstat -anv -p tcp | grep '\.5432 '
+```
+
+ไม่ต้องแก้ `docker-compose.yml` ให้ตั้งค่า `POSTGRES_PORT` ใน `.env` เป็น port ว่าง และปรับ port ใน `DATABASE_URL` กับ `TEST_DATABASE_URL` ให้ตรงกัน:
+
+```dotenv
+POSTGRES_PORT=5433
+DATABASE_URL="postgresql://travel_user:travel_password@localhost:5433/travel_planner?schema=public"
+TEST_DATABASE_URL="postgresql://travel_user:travel_password@localhost:5433/travel_planner_test?schema=public"
+```
+
+แล้วรัน `docker compose up -d database` ใหม่ Docker Compose อ่าน `POSTGRES_PORT` จาก `.env` โดยอัตโนมัติ (ค่าเริ่มต้นคือ 5432) ส่วน URL ภายใน Docker ยังคงใช้ `database:5432`
 
 ### ปัญหาที่ 5: Docker ติดต่อ Engine ไม่ได้
 
