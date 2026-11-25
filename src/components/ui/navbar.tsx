@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { Logo } from "@/components/ui/logo";
 import NavSearch, { NavSearchFallback, hasSearch } from "@/components/ui/nav-search";
 import UserMenu, { type NavUser } from "@/components/ui/user-menu";
+import { useSessionSync } from "@/components/ui/use-session-sync";
 
 const LINKS = [
   { label: "สำรวจทริป", href: "/discover" },
@@ -21,6 +22,7 @@ function isActive(pathname: string, href: string) {
 export default function Navbar({ user }: { user: NavUser | null }) {
   const pathname = usePathname();
   const searchable = hasSearch(pathname);
+  useSessionSync(user);
 
   return (
     <header className={`nav${searchable ? " has-search" : ""}`}>
