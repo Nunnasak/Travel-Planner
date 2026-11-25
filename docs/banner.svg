@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-label="ไปเรื่อย วางแผนเที่ยวทีละวัน แล้วแชร์ให้เพื่อน ช่วยกันแก้">
+  <rect width="1200" height="300" rx="24" fill="#2a2a72"/>
+  <path d="M640 230 C760 230 740 90 880 90 S1010 210 1080 160 S1150 70 1160 70" fill="none" stroke="#ffa400" stroke-width="10" stroke-linecap="round"/>
+  <g fill="#2a2a72" stroke="#ffa400" stroke-width="8">
+    <circle cx="640" cy="230" r="14"/>
+    <circle cx="880" cy="90" r="14"/>
+    <circle cx="1080" cy="160" r="14"/>
+    <circle cx="1160" cy="70" r="14"/>
+  </g>
+  <g font-family="'Bai Jamjuree','Noto Sans Thai','Leelawadee UI','Tahoma',sans-serif" fill="#ffffff">
+    <text x="72" y="140" font-size="76" font-weight="700">ไปเรื่อย</text>
+    <text x="74" y="196" font-size="28" fill="#eaf6ff">วางแผนเที่ยวทีละวัน แล้วแชร์ให้เพื่อน ช่วยกันแก้</text>
+    <text x="74" y="240" font-size="20" fill="#a9d8fb">Travel Planner · Next.js · Prisma · PostgreSQL</text>
+  </g>
+</svg>

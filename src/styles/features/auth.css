@@ -135,19 +135,35 @@
 @media (max-width: 860px) {
   .auth-page {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
   }
 
   .auth-art {
-    gap: 20px;
-    padding: 32px 16px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
   }
 
   .auth-art-title {
-    font-size: 26px;
+    font-size: 17px;
+    line-height: 1.4;
   }
 
   .auth-route {
-    max-width: 200px;
+    flex: none;
+    width: 96px;
+    max-width: none;
+  }
+
+  .auth-route path {
+    stroke-width: 14;
+  }
+
+  .auth-route circle {
+    r: 18px;
+    stroke-width: 12;
   }
 
   .auth-points {

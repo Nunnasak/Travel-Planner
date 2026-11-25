@@ -7,11 +7,13 @@ import InlineTitle from "./InlineTitle";
 import PlanInfoPanel from "./PlanInfoPanel";
 import PlanMapColumn from "./PlanMapColumn";
 import ShareDialog from "./ShareDialog";
+import { useLiveRefresh } from "./useLiveRefresh";
 import { usePlanPatch } from "./usePlanPatch";
 
 export default function ScheduleEditor({ plan }: { plan: ScheduleDetail }) {
   const { state, save } = usePlanPatch(plan.schedule_id);
   const [sharing, setSharing] = useState(false);
+  useLiveRefresh(plan.schedule_id, plan.version);
   const status = state.kind === "saving" ? "กำลังบันทึก…" : state.kind === "saved" ? "บันทึกแล้ว" : "";
 
   return (
