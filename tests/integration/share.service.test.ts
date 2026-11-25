@@ -179,3 +179,33 @@ describe("ShareService.joinByToken", () => {
     await expect(share.joinByToken(await tokenOf(), thirdUserId)).resolves.toBe(ctx.scheduleId);
   });
 });
+
+describe("ShareService.leave", () => {
+  it("lets a member leave and drops the plan from their list", async () => {
+    await addMember(prisma, ctx.scheduleId, ctx.otherUserId, Role.EDITOR);
+
+    await share.leave(ctx.scheduleId, ctx.otherUserId);
+
+    await expect(roleOf(ctx.otherUserId)).resolves.toBeNull();
+    const mine = await schedules.listMine(ctx.otherUserId);
+    expect(mine.map((plan) => plan.schedule_id)).not.toContain(ctx.scheduleId);
+  });
+
+  it("keeps the other members when one person leaves", async () => {
+    await addMember(prisma, ctx.scheduleId, ctx.otherUserId, Role.VIEWER);
+    await addMember(prisma, ctx.scheduleId, thirdUserId, Role.EDITOR);
+
+    await share.leave(ctx.scheduleId, ctx.otherUserId);
+
+    await expect(roleOf(thirdUserId)).resolves.toBe(Role.EDITOR);
+  });
+
+  it("does not let the owner leave their own plan", async () => {
+    await expect(share.leave(ctx.scheduleId, ctx.userId)).rejects.toBeInstanceOf(BadRequestError);
+    await expect(prisma.schedule.count({ where: { schedule_id: ctx.scheduleId } })).resolves.toBe(1);
+  });
+
+  it("hides the plan from someone who is not a member", async () => {
+    await expect(share.leave(ctx.scheduleId, ctx.otherUserId)).rejects.toBeInstanceOf(NotFoundError);
+  });
+});

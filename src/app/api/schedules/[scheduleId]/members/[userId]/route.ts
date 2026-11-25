@@ -28,6 +28,10 @@ export async function DELETE(_request: NextRequest, context: Context) {
   try {
     const userId = await requireUserId();
     const { scheduleId, memberId } = await ids(context);
+    if (memberId === userId) {
+      await shareService.leave(scheduleId, userId);
+      return new NextResponse(null, { status: 204 });
+    }
     return NextResponse.json(await shareService.removeMember(scheduleId, userId, memberId));
   } catch (error) {
     return errorResponse(error);
