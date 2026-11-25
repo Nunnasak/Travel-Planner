@@ -1,5 +1,5 @@
 import type { Prisma, PrismaClient } from "../../generated/prisma/client";
-import { emptyDayNumbers, unorderedDayNumbers } from "../domain/schedule";
+import { emptyDayNumbers, planVersion, unorderedDayNumbers } from "../domain/schedule";
 import { BadRequestError } from "../errors/bad-request.error";
 import { ForbiddenError } from "../errors/forbidden.error";
 import { NotFoundError } from "../errors/not-found.error";
@@ -132,6 +132,19 @@ export class ScheduleService {
     });
 
     const { items, _count, ...rest } = schedule;
+    const version = planVersion({
+      access,
+      updated_at: schedule.updated_at,
+      post: schedule.post,
+      member_count: _count.members,
+      items: items.map((item) => ({
+        item_id: item.item_id,
+        day_no: item.day_no,
+        sequence_no: item.sequence_no,
+        visit_time: formatTime(item.visit_time),
+        location_id: item.location.location_id,
+      })),
+    });
     const lastDay = Math.max(schedule.total_day, ...items.map((i) => i.day_no));
     const days = Array.from({ length: lastDay }, (_, index) => ({
       day_no: index + 1,
@@ -145,7 +158,30 @@ export class ScheduleService {
         })),
     }));
 
-    return { ...rest, access, can_edit: access !== "viewer", member_count: _count.members, days };
+    return { ...rest, access, can_edit: access !== "viewer", member_count: _count.members, days, version };
+  }
+
+  async getVersion(scheduleId: number, userId: number) {
+    const access = await this.access(scheduleId, userId);
+    const schedule = await this.prisma.schedule.findUniqueOrThrow({
+      where: { schedule_id: scheduleId },
+      select: {
+        updated_at: true,
+        post: POST_SELECT,
+        _count: { select: { members: true } },
+        items: {
+          orderBy: [...ORDERED_ITEMS],
+          select: { item_id: true, day_no: true, sequence_no: true, visit_time: true, location_id: true },
+        },
+      },
+    });
+    return planVersion({
+      access,
+      updated_at: schedule.updated_at,
+      post: schedule.post,
+      member_count: schedule._count.members,
+      items: schedule.items.map((item) => ({ ...item, visit_time: formatTime(item.visit_time) })),
+    });
   }
 
   async create(userId: number, input: unknown) {

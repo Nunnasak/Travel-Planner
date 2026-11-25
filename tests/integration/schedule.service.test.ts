@@ -183,3 +183,46 @@ describe("ScheduleService.copy", () => {
     });
   });
 });
+
+describe("ScheduleService.getVersion", () => {
+  async function version() {
+    return schedules.getVersion(ctx.scheduleId, ctx.userId);
+  }
+
+  it("matches the version sent with the plan page", async () => {
+    await items.addToSchedule(ctx.scheduleId, ctx.userId, { location_id: ctx.locationId, day_no: 1, visit_time: "09:00" });
+
+    const plan = await schedules.getForUser(ctx.scheduleId, ctx.userId);
+
+    await expect(version()).resolves.toBe(plan.version);
+  });
+
+  it("stays the same while nothing changes", async () => {
+    const first = await version();
+    await expect(version()).resolves.toBe(first);
+  });
+
+  it("changes when someone edits the places or the plan details", async () => {
+    await addMember(prisma, ctx.scheduleId, ctx.otherUserId, Role.EDITOR);
+    const seen = new Set([await version()]);
+
+    const item = await items.addToSchedule(ctx.scheduleId, ctx.otherUserId, {
+      location_id: ctx.locationId,
+      day_no: 1,
+      visit_time: "09:00",
+    });
+    seen.add(await version());
+    await items.editInSchedule(ctx.scheduleId, item.item_id, ctx.otherUserId, { visit_time: "10:15" });
+    seen.add(await version());
+    await schedules.update(ctx.scheduleId, ctx.otherUserId, { schedule_name: "Renamed by a friend" });
+    seen.add(await version());
+    await items.removeFromSchedule(ctx.scheduleId, item.item_id, ctx.otherUserId);
+    seen.add(await version());
+
+    expect(seen.size).toBe(5);
+  });
+
+  it("is hidden from someone who is not a member", async () => {
+    await expect(schedules.getVersion(ctx.scheduleId, ctx.otherUserId)).rejects.toBeInstanceOf(NotFoundError);
+  });
+});
