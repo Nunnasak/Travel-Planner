@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { pickFieldErrors, postJson } from "@/lib/api-client";
 import { NETWORK_ERROR } from "@/lib/messages";
+import { withNextPath } from "@/lib/redirect";
 import { EMAIL_PATTERN } from "@/lib/validation";
 
 type Field = "email" | "password";
@@ -128,7 +129,7 @@ export function LoginForm({ redirectTo = "/discover" }: { redirectTo?: string })
 
       <p className="auth-switch">
         ยังไม่มีบัญชี?{" "}
-        <Link href="/register" className="link">
+        <Link href={withNextPath("/register", redirectTo)} className="link">
           สมัครสมาชิก
         </Link>
       </p>

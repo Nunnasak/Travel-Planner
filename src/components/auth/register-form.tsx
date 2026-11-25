@@ -13,12 +13,13 @@ import {
   USERNAME_MIN_LENGTH,
 } from "@/lib/validation";
 import { NETWORK_ERROR } from "@/lib/messages";
+import { DEFAULT_NEXT_PATH, withNextPath } from "@/lib/redirect";
 
 const FIELDS = ["username", "email", "password", "confirm"] as const;
 type Field = (typeof FIELDS)[number];
 type Errors = Partial<Record<Field, string>>;
 
-export function RegisterForm() {
+export function RegisterForm({ redirectTo = DEFAULT_NEXT_PATH }: { redirectTo?: string }) {
   const router = useRouter();
   const [values, setValues] = useState<Record<Field, string>>({
     username: "",
@@ -73,7 +74,7 @@ export function RegisterForm() {
       });
 
       if (result.ok) {
-        router.push("/login");
+        router.push(withNextPath("/login", redirectTo));
         return;
       }
 
@@ -157,7 +158,7 @@ export function RegisterForm() {
 
       <p className="auth-switch">
         มีบัญชีอยู่แล้ว?{" "}
-        <Link href="/login" className="link">
+        <Link href={withNextPath("/login", redirectTo)} className="link">
           เข้าสู่ระบบ
         </Link>
       </p>
