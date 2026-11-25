@@ -29,6 +29,7 @@ const EXACT: Record<string, string> = {
   "Only the owner can delete this plan.": "เฉพาะเจ้าของแผนเท่านั้นที่ลบแผนนี้ได้",
   "Only the owner can post this plan to Discover.": "เฉพาะเจ้าของแผนเท่านั้นที่โพสต์แผนนี้ได้",
   "Only the owner can remove this plan from Discover.": "เฉพาะเจ้าของแผนเท่านั้นที่เอาโพสต์ออกได้",
+  "The owner can't leave their own plan.": "เจ้าของแผนออกจากแผนของตัวเองไม่ได้ ถ้าไม่ใช้แล้วให้ลบแผนแทน",
   "You already own this plan.": "คุณเป็นเจ้าของแผนนี้อยู่แล้ว",
   "That person doesn't have access to this plan.": "คนนี้ไม่มีสิทธิ์เข้าถึงแผนนี้",
   "No one has that username or email.": "ไม่พบผู้ใช้ที่มีชื่อหรืออีเมลนี้",

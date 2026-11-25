@@ -105,6 +105,12 @@ export class ShareService {
     return this.getSharing(scheduleId, ownerId);
   }
 
+  async leave(scheduleId: number, userId: number) {
+    const access = await this.schedules.access(scheduleId, userId);
+    if (access === "owner") throw new BadRequestError("The owner can't leave their own plan.");
+    await this.prisma.scheduleMember.deleteMany({ where: { schedule_id: scheduleId, user_id: userId } });
+  }
+
   async setLinkAccess(scheduleId: number, ownerId: number, input: unknown) {
     const data = linkAccessSchema.parse(input);
     await this.assertOwner(scheduleId, ownerId);

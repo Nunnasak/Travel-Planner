@@ -8,7 +8,7 @@ import SelectMenu, { type MenuOption } from "@/components/ui/select-menu";
 import type { MemberRole } from "@/core/schema/share.schema";
 import type { SharedPerson, Sharing } from "@/lib/schedule";
 
-type Props = { scheduleId: number; emptyDays: number[]; unorderedDays: number[]; onClose: () => void };
+type Props = { scheduleId: number; emptyDays?: number[]; unorderedDays?: number[]; onClose: () => void };
 const LISTED_DAYS = 5;
 const ROLE_LABEL: Record<MemberRole, string> = { VIEWER: "ดูได้อย่างเดียว", EDITOR: "แก้ไขได้" };
 
@@ -34,7 +34,7 @@ function dayList(days: number[]) {
   return rest > 0 ? `${shown} และอีก ${rest} วัน` : shown;
 }
 
-export default function ShareDialog({ scheduleId, emptyDays, unorderedDays, onClose }: Props) {
+export default function ShareDialog({ scheduleId, emptyDays = [], unorderedDays = [], onClose }: Props) {
   const router = useRouter();
   const [sharing, setSharing] = useState<Sharing | null>(null);
   const [loadError, setLoadError] = useState("");
